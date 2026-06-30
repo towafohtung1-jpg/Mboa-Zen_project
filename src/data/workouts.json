@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "figma_system_label": "Lion Lunges",
+    "target_muscle_group": "Quadriceps, Gluteal Complex, Pectorals",
+    "cultural_lineage_roots": "Fuses West African hunter tracking patterns with traditional Cameroonian dance openings.",
+    "archetypes": ["runner", "warrior"],
+    "duration_parameters": {
+      "default_active_seconds": 45,
+      "default_rest_seconds": 15,
+      "recommended_reps": 12
+    },
+    "movement_mechanics": [
+      "Stand with feet hip-width apart, keeping your core tight and hands anchored at your chest center.",
+      "Take a large controlled step backward with your right leg, lowering your hips until your back knee is hovering just above the ground.",
+      "As you drop into the lunge, explosively extend both arms straight out to your sides, opening your chest wide to emulate a lion tracking prey.",
+      "Drive through your front heel to return to the starting standing position while snapping your hands back to your chest center.",
+      "Alternate legs on the next rep and repeat fluidly, maintaining continuous control."
+    ],
+    "audio_coaching_cues": [
+      "Open the chest wide as you step back.",
+      "Keep your weight anchored firmly in your front heel.",
+      "Exhale sharply as you explode back to a standing position."
+    ]
+  },
+  {
+    "id": 2,
+    "figma_system_label": "Shaolin Push-Ups",
+    "target_muscle_group": "Triceps, Anterior Deltoids, Core Stabilizers",
+    "cultural_lineage_roots": "Derived directly from the core stability conditioning drills of ancient Chinese martial arts.",
+    "archetypes": ["warrior"],
+    "duration_parameters": {
+      "default_active_seconds": 40,
+      "default_rest_seconds": 20,
+      "recommended_reps": 10
+    },
+    "movement_mechanics": [
+      "Assume a strict high plank position, tracking your hands directly beneath your shoulders with your feet pressed close together.",
+      "Lower your entire torso toward the ground in a rigid line, keeping your elbows tucked tightly against your ribs to focus energy on the triceps.",
+      "Push through your palms to ascend, and as your arms reach full extension, explosively lift your right hand to tap your left shoulder.",
+      "Place your hand back down, lower into your next push-up rep, and tap your right shoulder with your left hand at the peak.",
+      "Keep your hips perfectly level throughout the entire set, resisting any side-to-side torso rocking."
+    ],
+    "audio_coaching_cues": [
+      "Lock your core tight like a wooden board.",
+      "Keep your elbows tucked into your ribs; don't let them flare.",
+      "Stabilize your hips completely before you tap your shoulder."
+    ]
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "coach_name": "Coach Tagne",
+    "specialty": "Ancestral Strength",
+    "hourly_rate": "$30/hr",
+    "status": "Available"
+  },
+  {
+    "id": 2,
+    "coach_name": "Coach Amina",
+    "specialty": "Nutritional Vitality",
+    "hourly_rate": "$45/hr",
+    "status": "Available"
+  }
+]

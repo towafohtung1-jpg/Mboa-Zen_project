@@ -1,0 +1,35 @@
+import { Proverb } from '../types';
+
+export const PROVERBS_DATABASE: Proverb[] = [
+  { id: 1, proverb: "Rain beats a leopard's skin, but it does not wash out the spots.", origin: 'West African Proverb', lesson: 'Hardship and intense training only reveal your true, unchanging inner strength.' },
+  { id: 2, proverb: 'A journey of a thousand miles begins with a single step.', origin: 'Lao Tzu (East Asian)', lesson: "Do not rush your physical progression; celebrate today's single workout session." },
+  { id: 3, proverb: 'The river is filled by following its small streams.', origin: 'Cameroonian Proverb', lesson: 'Small, daily healthy habits build up over time to create an unstoppable life.' },
+  { id: 4, proverb: 'The bamboo that bends is stronger than the oak that resists.', origin: 'East Asian Proverb', lesson: 'True power requires flexibility. Keep your muscles supple and your mind adaptable.' },
+  { id: 5, proverb: 'However long the night, the dawn will surely break.', origin: 'West African Proverb', lesson: 'When a difficult workout feels impossible to finish, remember that relief is coming.' },
+  { id: 6, proverb: 'An ant on the move does more than a dozing ox.', origin: 'Lao Tzu (East Asian)', lesson: 'Even a short, 10-minute focused routine outpaces a massive workout plan you never start.' },
+  { id: 7, proverb: 'If you want to go fast, go alone. If you want to go far, go together.', origin: 'African Heritage Proverb', lesson: 'Lean on the Mboa-Zen marketplace coaches and community to keep your momentum alive.' },
+  { id: 8, proverb: 'Gold is tested by fire; a strong warrior is tested by hardships.', origin: 'Zen Philosophy', lesson: 'Muscle fatigue and physical challenges are simply refining your underlying power.' },
+  { id: 9, proverb: 'One falsehood spoils a thousand truths; one skipped step stalls the rhythm.', origin: 'Ashanti Proverb', lesson: 'Focus fully on your execution form. Precision matters more than rushing your speed.' },
+  { id: 10, proverb: 'A falling leaf turns our attention to the roots.', origin: 'East Asian Proverb', lesson: 'When dynamic movements feel unstable, ground your center and fix your balance roots.' },
+  { id: 11, proverb: 'By crawling, a child learns to stand.', origin: 'West African Proverb', lesson: 'Embrace baseline regression. Mastery over basic steps always precedes advanced power moves.' },
+  { id: 12, proverb: 'Be not afraid of going slowly, be afraid only of standing still.', origin: 'East Asian Proverb', lesson: 'A slow workout pacing is still moving forward. Keep your momentum flowing smoothly.' },
+  { id: 13, proverb: 'Smooth seas do not make skillful sailors.', origin: 'African Maritime Proverb', lesson: 'Confronting physical resistance head-on develops deep physical resilience.' },
+  { id: 14, proverb: 'When the root is deep, there is no reason to fear the wind.', origin: 'Zen Philosophy', lesson: 'Build strong stability foundations through core training to safeguard your mobility.' },
+  { id: 15, proverb: 'He who learns teaches, and he who teaches learns.', origin: 'West African Proverb', lesson: 'Share your fitness journey milestones to anchor your own functional growth.' },
+  { id: 16, proverb: 'The diamond cannot be polished without friction, nor man perfected without trials.', origin: 'East Asian Proverb', lesson: 'Lean fully into the intense moments of resistance; they format your physical breakthrough.' },
+  { id: 17, proverb: 'A roaring lion kills no game.', origin: 'African Heritage Proverb', lesson: 'Quiet consistency beats loud declarations. Let your daily metrics speak for you.' },
+  { id: 18, proverb: 'A closed mind is like a closed book; just a block of wood.', origin: 'East Asian Proverb', lesson: 'Keep your mind open to cross-cultural methods. Fusing styles unlocks novel performance.' },
+  { id: 19, proverb: 'Little by little, the bird builds its nest.', origin: 'Cameroonian Proverb', lesson: 'Do not worry about overall targets today; just execute this single block right now.' },
+  { id: 20, proverb: 'The water that bears the ship can also capsize it.', origin: 'East Asian Proverb', lesson: 'Nutrition fuels your health engine, but imbalance can disrupt it. Choose food wisely.' },
+  { id: 21, proverb: 'He who runs after good health does not get tired of the path.', origin: 'West African Proverb', lesson: 'When health targets align with ancestral purpose, movement stops being a chore.' },
+  { id: 22, proverb: 'Muddy water is best cleared by leaving it alone.', origin: 'Zen Philosophy', lesson: 'Incorporate active recovery and breathing blocks to clear internal lactic buildup.' },
+  { id: 23, proverb: 'The ruin of a nation begins in the homes of its people.', origin: 'West African Proverb', lesson: 'Protecting community health starts with managing your own physical vitality.' },
+  { id: 24, proverb: 'A tree with strong roots laughs at storms.', origin: 'East Asian Proverb', lesson: 'Prioritize baseline core stability over flashiness to protect your musculoskeletal framework.' },
+  { id: 25, proverb: 'Exertion over time breaks the hard stone shell.', origin: 'African Heritage Proverb', lesson: 'Unwavering consistency chips away at functional plateaus until a breakthrough appears.' },
+  { id: 26, proverb: 'The best time to plant a tree was 20 years ago. The second best time is now.', origin: 'East Asian Proverb', lesson: 'Forget missed sessions or past breaks. Start fresh on your profile goals today.' },
+  { id: 27, proverb: 'No matter how hot your anger, it cannot cook the wild yam.', origin: 'West African Proverb', lesson: 'Replace erratic intensity bursts with structured, patient, long-term discipline.' },
+  { id: 28, proverb: 'Water flows smoothly because it accepts the shape of the channel.', origin: 'Zen Philosophy', lesson: 'Work in harmony with your primary natural archetype to prevent functional strain.' },
+  { id: 29, proverb: 'Knowledge without adaptation is like a hand without fingers.', origin: 'West African Proverb', lesson: 'Translate your market availability data directly into adaptive, healthy meal choices.' },
+  { id: 30, proverb: 'Conquering yourself is a greater task than conquering others.', origin: 'East Asian Proverb', lesson: "Your primary metric competitor is yesterday's self-profile. Keep striving forward." }
+];
+
