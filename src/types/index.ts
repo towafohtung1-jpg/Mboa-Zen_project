@@ -1,5 +1,6 @@
 export type Archetype = 'runner' | 'warrior' | 'guardian' | null;
 export type ArchetypeLabel = 'The Runner' | 'The Warrior' | 'The Guardian';
+export type MealTime = 'breakfast' | 'lunch' | 'supper';
 
 export interface Proverb {
   id: number;
@@ -17,8 +18,10 @@ export interface RecipeMacros {
 export interface Recipe {
   id: number;
   archetype: ArchetypeLabel;
-  profile_focus: string;
+  meal_time: MealTime;
   meal_name: string;
+  image: string;
+  profile_focus: string;
   market_staples_required: string[];
   macronutrients: RecipeMacros;
   ingredients: string[];

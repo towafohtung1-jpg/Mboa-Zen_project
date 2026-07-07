@@ -1,7 +1,6 @@
 import React from 'react';
 import { Image } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
 
 import HubScreen from '../screens/HubScreen';
 import NurtureScreen from '../screens/NurtureScreen';
@@ -11,6 +10,14 @@ import MarketScreen from '../screens/MarketScreen';
 import { Colors } from '../constants/colors';
 
 const Tab = createBottomTabNavigator();
+
+const ICONS: Record<string, any> = {
+  Hub: require('../../assets/Graphics/UI_vectors_icon_set/dashboard.png'),
+  Nurture: require('../../assets/Graphics/UI_vectors_icon_set/kitchen.png'),
+  Scan: require('../../assets/Graphics/UI_vectors_icon_set/scan.png'),
+  Dojo: require('../../assets/Graphics/UI_vectors_icon_set/dojo.png'),
+  Market: require('../../assets/Graphics/UI_vectors_icon_set/market.png'),
+};
 
 export const TabNavigator = () => {
   return (
@@ -22,49 +29,26 @@ export const TabNavigator = () => {
         tabBarStyle: {
           backgroundColor: Colors.cleanWhite,
           borderTopColor: '#e5e5e5',
-          height: 65,
-          paddingBottom: 8,
-          paddingTop: 8,
+          height: 82,
+          paddingBottom: 14,
+          paddingTop: 14,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: '600',
+          marginTop: 2,
         },
-        tabBarIcon: ({ focused }) => {
-          if (route.name === 'Hub') {
-            return (
-              <Image
-                source={require('../../assets/Graphics/UI_vectors_icon_set/dashboard.png')}
-                style={{ width: 24, height: 24 }}
-                resizeMode="contain"
-              />
-            );
-          }
-
-          if (route.name === 'Dojo') {
-            return (
-              <Image
-                source={require('../../assets/Graphics/UI_vectors_icon_set/dojo.png')}
-                style={{ width: 24, height: 24 }}
-                resizeMode="contain"
-              />
-            );
-          }
-
-          let iconName: any = 'ellipse';
-
-          if (route.name === 'Nurture') iconName = focused ? 'restaurant' : 'restaurant-outline';
-          if (route.name === 'Scan') iconName = focused ? 'scan-circle' : 'scan-circle-outline';
-          if (route.name === 'Market') iconName = focused ? 'people' : 'people-outline';
-
-          return (
-            <Ionicons
-              name={iconName}
-              size={24}
-              color={focused ? Colors.mboaGreen : Colors.tabInactive}
-            />
-          );
-        },
+        tabBarIcon: ({ focused }) => (
+          <Image
+            source={ICONS[route.name]}
+            style={{
+              width: 34,
+              height: 34,
+              opacity: focused ? 1 : 0.45,
+            }}
+            resizeMode="contain"
+          />
+        ),
       })}
     >
       <Tab.Screen name="Hub" component={HubScreen} />

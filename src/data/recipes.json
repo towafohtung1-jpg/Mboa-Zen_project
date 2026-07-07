@@ -2,256 +2,265 @@
   {
     "id": 1,
     "archetype": "The Runner",
+    "meal_time": "breakfast",
+    "meal_name": "Puff-Puff and Pap",
+    "image": "runner_breakfast_puffpuff_pap.png",
     "profile_focus": "Ectomorphic / Enduring Focus",
-    "meal_name": "Vascular Recovery Sweet Potato & Jasmine Bowl",
-    "market_staples_required": ["Sweet Potato", "Cassava", "Plantains", "Njama-Njama", "Jasmine Rice", "Ginger"],
+    "macronutrients": {
+      "carbohydrates": "High (Fast-Digesting Morning Fuel)",
+      "protein": "Low",
+      "lipids": "Moderate (Fried Dough)"
+    },
+    "market_staples_required": ["Flour", "Yeast", "Sugar", "Corn Flour", "Nutmeg"],
+    "ingredients": [
+      "2 cups of plain flour",
+      "1 teaspoon of instant yeast",
+      "3 tablespoons of sugar",
+      "A pinch of nutmeg",
+      "Warm water as needed",
+      "Vegetable oil for frying",
+      "1 cup of fine corn flour (for the pap)"
+    ],
+    "cooking_steps": [
+      "Mix flour, yeast, sugar, and nutmeg in a bowl. Gradually add warm water while stirring until you get a thick, stretchy batter.",
+      "Cover the bowl with a cloth and let the batter rise for 45 minutes to 1 hour until it doubles in size and becomes bubbly.",
+      "Heat vegetable oil in a deep pan. Scoop small handfuls of the batter and drop them into the hot oil, frying until golden brown on all sides.",
+      "Separately, mix the corn flour with a little cold water to form a smooth paste, then stir it into boiling water until it thickens into a smooth porridge (pap).",
+      "Serve the warm puff-puff alongside a bowl of pap for a classic energizing breakfast."
+    ]
+  },
+  {
+    "id": 2,
+    "archetype": "The Runner",
+    "meal_time": "lunch",
+    "meal_name": "Sweet Potato, Rice, Greens and Meat",
+    "image": "runner_lunch_sweetpotato_rice_greens_meat.png",
+    "profile_focus": "Ectomorphic / Enduring Focus",
     "macronutrients": {
       "carbohydrates": "High (Glycogen Restoration)",
       "protein": "Moderate (Lean Muscle Repair)",
       "lipids": "Low / Clean Fats"
     },
+    "market_staples_required": ["Sweet Potato", "Rice", "Njama-Njama", "Beef", "Onion"],
     "ingredients": [
-      "2 medium-sized local Sweet Potatoes",
-      "1 cup of steamed Jasmine Rice",
-      "1 bunch of fresh huckleberry leaves (Njama-Njama)",
-      "1 thumb of fresh Ginger root",
-      "1 teaspoon of cold-pressed vegetable oil"
+      "2 medium sweet potatoes",
+      "1 cup of white or jasmine rice",
+      "2 cups of njama-njama (huckleberry leaves), washed and chopped",
+      "200g of lean beef, cut into small pieces",
+      "1 small onion, sliced",
+      "1 tablespoon of vegetable oil",
+      "Salt and seasoning to taste"
     ],
     "cooking_steps": [
-      "Wash and peel the sweet potatoes, then boil them until soft.",
-      "Steam the jasmine rice in a separate pot until fluffy.",
-      "Wash the Njama-Njama thoroughly. Lightly sauté the leaves in a pan with 1 teaspoon of oil and grated ginger for 5 minutes.",
-      "Arrange the boiled sweet potatoes, jasmine rice, and gingered greens together in a large bowl.",
-      "Serve warm to instantly restore energy levels after long cardiovascular sessions."
+      "Peel and boil the sweet potatoes until soft, then set aside.",
+      "Cook the rice separately until fluffy and set aside.",
+      "In a pan, heat oil and sauté the sliced onion until soft. Add the beef and cook until browned and tender.",
+      "Add the chopped njama-njama to the pan and stir for 5 minutes until wilted, seasoning to taste.",
+      "Plate the boiled sweet potato and rice together, then top with the greens and beef mixture.",
+      "Serve warm as a balanced midday meal to sustain energy through the afternoon."
     ]
   },
   {
-    "id": 4,
+    "id": 3,
     "archetype": "The Runner",
+    "meal_time": "supper",
+    "meal_name": "Grilled Fish and Miondo",
+    "image": "runner_supper_grilledfish_miondo.png",
     "profile_focus": "Ectomorphic / Enduring Focus",
-    "meal_name": "Morning Papaya & Oat Power Bowl",
-    "market_staples_required": ["Oats", "Papaya", "Banana", "Honey", "Coconut"],
-    "macronutrients": {
-      "carbohydrates": "High (Slow Release Energy)",
-      "protein": "Moderate (Oat-Based)",
-      "lipids": "Moderate (Coconut Healthy Fats)"
-    },
-    "ingredients": [
-      "1 cup of rolled oats",
-      "1 medium ripe papaya (diced)",
-      "1 ripe banana (sliced)",
-      "2 tablespoons of shredded coconut",
-      "1 tablespoon of local honey",
-      "1 cup of warm water or milk"
-    ],
-    "cooking_steps": [
-      "Boil 1 cup of water or warm milk in a small pot.",
-      "Add the oats and stir over low heat for 3 to 4 minutes until soft.",
-      "Pour the cooked oats into a wide bowl and let it cool slightly.",
-      "Top the oats with diced papaya, sliced banana, and shredded coconut.",
-      "Drizzle local honey over the top for natural sweetness.",
-      "Eat 30 minutes before a morning run for sustained energy release."
-    ]
-  },
-  {
-    "id": 5,
-    "archetype": "The Runner",
-    "profile_focus": "Ectomorphic / Enduring Focus",
-    "meal_name": "Grilled Tilapia & Cassava Salad",
-    "market_staples_required": ["Fresh Tilapia", "Cassava", "Tomatoes", "Onion", "Lemon", "Cucumber"],
     "macronutrients": {
       "carbohydrates": "Moderate (Cassava Complex Carb)",
       "protein": "Very High (Lean Fish Protein)",
       "lipids": "Low (Heart-Healthy Fish Oils)"
     },
+    "market_staples_required": ["Fresh Tilapia", "Miondo (Cassava Sticks)", "Pepper", "Lemon", "Onion"],
     "ingredients": [
-      "1 whole fresh tilapia (cleaned and scaled)",
-      "2 cups of boiled cassava (sliced)",
-      "2 medium tomatoes (chopped)",
-      "1 small red onion (sliced thin)",
-      "1 small cucumber (sliced)",
-      "1 fresh lemon (juiced)",
-      "1 tablespoon of olive oil",
-      "Salt and pepper to taste"
+      "1 whole fresh tilapia, cleaned and scaled",
+      "3 pieces of miondo (fermented cassava wrapped in leaves)",
+      "1 fresh lemon, juiced",
+      "1 small onion, sliced",
+      "1 hot pepper, chopped (optional)",
+      "Salt and seasoning to taste"
     ],
     "cooking_steps": [
-      "Boil the cassava until soft, peel, and slice into rounds. Set aside to cool.",
-      "Rinse the tilapia and pat dry. Season inside and out with salt, pepper, and lemon juice.",
-      "Grill the tilapia over medium heat for 6 to 7 minutes on each side until the skin is crispy and the flesh is flaky.",
-      "In a bowl, combine chopped tomatoes, sliced onion, cucumber, and a splash of olive oil and lemon juice.",
-      "Arrange the cassava slices on a plate, top with the salad, and place the grilled tilapia beside it.",
-      "Eat within 2 hours of a long run to replenish protein and minerals."
+      "Rinse the tilapia and pat dry. Season with salt, pepper, and lemon juice, then let it marinate for 15 minutes.",
+      "Grill the fish over medium heat for 6 to 7 minutes on each side until the skin is crispy and the flesh is fully cooked.",
+      "Unwrap the miondo from its leaf wrapping and slice into portions.",
+      "Arrange the grilled fish beside the miondo, garnished with sliced onion and a squeeze of fresh lemon.",
+      "Serve as a light, protein-rich evening meal before rest."
     ]
   },
   {
-    "id": 2,
+    "id": 4,
     "archetype": "The Warrior",
+    "meal_time": "breakfast",
+    "meal_name": "Kumba Bread with Akara, Pap and Pepper",
+    "image": "warrior_breakfast_kumbabread_akara_pap.png",
     "profile_focus": "Mesomorphic / Power & Strength",
-    "meal_name": "Elite Strength Waterfufu & Eru Warrior Platter",
-    "market_staples_required": ["Waterfufu", "Eru", "Cocoyam Paste", "Groundnuts", "Mackerel Fish", "Goat Meat"],
+    "macronutrients": {
+      "carbohydrates": "High (Bread + Pap Energy)",
+      "protein": "High (Bean Cake Protein)",
+      "lipids": "Moderate (Fried Akara)"
+    },
+    "market_staples_required": ["Kumba Bread", "Black-Eyed Peas", "Corn Flour", "Pepper", "Onion"],
+    "ingredients": [
+      "2 rounds of kumba bread (or soft local bread rolls)",
+      "1 cup of peeled black-eyed peas",
+      "1 small onion, blended",
+      "1 hot pepper, blended",
+      "Vegetable oil for frying",
+      "1 cup of fine corn flour (for the pap)",
+      "Salt to taste"
+    ],
+    "cooking_steps": [
+      "Soak the black-eyed peas and remove the skins, then blend with the onion and a small amount of water until smooth and fluffy.",
+      "Season the bean batter with salt, then scoop spoonfuls into hot oil, frying until golden brown to make the akara (bean cakes).",
+      "Prepare the pap by stirring corn flour into boiling water until it forms a smooth, thick porridge.",
+      "Split the kumba bread open and tuck two or three akara pieces inside, adding a touch of blended pepper for heat.",
+      "Serve the stuffed bread alongside the warm pap for a hearty, protein-packed start to the day."
+    ]
+  },
+  {
+    "id": 5,
+    "archetype": "The Warrior",
+    "meal_time": "lunch",
+    "meal_name": "Waterfufu and Eru",
+    "image": "warrior_lunch_waterfufu_eru.png",
+    "profile_focus": "Mesomorphic / Power & Strength",
     "macronutrients": {
       "carbohydrates": "Complex / Sustained Burn",
       "protein": "Dense / High Nitrogen Processing",
       "lipids": "Essential Amino Chains"
     },
+    "market_staples_required": ["Waterfufu", "Eru", "Cocoyam Paste", "Groundnuts", "Mackerel Fish", "Goat Meat"],
     "ingredients": [
-      "1 ball of local prepared Waterfufu",
-      "2 cups of shredded Eru leaves",
-      "1 piece of roasted local Mackerel fish or lean boiled Goat Meat",
-      "A small handful of roasted Groundnuts",
+      "1 ball of local prepared waterfufu",
+      "2 cups of shredded eru leaves",
+      "1 piece of roasted mackerel fish or lean boiled goat meat",
+      "A small handful of roasted groundnuts",
       "1 pinch of local seasoning"
     ],
     "cooking_steps": [
-      "Cook the waterfufu paste in boiling water, stirring vigorously until smooth.",
-      "Steam Eru leaves gently with mackerel fish or goat meat.",
-      "Mix ingredients to ensure protein juices flavor the greens.",
-      "Serve hot waterfufu next to the protein-dense Eru stew.",
-      "Eat within 2 hours of a heavy lifting session."
+      "Cook the waterfufu paste in boiling water, stirring vigorously until it forms a smooth, heavy, solid ball.",
+      "Steam the shredded eru leaves gently with a small amount of water alongside the mackerel fish or goat meat.",
+      "Mix the ingredients smoothly to ensure the natural protein juices flavor the greens.",
+      "Serve the hot waterfufu next to the rich, protein-dense eru stew.",
+      "Eat within 2 hours of a heavy lifting session to maximize muscle tissue rebuilding."
     ]
   },
   {
     "id": 6,
     "archetype": "The Warrior",
+    "meal_time": "supper",
+    "meal_name": "Suya and Ripe Plantain",
+    "image": "warrior_supper_suya_plantain.png",
     "profile_focus": "Mesomorphic / Power & Strength",
-    "meal_name": "Pepper Soup with Yam",
-    "market_staples_required": ["Yam", "Beef", "Goat Meat", "Scotch Bonnet Pepper", "Ginger", "Garlic"],
-    "macronutrients": {
-      "carbohydrates": "Moderate (Yam Energy)",
-      "protein": "Very High (Beef + Goat Meat)",
-      "lipids": "Moderate (Meat Fats)"
-    },
-    "ingredients": [
-      "3 slices of white yam",
-      "300g of assorted beef and goat meat",
-      "2 scotch bonnet peppers (whole)",
-      "1 thumb of ginger (sliced)",
-      "3 cloves of garlic (crushed)",
-      "1 small onion (sliced)",
-      "Salt and local seasoning to taste",
-      "4 cups of water"
-    ],
-    "cooking_steps": [
-      "Bring 4 cups of water to a rolling boil in a deep pot.",
-      "Add the ginger, garlic, scotch bonnet peppers, and onion. Boil for 10 minutes to build the spiced broth.",
-      "Add the beef and goat meat. Simmer for 20 minutes until the meat is tender.",
-      "Add the yam slices and continue cooking for another 15 minutes until soft.",
-      "Season with salt and local spices to taste.",
-      "Serve hot in a deep bowl. Best consumed after strength training for muscle recovery."
-    ]
-  },
-  {
-    "id": 7,
-    "archetype": "The Warrior",
-    "profile_focus": "Mesomorphic / Power & Strength",
-    "meal_name": "Suya-Spiced Beef & Plantain Plate",
-    "market_staples_required": ["Beef", "Ripe Plantain", "Groundnuts", "Suya Spice", "Onion", "Tomato"],
     "macronutrients": {
       "carbohydrates": "High (Plantain Complex Carb)",
       "protein": "Very High (Lean Beef)",
       "lipids": "Moderate (Suya Spice Oils)"
     },
+    "market_staples_required": ["Beef", "Ripe Plantain", "Groundnuts", "Suya Spice", "Onion"],
     "ingredients": [
-      "400g of lean beef (cut into strips)",
-      "2 ripe plantains (sliced)",
+      "400g of lean beef, cut into strips",
+      "2 ripe plantains, sliced",
       "3 tablespoons of suya spice mix",
-      "1 small onion (sliced)",
-      "1 medium tomato (sliced)",
+      "1 small onion, sliced",
       "2 tablespoons of crushed roasted groundnuts",
       "1 tablespoon of vegetable oil"
     ],
     "cooking_steps": [
-      "Marinate the beef strips in suya spice mix for 15 minutes.",
-      "Heat vegetable oil in a pan and sear the beef strips over high heat for 3 to 4 minutes until browned but still juicy.",
-      "Peel and slice the plantains, then pan-fry them until golden on both sides.",
-      "Arrange the fried plantains on a plate and top with the suya-spiced beef.",
-      "Garnish with sliced onion, tomato, and crushed roasted groundnuts.",
-      "Serve warm. Best eaten within 1 hour of a strength training session for maximum protein uptake."
+      "Marinate the beef strips in suya spice mix for at least 15 minutes.",
+      "Skewer the beef and grill over hot coals or a grill pan for 3 to 4 minutes per side until browned but still juicy.",
+      "Peel and grill the plantain slices until golden on both sides.",
+      "Arrange the suya skewers alongside the grilled plantain, garnished with sliced onion and crushed groundnuts.",
+      "Serve warm within an hour of training for maximum protein uptake and muscle recovery."
     ]
   },
   {
-    "id": 3,
+    "id": 7,
     "archetype": "The Guardian",
+    "meal_time": "breakfast",
+    "meal_name": "Koki",
+    "image": "guardian_breakfast_koki.png",
     "profile_focus": "Endomorphic / Balance & Vitality",
-    "meal_name": "Anti-Inflammatory Boiled Yam & Egusi Purée",
-    "market_staples_required": ["Yam", "Egusi", "Pumpkin Leaves", "Palm Oil", "Lemongrass"],
     "macronutrients": {
-      "carbohydrates": "Low Glycemic Index / Controlled Insulin",
-      "protein": "High Plant Fibers",
-      "lipids": "Anti-Inflammatory Lipids"
+      "carbohydrates": "Low Glycemic Index",
+      "protein": "High Plant Protein",
+      "lipids": "Moderate (Palm Oil)"
     },
+    "market_staples_required": ["Black-Eyed Peas", "Palm Oil", "Banana Leaves", "Pepper", "Crayfish"],
     "ingredients": [
-      "3 clean slices of white or yellow Yam",
-      "4 tablespoons of ground Egusi (pumpkin seeds)",
-      "2 cups of chopped fresh Pumpkin leaves (Ploko)",
-      "1 half-teaspoon of unrefined raw Palm Oil",
-      "1 stalk of fresh Lemongrass"
+      "2 cups of peeled black-eyed peas",
+      "3 tablespoons of red palm oil",
+      "1 tablespoon of ground crayfish",
+      "1 hot pepper, blended",
+      "Banana leaves for wrapping",
+      "Salt to taste"
     ],
     "cooking_steps": [
-      "Boil yam slices until a fork passes through easily. Drain.",
-      "Mix ground Egusi with water to form a thick paste.",
-      "Boil Egusi paste with pumpkin leaves and a tiny drop of raw palm oil.",
-      "Boil lemongrass in hot water separately for 5 minutes for tea.",
-      "Serve boiled yam alongside Egusi greens with lemongrass tea."
+      "Soak the black-eyed peas and remove the skins, then blend into a smooth, thick paste with a small amount of water.",
+      "Mix in the red palm oil, ground crayfish, blended pepper, and salt until well combined.",
+      "Wrap portions of the mixture in banana leaves, folding securely into small parcels.",
+      "Steam the wrapped parcels for 45 minutes to 1 hour until firm and fully cooked.",
+      "Unwrap and serve warm as a fiber-rich, plant-protein breakfast that supports steady insulin response."
     ]
   },
   {
     "id": 8,
     "archetype": "The Guardian",
+    "meal_time": "lunch",
+    "meal_name": "Boiled Yam and Egusi Greens",
+    "image": "guardian_lunch_yam_egusi.png",
     "profile_focus": "Endomorphic / Balance & Vitality",
-    "meal_name": "Avocado-Cucumber Detox Plate",
-    "market_staples_required": ["Avocado", "Cucumber", "Tomato", "Lettuce", "Lemon", "Groundnuts"],
     "macronutrients": {
-      "carbohydrates": "Very Low (Raw Plant Only)",
-      "protein": "Moderate (Groundnut Protein)",
-      "lipids": "Healthy (Avocado Monounsaturated Fats)"
+      "carbohydrates": "Low Glycemic Index / Controlled Insulin",
+      "protein": "High Plant Fibers",
+      "lipids": "Anti-Inflammatory Lipids"
     },
+    "market_staples_required": ["Yam", "Egusi", "Pumpkin Leaves", "Palm Oil", "Lemongrass"],
     "ingredients": [
-      "1 ripe avocado (sliced)",
-      "1 medium cucumber (sliced)",
-      "2 medium tomatoes (sliced)",
-      "4 to 5 lettuce leaves",
-      "1 fresh lemon (juiced)",
-      "2 tablespoons of crushed roasted groundnuts",
-      "Pinch of salt"
+      "3 clean slices of white or yellow yam",
+      "4 tablespoons of ground egusi (pumpkin seeds)",
+      "2 cups of chopped fresh pumpkin leaves",
+      "1 half-teaspoon of unrefined raw palm oil",
+      "1 stalk of fresh lemongrass"
     ],
     "cooking_steps": [
-      "Wash the lettuce leaves and arrange them as a base on a wide plate.",
-      "Layer cucumber and tomato slices over the lettuce.",
-      "Add avocado slices on top.",
-      "Squeeze fresh lemon juice evenly across the plate.",
-      "Sprinkle crushed roasted groundnuts over the top for added protein and crunch.",
-      "Drizzle a small amount of olive oil if desired. Best eaten as a light dinner for metabolic reset."
+      "Boil the yam slices until a fork passes through easily, then drain.",
+      "Mix the ground egusi with water to form a thick paste.",
+      "Boil the egusi paste gently with the chopped pumpkin leaves and a tiny drop of raw palm oil to create a thick vegetable purée.",
+      "Boil the lemongrass in hot water separately for 5 minutes to create a metabolic-clearing tea.",
+      "Serve the boiled yam alongside the egusi greens with the lemongrass tea to help balance insulin sensitivity."
     ]
   },
   {
     "id": 9,
     "archetype": "The Guardian",
+    "meal_time": "supper",
+    "meal_name": "Light Pepper Soup with Garden Egg",
+    "image": "guardian_supper_peppersoup_gardenegg.png",
     "profile_focus": "Endomorphic / Balance & Vitality",
-    "meal_name": "Okra Soup with Light Garri",
-    "market_staples_required": ["Okra", "Garri", "Fish", "Palm Oil", "Onion", "Crayfish"],
     "macronutrients": {
-      "carbohydrates": "Very Low (Controlled Garri Portion)",
-      "protein": "Moderate (Fish + Crayfish)",
-      "lipids": "Low (Controlled Palm Oil)"
+      "carbohydrates": "Very Low",
+      "protein": "Moderate (Light Fish or Meat)",
+      "lipids": "Very Low (Broth-Based)"
     },
+    "market_staples_required": ["Garden Egg", "Pepper Soup Spice", "Fish or Chicken", "Ginger", "Garlic"],
     "ingredients": [
-      "2 cups of fresh okra (chopped)",
-      "3 tablespoons of white garri (soaked)",
-      "1 piece of smoked fish (shredded)",
-      "1 tablespoon of ground crayfish",
-      "1 small onion (sliced)",
-      "1 teaspoon of palm oil",
-      "1 cup of water or stock",
-      "Salt and seasoning to taste"
+      "4 to 5 garden eggs (African eggplant), sliced",
+      "200g of light fish or chicken pieces",
+      "1 tablespoon of pepper soup spice mix",
+      "1 thumb of ginger, sliced",
+      "2 cloves of garlic, crushed",
+      "Salt to taste",
+      "3 cups of water"
     ],
     "cooking_steps": [
-      "Soak the garri in cold water for 2 minutes, then drain excess water so it stays light and fluffy.",
-      "Heat palm oil in a pot and sauté the sliced onion until soft.",
-      "Add the chopped okra and stir for 2 minutes.",
-      "Pour in the water or stock and add the smoked fish and ground crayfish.",
-      "Simmer for 5 minutes until the okra is tender but still firm.",
-      "Serve the hot okra soup with the light garri on the side as a small portion.",
-      "Best consumed as a dinner to support overnight fat metabolism."
+      "Bring water to a boil and add the ginger, garlic, and pepper soup spice mix.",
+      "Add the fish or chicken pieces and simmer for 15 to 20 minutes until fully cooked.",
+      "Add the sliced garden eggs and cook for a further 5 minutes until just tender.",
+      "Season with salt to taste, keeping the broth light and clear.",
+      "Serve hot as a warming, low-carb evening meal that supports overnight digestion and recovery."
     ]
   }
 ]

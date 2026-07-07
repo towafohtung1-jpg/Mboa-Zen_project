@@ -24,29 +24,29 @@ export default function App() {
   const userPhone = useUserStore((state) => state.phone);
 
   useEffect(() => {
-  const init = async () => {
-    if (!fontsLoaded) return;
+    const init = async () => {
+      if (!fontsLoaded) return;
 
-    const saved = await loadUserState();
-    console.log('APP INIT - Saved state:', saved);
+      const saved = await loadUserState();
+      console.log('APP INIT - Saved state:', saved);
 
-    if (saved && saved.onboardingComplete) {
-      console.log('APP INIT - Found saved state, going to app');
-      if (saved.archetype) {
-        setArchetype(saved.archetype as any);
+      if (saved && saved.onboardingComplete) {
+        console.log('APP INIT - Found saved state, going to app');
+        if (saved.archetype) {
+          setArchetype(saved.archetype as any);
+        }
+        if (saved.phone) {
+          setPhone(saved.phone);
+        }
+        setStep('app');
+      } else {
+        console.log('APP INIT - No saved state, starting onboarding');
       }
-      if (saved.phone) {
-        setPhone(saved.phone);
-      }
-      setStep('app');
-    } else {
-      console.log('APP INIT - No saved state, starting onboarding');
-    }
 
-    setLoading(false);
-  };
-  init();
-}, [fontsLoaded]);
+      setLoading(false);
+    };
+    init();
+  }, [fontsLoaded]);
 
   if (!fontsLoaded || loading) {
     return (
@@ -79,8 +79,9 @@ export default function App() {
     return (
       <PhoneScreen
         onFinish={() => {
-          // Only go to OTP if user actually entered a phone
-          if (userPhone && userPhone.length > 0) {
+          // Read the store fresh at click-time — avoids stale closure bug
+          const currentPhone = useUserStore.getState().phone;
+          if (currentPhone && currentPhone.length > 0) {
             setStep('otp');
           } else {
             setStep('app');

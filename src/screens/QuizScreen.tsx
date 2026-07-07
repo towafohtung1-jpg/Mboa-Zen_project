@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Colors } from '../constants/colors';
 import { FONTS, SIZES } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
@@ -57,6 +57,51 @@ const questions = [
   },
 ];
 
+const OptionCard = ({
+  label,
+  onPress,
+}: {
+  label: string;
+  onPress: () => void;
+}) => {
+  const scale = useState(new Animated.Value(1))[0];
+
+  const pressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.97,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 8,
+    }).start();
+  };
+
+  const pressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 30,
+      bounciness: 8,
+    }).start();
+  };
+
+  return (
+    <Animated.View style={{ transform: [{ scale }] }}>
+      <TouchableOpacity
+        style={styles.option}
+        onPress={onPress}
+        onPressIn={pressIn}
+        onPressOut={pressOut}
+        activeOpacity={1}
+      >
+        <View style={styles.radio}>
+          <View style={styles.radioInner} />
+        </View>
+        <Text style={styles.optionLabel}>{label}</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
+
 const QuizScreen = ({ onFinish }: Props) => {
   const setArchetype = useUserStore((state) => state.setArchetype);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -76,7 +121,9 @@ const QuizScreen = ({ onFinish }: Props) => {
     }
 
     const counts: Record<string, number> = { runner: 0, warrior: 0, guardian: 0 };
-    updatedAnswers.forEach((a) => { counts[a] = (counts[a] || 0) + 1; });
+    updatedAnswers.forEach((a) => {
+      counts[a] = (counts[a] || 0) + 1;
+    });
 
     let winner: 'runner' | 'warrior' | 'guardian' = 'warrior';
     let highest = 0;
@@ -96,8 +143,12 @@ const QuizScreen = ({ onFinish }: Props) => {
       <View style={styles.topAccentBar} />
 
       <View style={styles.content}>
-        <Text style={styles.accentLabel}>DISCOVER YOUR ARCHETYPE</Text>
-        <Text style={styles.progress}>Question {currentQuestion + 1} of {questions.length}</Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.accentLabel}>DISCOVER YOUR ARCHETYPE</Text>
+          <Text style={styles.stepCounter}>
+            {currentQuestion + 1} / {questions.length}
+          </Text>
+        </View>
 
         <View style={styles.progressBarBg}>
           <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
@@ -106,17 +157,11 @@ const QuizScreen = ({ onFinish }: Props) => {
         <Text style={styles.question}>{question.question}</Text>
 
         {question.options.map((option, index) => (
-          <TouchableOpacity
+          <OptionCard
             key={index}
-            style={styles.option}
+            label={option.label}
             onPress={() => handleAnswer(option.archetype)}
-            activeOpacity={0.8}
-          >
-            <View style={styles.radio}>
-              <View style={styles.radioInner} />
-            </View>
-            <Text style={styles.optionLabel}>{option.label}</Text>
-          </TouchableOpacity>
+          />
         ))}
       </View>
     </FadeInView>
@@ -124,18 +169,90 @@ const QuizScreen = ({ onFinish }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.cleanWhite },
-  topAccentBar: { height: 6, backgroundColor: Colors.mboaGreen, width: '100%' },
-  content: { flex: 1, paddingHorizontal: 24, paddingTop: 30 },
-  accentLabel: { fontSize: 12, ...FONTS.bold, color: Colors.zenGold, letterSpacing: 3, marginBottom: 14, textAlign: 'center' },
-  progress: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, textAlign: 'right', marginBottom: 8 },
-  progressBarBg: { height: 5, backgroundColor: '#E5E5E5', borderRadius: 3, marginBottom: 30 },
-  progressBarFill: { height: 5, backgroundColor: Colors.mboaGreen, borderRadius: 3 },
-  question: { fontSize: 22, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 30, lineHeight: 30 },
-  option: { flexDirection: 'row', alignItems: 'center', padding: 18, backgroundColor: '#FAFAFA', borderRadius: 14, marginBottom: 12, borderWidth: 1, borderColor: '#EEEEEE' },
-  radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.mboaGreen, alignItems: 'center', justifyContent: 'center', marginRight: 14 },
-  radioInner: { width: 0, height: 0 },
-  optionLabel: { fontSize: 15, ...FONTS.medium, color: Colors.earthBlack, flex: 1 },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.cleanWhite,
+    alignItems: 'center',
+  },
+  topAccentBar: {
+    height: 6,
+    backgroundColor: Colors.mboaGreen,
+    width: '100%',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 30,
+    width: '100%',
+    maxWidth: 480,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  accentLabel: {
+    fontSize: 11,
+    ...FONTS.bold,
+    color: Colors.zenGold,
+    letterSpacing: 3,
+  },
+  stepCounter: {
+    fontSize: 12,
+    ...FONTS.semibold,
+    color: Colors.textMuted,
+    letterSpacing: 1,
+  },
+  progressBarBg: {
+    height: 4,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 2,
+    marginBottom: 32,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: 4,
+    backgroundColor: Colors.mboaGreen,
+    borderRadius: 2,
+  },
+  question: {
+    fontSize: 22,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    marginBottom: 28,
+    lineHeight: 30,
+  },
+  option: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 18,
+    backgroundColor: '#FAFAFA',
+    borderRadius: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#EEEEEE',
+  },
+  radio: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: Colors.mboaGreen,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  radioInner: {
+    width: 0,
+    height: 0,
+  },
+  optionLabel: {
+    fontSize: 15,
+    ...FONTS.medium,
+    color: Colors.earthBlack,
+    flex: 1,
+  },
 });
 
 export default QuizScreen;

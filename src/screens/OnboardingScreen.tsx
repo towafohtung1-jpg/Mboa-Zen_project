@@ -1,16 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+} from 'react-native';
 import { Colors } from '../constants/colors';
 import { FONTS, SIZES } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
 import { AnimatedLogo } from '../components/common/AnimatedLogo';
-const slides = [
+
+const { width } = Dimensions.get('window');
+
+interface Slide {
+  id: number;
+  title: string;
+  description: string;
+  accent: string;
+  image: any;
+}
+
+const slides: Slide[] = [
   {
     id: 1,
     title: 'LOCAL FOOD.\nREAL STRENGTH.',
     description:
       'Nutrition plans built around the foods you already know and trust.',
     accent: 'NOURISH',
+    image: require('../../assets/Illustrations/onboarding_nourish.png'),
   },
   {
     id: 2,
@@ -18,6 +37,7 @@ const slides = [
     description:
       'Bodyweight workouts for home, campus, and everyday life. No gym required.',
     accent: 'MOVE',
+    image: require('../../assets/Illustrations/onboarding_move.png'),
   },
   {
     id: 3,
@@ -25,6 +45,7 @@ const slides = [
     description:
       'Simple mobile-friendly access with MTN MoMo and Orange Money.',
     accent: 'ACCESS',
+    image: require('../../assets/Illustrations/onboarding_access.png'),
   },
 ];
 
@@ -44,14 +65,16 @@ const OnboardingScreen = ({ onFinish }: Props) => {
   }, []);
 
   if (showSplash) {
-  return (
-    <View style={styles.splashContainer}>
-      <AnimatedLogo size={120} showText={true} />
-    </View>
-  );
-}
+    return (
+      <View style={styles.splashContainer}>
+        <AnimatedLogo size={120} showText={true} />
+      </View>
+    );
+  }
+
   const slide = slides[currentSlide];
   const isLastSlide = currentSlide === slides.length - 1;
+  const progress = ((currentSlide + 1) / slides.length) * 100;
 
   const handleNext = () => {
     if (isLastSlide) {
@@ -66,11 +89,29 @@ const OnboardingScreen = ({ onFinish }: Props) => {
       <View style={styles.topAccentBar} />
 
       <View style={styles.content}>
-        <Text style={styles.accentLabel}>{slide.accent}</Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.accentLabel}>{slide.accent}</Text>
+          <Text style={styles.stepCounter}>
+            {currentSlide + 1} / {slides.length}
+          </Text>
+        </View>
+
+        <View style={styles.progressBarBg}>
+          <View
+            style={[
+              styles.progressBarFill,
+              { width: `${progress}%` },
+            ]}
+          />
+        </View>
 
         <View style={styles.visualBlock}>
-          <View style={styles.visualRingOuter}>
-            <View style={styles.visualRingInner} />
+          <View style={styles.illustrationCircle}>
+            <Image
+              source={slide.image}
+              style={styles.illustration}
+              resizeMode="cover"
+            />
           </View>
         </View>
 
@@ -91,10 +132,15 @@ const OnboardingScreen = ({ onFinish }: Props) => {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleNext}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleNext}
+          activeOpacity={0.85}
+        >
           <Text style={styles.buttonText}>
             {isLastSlide ? 'Enter Mboa-Zen' : 'Continue'}
           </Text>
+          {!isLastSlide && <Text style={styles.arrow}> →</Text>}
         </TouchableOpacity>
       </View>
     </FadeInView>
@@ -109,39 +155,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 30,
   },
-  logoCircle: {
-    width: 94,
-    height: 94,
-    borderRadius: 47,
-    backgroundColor: Colors.zenGold,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  logoMark: {
-    fontSize: 28,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-    letterSpacing: 1,
-  },
-  splashTitle: {
-    fontSize: 30,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-    letterSpacing: 2,
-    marginBottom: 10,
-  },
-  splashSubtitle: {
-    fontSize: 15,
-    ...FONTS.regular,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
-
   container: {
     flex: 1,
     backgroundColor: Colors.cleanWhite,
-    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   topAccentBar: {
     height: 6,
@@ -150,35 +167,62 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
     paddingHorizontal: 32,
+    paddingTop: 24,
+    width: '100%',
+    maxWidth: 480,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
   },
   accentLabel: {
-    fontSize: 12,
+    fontSize: 11,
     ...FONTS.bold,
     color: Colors.zenGold,
     letterSpacing: 3,
-    marginBottom: 20,
-    textAlign: 'center',
+  },
+  stepCounter: {
+    fontSize: 12,
+    ...FONTS.semibold,
+    color: Colors.textMuted,
+    letterSpacing: 1,
+  },
+  progressBarBg: {
+    height: 4,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 2,
+    marginBottom: 40,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: 4,
+    backgroundColor: Colors.mboaGreen,
+    borderRadius: 2,
   },
   visualBlock: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 36,
   },
-  visualRingOuter: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
+  illustrationCircle: {
+    width: Math.min(width * 0.42, 220),
+    height: Math.min(width * 0.42, 220),
+    borderRadius: Math.min(width * 0.42, 220) / 2,
+    backgroundColor: Colors.softBg,
+    overflow: 'hidden',
+    shadowColor: Colors.mboaGreen,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
     borderWidth: 3,
     borderColor: Colors.zenGold,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  visualRingInner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: Colors.mboaGreen,
+  illustration: {
+    width: '100%',
+    height: '100%',
   },
   title: {
     fontSize: 30,
@@ -186,47 +230,65 @@ const styles = StyleSheet.create({
     color: Colors.earthBlack,
     textAlign: 'center',
     lineHeight: 38,
-    marginBottom: 18,
+    marginBottom: 16,
   },
   description: {
-    fontSize: 16,
+    fontSize: 15,
     ...FONTS.regular,
     color: Colors.textMuted,
     textAlign: 'center',
-    lineHeight: 25,
+    lineHeight: 24,
     paddingHorizontal: 8,
   },
   footer: {
-    paddingHorizontal: 30,
+    width: '100%',
+    maxWidth: 480,
+    paddingHorizontal: 32,
     paddingBottom: 36,
   },
   dotsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 24,
+    alignItems: 'center',
+    marginBottom: 28,
   },
   dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: '#D9D9D9',
-    marginHorizontal: 5,
+    marginHorizontal: 4,
   },
   activeDot: {
-    width: 28,
+    width: 24,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: Colors.mboaGreen,
   },
   button: {
     backgroundColor: Colors.mboaGreen,
-    paddingVertical: 17,
-    borderRadius: 14,
+    height: 56, // Fixed height provides a structural, premium feel
+    borderRadius: 12, // Smooth, modern squircle curvature 
     alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    // Elegant, premium neutral shadow depth instead of a loud neon glow
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 4,
   },
   buttonText: {
     color: Colors.cleanWhite,
     fontSize: 16,
     ...FONTS.bold,
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
+  },
+  arrow: {
+    color: Colors.cleanWhite,
+    fontSize: 16,
+    lineHeight: 16,
   },
 });
 

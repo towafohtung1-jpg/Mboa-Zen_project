@@ -13,8 +13,7 @@ export const ArchetypeGatekeeper = ({ children }: { children: React.ReactNode })
   // If they are a new "Seeker", block access and guide them to the Hub
   return (
     <View style={styles.container}>
-      <Text style={styles.message}>✋ Profile Required</Text>
-      <Text style={styles.subMessage}>Please complete your Hub Quiz to unlock personalized content.</Text>
+<Text style={styles.message}>Profile Required</Text>      <Text style={styles.subMessage}>Please complete your Hub Quiz to unlock personalized content.</Text>
     </View>
   );
 };

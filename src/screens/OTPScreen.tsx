@@ -17,7 +17,9 @@ const OTPScreen = ({ phone, onFinish, onBack }: Props) => {
   const inputs = useRef<TextInput[]>([]);
 
   useEffect(() => {
-    setTimeout(() => { inputs.current[0]?.focus(); }, 300);
+    setTimeout(() => {
+      inputs.current[0]?.focus();
+    }, 300);
   }, []);
 
   const handleChange = (text: string, index: number) => {
@@ -67,7 +69,9 @@ const OTPScreen = ({ phone, onFinish, onBack }: Props) => {
           {code.map((digit, index) => (
             <TextInput
               key={index}
-              ref={(ref) => { if (ref) inputs.current[index] = ref; }}
+              ref={(ref) => {
+                if (ref) inputs.current[index] = ref;
+              }}
               style={styles.codeInput}
               value={digit}
               onChangeText={(text) => handleChange(text, index)}
@@ -95,20 +99,99 @@ const OTPScreen = ({ phone, onFinish, onBack }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.cleanWhite },
-  topAccentBar: { height: 6, backgroundColor: Colors.mboaGreen, width: '100%' },
-  content: { flex: 1, paddingHorizontal: 24, paddingTop: 40, alignItems: 'center' },
-  accentLabel: { fontSize: 12, ...FONTS.bold, color: Colors.zenGold, letterSpacing: 3, marginBottom: 14, textAlign: 'center' },
-  title: { fontSize: 28, ...FONTS.bold, color: Colors.earthBlack, textAlign: 'center', marginBottom: 12 },
-  subtitle: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, textAlign: 'center', marginBottom: 4 },
-  phone: { fontSize: 16, ...FONTS.bold, color: Colors.mboaGreen, textAlign: 'center', marginBottom: 40, letterSpacing: 1 },
-  codeRow: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', paddingHorizontal: 10, marginBottom: 30 },
-  codeInput: { width: 48, height: 56, borderWidth: 2, borderColor: '#E5E5E5', borderRadius: 12, textAlign: 'center', fontSize: 24, ...FONTS.bold, color: Colors.earthBlack, backgroundColor: '#FAFAFA' },
-  resendRow: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },
-  resendText: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, marginRight: 6 },
-  resendLink: { fontSize: 14, color: Colors.mboaGreen, ...FONTS.bold },
-  changeButton: { marginTop: 30, padding: 10 },
-  changeText: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, textDecorationLine: 'underline' },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.cleanWhite,
+    alignItems: 'center',
+  },
+  topAccentBar: {
+    height: 6,
+    backgroundColor: Colors.mboaGreen,
+    width: '100%',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 40,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 480,
+  },
+  accentLabel: {
+    fontSize: 11,
+    ...FONTS.bold,
+    color: Colors.zenGold,
+    letterSpacing: 3,
+    marginBottom: 14,
+    textAlign: 'center',
+  },
+  title: {
+    fontSize: 28,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  subtitle: {
+    fontSize: 14,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  phone: {
+    fontSize: 16,
+    ...FONTS.bold,
+    color: Colors.mboaGreen,
+    textAlign: 'center',
+    marginBottom: 40,
+    letterSpacing: 1,
+  },
+  codeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 10,
+    marginBottom: 30,
+  },
+  codeInput: {
+    width: 48,
+    height: 56,
+    borderWidth: 2,
+    borderColor: '#E5E5E5',
+    borderRadius: 12,
+    textAlign: 'center',
+    fontSize: 24,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    backgroundColor: '#FAFAFA',
+  },
+  resendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  resendText: {
+    fontSize: 14,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    marginRight: 6,
+  },
+  resendLink: {
+    fontSize: 14,
+    color: Colors.mboaGreen,
+    ...FONTS.bold,
+  },
+  changeButton: {
+    marginTop: 30,
+    padding: 10,
+  },
+  changeText: {
+    fontSize: 14,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    textDecorationLine: 'underline',
+  },
 });
 
 export default OTPScreen;

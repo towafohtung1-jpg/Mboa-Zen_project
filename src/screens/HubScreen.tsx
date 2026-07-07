@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../constants/colors';
+import { FONTS, SIZES } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
 import proverbs from '../data/proverbs.json';
 import { FadeInView } from '../components/common/FadeInView';
@@ -19,35 +20,46 @@ const HubScreen = () => {
 
   if (!archetype) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.header}>Find Your Archetype</Text>
-        <Text style={styles.subHeader}>
-          Select your path to unlock your personalized plan.
-        </Text>
+      <FadeInView style={styles.container}>
+        <View style={styles.headerArea}>
+          <Text style={styles.eyebrow}>YOUR JOURNEY</Text>
+          <Text style={styles.header}>Find Your Archetype</Text>
+          <Text style={styles.subHeader}>
+            Select your path to unlock your personalized plan.
+          </Text>
+        </View>
 
         {options.map((option) => (
-          <TouchableOpacity
+          <AnimatedButton
             key={option.id}
-            style={styles.card}
+            title={option.label}
             onPress={() => setArchetype(option.id)}
-          >
-            <Text style={styles.cardText}>{option.label}</Text>
-          </TouchableOpacity>
+            variant="primary"
+            style={styles.archetypeButton}
+          />
         ))}
-      </View>
+      </FadeInView>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Daily Mindset</Text>
+    <FadeInView style={styles.container}>
+      <View style={styles.headerArea}>
+        <Text style={styles.eyebrow}>DAILY MINDSET</Text>
+        <Text style={styles.header}>Hello, {archetype.toUpperCase()}</Text>
+      </View>
 
       <View style={styles.card}>
+        <View style={styles.accentLine} />
+
         <Text style={styles.proverb}>"{randomProverb.proverb}"</Text>
-        <Text style={styles.author}>- {randomProverb.origin}</Text>
+        <Text style={styles.author}>— {randomProverb.origin}</Text>
+
+        <View style={styles.divider} />
+
         <Text style={styles.lesson}>{randomProverb.lesson}</Text>
       </View>
-    </View>
+    </FadeInView>
   );
 };
 
@@ -56,44 +68,83 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: Colors.cleanWhite,
+    alignItems: 'center',
+  },
+  headerArea: {
+    width: '100%',
+    maxWidth: 480,
+    marginBottom: 28,
+  },
+  eyebrow: {
+    fontSize: 11,
+    ...FONTS.bold,
+    color: Colors.zenGold,
+    letterSpacing: 3,
+    marginBottom: 6,
   },
   header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.mboaGreen,
-    marginBottom: 20,
+    fontSize: 28,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    marginBottom: 8,
   },
   subHeader: {
-    marginBottom: 20,
+    fontSize: 14,
+    ...FONTS.regular,
     color: Colors.textMuted,
+    lineHeight: 22,
+  },
+  archetypeButton: {
+    width: '100%',
+    maxWidth: 480,
+    height: 56,
+    borderRadius: 12,
+    marginBottom: 12,
   },
   card: {
-    padding: 20,
+    width: '100%',
+    maxWidth: 480,
+    padding: 24,
     backgroundColor: Colors.softBg,
-    borderRadius: 15,
-    marginBottom: 15,
+    borderRadius: 18,
+    position: 'relative',
   },
-  cardText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: Colors.mboaGreen,
+  accentLine: {
+    position: 'absolute',
+    top: 16,
+    left: 0,
+    width: 4,
+    height: 40,
+    backgroundColor: Colors.zenGold,
+    borderTopRightRadius: 4,
+    borderBottomRightRadius: 4,
   },
   proverb: {
-    fontSize: 18,
-    fontStyle: 'italic',
-    marginBottom: 10,
+    fontSize: 20,
+    ...FONTS.medium,
+    marginBottom: 12,
     color: Colors.earthBlack,
+    lineHeight: 30,
+    fontStyle: 'italic',
+    marginLeft: 12,
   },
   author: {
-    fontSize: 14,
-    color: Colors.textMuted,
+    fontSize: 13,
+    ...FONTS.semibold,
+    color: Colors.mboaGreen,
     textAlign: 'right',
+    letterSpacing: 1,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#D9D9D9',
+    marginVertical: 16,
   },
   lesson: {
-    fontSize: 13,
-    color: Colors.mboaGreen,
-    marginTop: 10,
-    fontStyle: 'italic',
+    fontSize: 14,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    lineHeight: 22,
   },
 });
 
