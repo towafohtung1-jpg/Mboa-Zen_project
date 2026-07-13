@@ -39,6 +39,8 @@ export interface WorkoutExercise {
   figma_system_label: string;
   target_muscle_group: string;
   cultural_lineage_roots: string;
+  archetypes: string[];
+  image: string;
   duration_parameters: WorkoutDuration;
   movement_mechanics: string[];
   audio_coaching_cues: string[];
