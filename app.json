@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mboa-zen",
+    "name": "Mboa-Zen",
     "slug": "mboa-zen",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -24,7 +24,16 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "name": "Mboa-Zen",
+      "shortName": "Mboa-Zen",
+      "lang": "en",
+      "backgroundColor": "#1A1A1A",
+      "themeColor": "#007A33",
+      "description": "Local Wellness. Modern Discipline. Nutrition and fitness built for West Africa.",
+      "display": "standalone",
+      "orientation": "portrait",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-font"
