@@ -13,9 +13,9 @@ const Tab = createBottomTabNavigator();
 
 const ICONS: Record<string, any> = {
   Hub: require('../../assets/Graphics/UI_vectors_icon_set/dashboard.png'),
-  Nurture: require('../../assets/Graphics/UI_vectors_icon_set/kitchen.png'),
+  Meals: require('../../assets/Graphics/UI_vectors_icon_set/kitchen.png'),
   Scan: require('../../assets/Graphics/UI_vectors_icon_set/scan.png'),
-  Dojo: require('../../assets/Graphics/UI_vectors_icon_set/dojo.png'),
+  Training: require('../../assets/Graphics/UI_vectors_icon_set/dojo.png'),
   Market: require('../../assets/Graphics/UI_vectors_icon_set/market.png'),
 };
 
@@ -52,9 +52,9 @@ export const TabNavigator = () => {
       })}
     >
       <Tab.Screen name="Hub" component={HubScreen} />
-      <Tab.Screen name="Nurture" component={NurtureScreen} />
+      <Tab.Screen name="Meals" component={NurtureScreen} />
       <Tab.Screen name="Scan" component={ScanScreen} />
-      <Tab.Screen name="Dojo" component={DojoScreen} />
+      <Tab.Screen name="Training" component={DojoScreen} />
       <Tab.Screen name="Market" component={MarketScreen} />
     </Tab.Navigator>
   );

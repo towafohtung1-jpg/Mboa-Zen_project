@@ -144,8 +144,7 @@ const NurtureScreen = () => {
     <FadeInView style={styles.container}>
       <View style={styles.headerArea}>
         <Text style={styles.eyebrow}>YOUR MEALS</Text>
-        <Text style={styles.header}>Nurture Your Archetype</Text>
-        {currentArchetypeLabel && (
+        <Text style={styles.header}>Your Meals</Text>        {currentArchetypeLabel && (
           <Text style={styles.subHeader}>
             Full day meal plan for {currentArchetypeLabel}
           </Text>
