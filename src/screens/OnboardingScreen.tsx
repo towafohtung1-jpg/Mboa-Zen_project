@@ -1,294 +1,186 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Image,
-  Dimensions,
+  StatusBar,
 } from 'react-native';
 import { Colors } from '../constants/colors';
-import { FONTS, SIZES } from '../constants/typography';
+import { FONTS } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
-import { AnimatedLogo } from '../components/common/AnimatedLogo';
+// ─── ADD THIS IMPORT ────────────────────────────────────────────────────
+import { useLanguage } from '../context/LanguageContext';
+import LanguageSwitcher from '../components/common/LanguageSwitcher';
 
-const { width } = Dimensions.get('window');
-
-interface Slide {
-  id: number;
-  title: string;
-  description: string;
-  accent: string;
-  image: any;
+interface OnboardingScreenProps {
+  onFinish: () => void;
 }
 
-const slides: Slide[] = [
-  {
-    id: 1,
-    title: 'LOCAL FOOD.\nREAL STRENGTH.',
-    description:
-      'Nutrition plans built around the foods you already know and trust.',
-    accent: 'NOURISH',
-    image: require('../../assets/Illustrations/onboarding_nourish.png'),
-  },
-  {
-    id: 2,
-    title: 'TRAIN\nANYWHERE.',
-    description:
-      'Bodyweight workouts for home, campus, and everyday life. No gym required.',
-    accent: 'MOVE',
-    image: require('../../assets/Illustrations/onboarding_move.png'),
-  },
-  {
-    id: 3,
-    title: 'PAY\nYOUR WAY.',
-    description:
-      'Simple mobile-friendly access with MTN MoMo and Orange Money.',
-    accent: 'ACCESS',
-    image: require('../../assets/Illustrations/onboarding_access.png'),
-  },
-];
-
-type Props = {
-  onFinish: () => void;
-};
-
-const OnboardingScreen = ({ onFinish }: Props) => {
-  const [showSplash, setShowSplash] = useState(true);
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 1800);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (showSplash) {
-    return (
-      <View style={styles.splashContainer}>
-        <AnimatedLogo size={120} showText={true} />
-      </View>
-    );
-  }
-
-  const slide = slides[currentSlide];
-  const isLastSlide = currentSlide === slides.length - 1;
-  const progress = ((currentSlide + 1) / slides.length) * 100;
-
-  const handleNext = () => {
-    if (isLastSlide) {
-      onFinish();
-    } else {
-      setCurrentSlide(currentSlide + 1);
-    }
-  };
+const OnboardingScreen = ({ onFinish }: OnboardingScreenProps) => {
+  // ─── USE LANGUAGE HOOK ────────────────────────────────────────────────
+  const { t, language } = useLanguage();
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
 
   return (
     <FadeInView style={styles.container}>
-      <View style={styles.topAccentBar} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.earthBlack} />
+      
+      {/* Language Button */}
+      <TouchableOpacity
+        style={styles.languageButton}
+        onPress={() => setShowLanguageModal(true)}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.languageButtonText}>
+          🌍 {language.toUpperCase()}
+        </Text>
+      </TouchableOpacity>
 
       <View style={styles.content}>
-        <View style={styles.headerRow}>
-          <Text style={styles.accentLabel}>{slide.accent}</Text>
-          <Text style={styles.stepCounter}>
-            {currentSlide + 1} / {slides.length}
-          </Text>
-        </View>
+        {/* Logo */}
+        <Image
+          source={require('../../assets/Logo/mboa_zen_logo_3D.jpeg')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
 
-        <View style={styles.progressBarBg}>
-          <View
-            style={[
-              styles.progressBarFill,
-              { width: `${progress}%` },
-            ]}
-          />
-        </View>
-
-        <View style={styles.visualBlock}>
-          <View style={styles.illustrationCircle}>
-            <Image
-              source={slide.image}
-              style={styles.illustration}
-              resizeMode="cover"
-            />
-          </View>
-        </View>
-
-        <Text style={styles.title}>{slide.title}</Text>
-        <Text style={styles.description}>{slide.description}</Text>
-      </View>
-
-      <View style={styles.footer}>
-        <View style={styles.dotsContainer}>
-          {slides.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.dot,
-                index === currentSlide && styles.activeDot,
-              ]}
-            />
-          ))}
-        </View>
+        <Text style={styles.title}>{t('onboarding.title')}</Text>
+        <Text style={styles.subtitle}>{t('onboarding.subtitle')}</Text>
 
         <TouchableOpacity
           style={styles.button}
-          onPress={handleNext}
-          activeOpacity={0.85}
+          onPress={onFinish}
+          activeOpacity={0.8}
         >
-          <Text style={styles.buttonText}>
-            {isLastSlide ? 'Enter Mboa-Zen' : 'Continue'}
-          </Text>
-          {!isLastSlide && <Text style={styles.arrow}> →</Text>}
+          <Text style={styles.buttonText}>{t('onboarding.continue')}</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Language Modal */}
+      {showLanguageModal && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Select Language</Text>
+            <LanguageSwitcher 
+              visible={showLanguageModal} 
+              onClose={() => setShowLanguageModal(false)} 
+            />
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setShowLanguageModal(false)}
+            >
+              <Text style={styles.modalCloseText}>{t('common.close')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </FadeInView>
   );
 };
 
 const styles = StyleSheet.create({
-  splashContainer: {
-    flex: 1,
-    backgroundColor: Colors.earthBlack,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 30,
-  },
   container: {
     flex: 1,
-    backgroundColor: Colors.cleanWhite,
+    backgroundColor: Colors.earthBlack,
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
   },
-  topAccentBar: {
-    height: 6,
-    backgroundColor: Colors.mboaGreen,
-    width: '100%',
+  languageButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    zIndex: 10,
+  },
+  languageButtonText: {
+    fontSize: 13,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+    letterSpacing: 0.5,
   },
   content: {
-    flex: 1,
-    paddingHorizontal: 32,
-    paddingTop: 24,
-    width: '100%',
-    maxWidth: 480,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 14,
-  },
-  accentLabel: {
-    fontSize: 11,
-    ...FONTS.bold,
-    color: Colors.zenGold,
-    letterSpacing: 3,
-  },
-  stepCounter: {
-    fontSize: 12,
-    ...FONTS.semibold,
-    color: Colors.textMuted,
-    letterSpacing: 1,
-  },
-  progressBarBg: {
-    height: 4,
-    backgroundColor: '#F0F0F0',
-    borderRadius: 2,
-    marginBottom: 40,
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: 4,
-    backgroundColor: Colors.mboaGreen,
-    borderRadius: 2,
-  },
-  visualBlock: {
-    alignItems: 'center',
-    marginBottom: 36,
-  },
-  illustrationCircle: {
-    width: Math.min(width * 0.42, 220),
-    height: Math.min(width * 0.42, 220),
-    borderRadius: Math.min(width * 0.42, 220) / 2,
-    backgroundColor: Colors.softBg,
-    overflow: 'hidden',
-    shadowColor: Colors.mboaGreen,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 8,
-    borderWidth: 3,
-    borderColor: Colors.zenGold,
-  },
-  illustration: {
     width: '100%',
-    height: '100%',
+    maxWidth: 400,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 30,
+    borderRadius: 60,
   },
   title: {
-    fontSize: 30,
+    fontSize: 28,
     ...FONTS.bold,
-    color: Colors.earthBlack,
+    color: Colors.cleanWhite,
     textAlign: 'center',
-    lineHeight: 38,
-    marginBottom: 16,
+    marginBottom: 12,
   },
-  description: {
-    fontSize: 15,
+  subtitle: {
+    fontSize: 16,
     ...FONTS.regular,
-    color: Colors.textMuted,
+    color: 'rgba(255,255,255,0.7)',
     textAlign: 'center',
     lineHeight: 24,
-    paddingHorizontal: 8,
-  },
-  footer: {
-    width: '100%',
-    maxWidth: 480,
-    paddingHorizontal: 32,
-    paddingBottom: 36,
-  },
-  dotsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 28,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#D9D9D9',
-    marginHorizontal: 4,
-  },
-  activeDot: {
-    width: 24,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.mboaGreen,
+    marginBottom: 40,
   },
   button: {
     backgroundColor: Colors.mboaGreen,
-    height: 56, // Fixed height provides a structural, premium feel
-    borderRadius: 12, // Smooth, modern squircle curvature 
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 48,
+    width: '100%',
     alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    // Elegant, premium neutral shadow depth instead of a loud neon glow
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 4,
   },
   buttonText: {
-    color: Colors.cleanWhite,
     fontSize: 16,
     ...FONTS.bold,
-    letterSpacing: 0.3,
-  },
-  arrow: {
     color: Colors.cleanWhite,
-    fontSize: 16,
-    lineHeight: 16,
+    letterSpacing: 1,
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: Colors.cleanWhite,
+    borderRadius: 24,
+    padding: 24,
+    width: '80%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 18,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  modalCloseButton: {
+    marginTop: 16,
+    paddingVertical: 12,
+    alignItems: 'center',
+    backgroundColor: Colors.softBg,
+    borderRadius: 12,
+  },
+  modalCloseText: {
+    fontSize: 14,
+    ...FONTS.bold,
+    color: Colors.textMuted,
   },
 });
 

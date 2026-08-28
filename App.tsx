@@ -1,3 +1,5 @@
+// ─── App.tsx ─────────────────────────────────────────────────────────────
+
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { RootNavigator } from './src/navigation/RootNavigator';
@@ -11,6 +13,8 @@ import { loadUserState } from './src/utils/storage';
 import { useUserStore } from './src/store/useUserStore';
 import { useFonts } from './src/utils/useFonts';
 import { AnimatedLogo } from './src/components/common/AnimatedLogo';
+// ─── ADD THIS IMPORT ────────────────────────────────────────────────────
+import { LanguageProvider } from './src/context/LanguageContext';
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -63,44 +67,53 @@ export default function App() {
     );
   }
 
-  if (step === 'onboarding') {
-    return <OnboardingScreen onFinish={() => setStep('goal')} />;
-  }
+  // ─── RENDER SCREENS ────────────────────────────────────────────────────
+  const renderScreen = () => {
+    if (step === 'onboarding') {
+      return <OnboardingScreen onFinish={() => setStep('goal')} />;
+    }
 
-  if (step === 'goal') {
-    return <GoalScreen onFinish={() => setStep('quiz')} />;
-  }
+    if (step === 'goal') {
+      return <GoalScreen onFinish={() => setStep('quiz')} />;
+    }
 
-  if (step === 'quiz') {
-    return <QuizScreen onFinish={() => setStep('phone')} />;
-  }
+    if (step === 'quiz') {
+      return <QuizScreen onFinish={() => setStep('phone')} />;
+    }
 
-  if (step === 'phone') {
-    return (
-      <PhoneScreen
-        onFinish={() => {
-          // Read the store fresh at click-time — avoids stale closure bug
-          const currentPhone = useUserStore.getState().phone;
-          if (currentPhone && currentPhone.length > 0) {
-            setStep('otp');
-          } else {
-            setStep('app');
-          }
-        }}
-        onSkip={() => setStep('app')}
-      />
-    );
-  }
+    if (step === 'phone') {
+      return (
+        <PhoneScreen
+          onFinish={() => {
+            const currentPhone = useUserStore.getState().phone;
+            if (currentPhone && currentPhone.length > 0) {
+              setStep('otp');
+            } else {
+              setStep('app');
+            }
+          }}
+          onSkip={() => setStep('app')}
+        />
+      );
+    }
 
-  if (step === 'otp') {
-    return (
-      <OTPScreen
-        phone={userPhone || '+237 XXX XXX XXX'}
-        onFinish={() => setStep('app')}
-        onBack={() => setStep('phone')}
-      />
-    );
-  }
+    if (step === 'otp') {
+      return (
+        <OTPScreen
+          phone={userPhone || '+237 XXX XXX XXX'}
+          onFinish={() => setStep('app')}
+          onBack={() => setStep('phone')}
+        />
+      );
+    }
 
-  return <RootNavigator />;
+    return <RootNavigator />;
+  };
+
+  // ─── WRAP EVERYTHING WITH LANGUAGE PROVIDER ──────────────────────────
+  return (
+    <LanguageProvider>
+      {renderScreen()}
+    </LanguageProvider>
+  );
 }
