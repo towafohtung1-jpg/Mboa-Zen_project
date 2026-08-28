@@ -1,6 +1,6 @@
 // ─── src/context/LanguageContext.tsx ──────────────────────────────────
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type Language = 'en' | 'pidgin' | 'fr';
@@ -46,30 +46,31 @@ const translations: Record<Language, Record<string, string>> = {
     'archetype.guardian_title': 'The Steady',
     
     // Quiz
-    'quiz.q1': 'Which body look like you?',
-    'quiz.q1_runner': 'Slim, long, light - like plantain tree',
-    'quiz.q1_warrior': 'Solid, broad, strong - like iroko tree',
-    'quiz.q1_guardian': 'Steady, soft, balanced - like mango tree',
-    'quiz.q2': 'What do you do every day?',
-    'quiz.q2_runner': 'I walk a lot, school, market, farm',
-    'quiz.q2_warrior': 'I carry heavy things, push, build',
-    'quiz.q2_guardian': 'I sit at shop, office, house',
-    'quiz.q3': 'After eating fufu, how do you feel?',
-    'quiz.q3_runner': 'Hungry again quick (fast burn)',
-    'quiz.q3_warrior': 'Strong for long work',
-    'quiz.q3_guardian': 'Tired if I eat too much',
-    'quiz.q4': 'Do you have any pain or special condition?',
-    'quiz.q4_no': 'No, I can do anything',
-    'quiz.q4_yes': 'Yes: knee/back pain, big belly, recently gave birth, 50+ years, doctor says no jumping',
-    'quiz.q5': 'What do you want?',
-    'quiz.q5_runner': 'I want energy to walk, not get tired',
-    'quiz.q5_warrior': 'I want muscle, strong arms',
-    'quiz.q5_guardian': 'I want balance, to feel good',
+    'quiz.q1': 'How would you describe your body frame?',
+    'quiz.q1_runner': 'Thin and lean',
+    'quiz.q1_warrior': 'Medium and athletic',
+    'quiz.q1_guardian': 'Broad and solid',
+    'quiz.q2': 'When you eat a large meal, what happens?',
+    'quiz.q2_runner': 'I stay the same weight',
+    'quiz.q2_warrior': 'I feel energized',
+    'quiz.q2_guardian': 'I feel heavy',
+    'quiz.q3': 'What type of activity feels most natural?',
+    'quiz.q3_runner': 'Long walks and running',
+    'quiz.q3_warrior': 'Lifting and pushing',
+    'quiz.q3_guardian': 'Gentle movement',
+    'quiz.q4': 'How does your body respond to exercise?',
+    'quiz.q4_runner': 'I get lean but not muscular',
+    'quiz.q4_warrior': 'I see results quickly',
+    'quiz.q4_guardian': 'I need long effort for changes',
+    'quiz.q5': 'What is your main fitness priority?',
+    'quiz.q5_runner': 'Stamina and endurance',
+    'quiz.q5_warrior': 'Power and strength',
+    'quiz.q5_guardian': 'Balance and recovery',
     
     // Hub
-    'hub.daily_mindset': 'DAILY MINDSET',
+    'hub.daily_mindset': 'Daily Mindset',
     'hub.hello': 'Hello',
-    'hub.today_checkin': "TODAY'S CHECK-IN",
+    'hub.today_checkin': "Today's Check-in",
     'hub.hydration': 'Have you drunk at least 3 cups of water today?',
     'hub.nutrition': 'Have you eaten a balanced local meal today?',
     'hub.training': 'Have you moved or exercised today?',
@@ -131,7 +132,6 @@ const translations: Record<Language, Record<string, string>> = {
     'common.loading': 'Loading...',
     'common.close': 'Close',
   },
-  
   pidgin: {
     // Common
     'app.name': 'Mboa-Zen',
@@ -162,30 +162,31 @@ const translations: Record<Language, Record<string, string>> = {
     'archetype.guardian_title': 'The Steady',
     
     // Quiz
-    'quiz.q1': 'Wich body like you?',
-    'quiz.q1_runner': 'Slim, long, light - like plantain tree',
-    'quiz.q1_warrior': 'Solid, broad, strong - like iroko tree',
-    'quiz.q1_guardian': 'Steady, soft, balanced - like mango tree',
-    'quiz.q2': 'Wetin you di do for day?',
-    'quiz.q2_runner': 'I waka plenty, school, market, farm',
-    'quiz.q2_warrior': 'I carry heavy thing, push, build',
-    'quiz.q2_guardian': 'I sit for shop, office, house',
-    'quiz.q3': 'After you chop fufu, how you feel?',
-    'quiz.q3_runner': 'Hungry again quick (fast burn)',
-    'quiz.q3_warrior': 'Strong for long work',
-    'quiz.q3_guardian': 'Tired if I chop too much',
-    'quiz.q4': 'You get any pain or special condition?',
-    'quiz.q4_no': 'No, I fit do anything',
-    'quiz.q4_yes': 'Yes: knee/back pain, big belle, born pikin recently, 50+ years, doctor says no jump',
-    'quiz.q5': 'Wetin you want?',
-    'quiz.q5_runner': 'I want get power for waka, no tired',
-    'quiz.q5_warrior': 'I want get muscle, strong hand',
-    'quiz.q5_guardian': 'I want balance, feel fine',
+    'quiz.q1': 'How you go describe your body?',
+    'quiz.q1_runner': 'Thin and lean',
+    'quiz.q1_warrior': 'Medium and athletic',
+    'quiz.q1_guardian': 'Broad and solid',
+    'quiz.q2': 'When you chop plenty food, wetin go happen?',
+    'quiz.q2_runner': 'I stay the same weight',
+    'quiz.q2_warrior': 'I feel energized',
+    'quiz.q2_guardian': 'I feel heavy',
+    'quiz.q3': 'Which kind activity feel natural for you?',
+    'quiz.q3_runner': 'Long walks and running',
+    'quiz.q3_warrior': 'Lifting and pushing',
+    'quiz.q3_guardian': 'Gentle movement',
+    'quiz.q4': 'How your body take respond to exercise?',
+    'quiz.q4_runner': 'I get lean but no muscular',
+    'quiz.q4_warrior': 'I see results quick',
+    'quiz.q4_guardian': 'I need long effort for changes',
+    'quiz.q5': 'Wetin be your main fitness goal?',
+    'quiz.q5_runner': 'Stamina and endurance',
+    'quiz.q5_warrior': 'Power and strength',
+    'quiz.q5_guardian': 'Balance and recovery',
     
     // Hub
-    'hub.daily_mindset': 'DAILY MINDSET',
+    'hub.daily_mindset': 'Daily Mindset',
     'hub.hello': 'Hello',
-    'hub.today_checkin': "TODAY'S CHECK-IN",
+    'hub.today_checkin': "Today's Check-in",
     'hub.hydration': 'You don drink water at least 3 cups today?',
     'hub.nutrition': 'You don chop balanced local food today?',
     'hub.training': 'You don move or exercise today?',
@@ -203,10 +204,10 @@ const translations: Record<Language, Record<string, string>> = {
     'meals.choose': 'Choose any meal below. All options suit your body profile.',
     'meals.option': 'Option',
     'meals.i_ate_this': '✓ I don chop this',
-    'meals.why_good': 'Why This One Good For You',
+    'meals.why_good': 'Why This Is Good For You',
     'meals.what_you_need': 'What You Need',
-    'meals.nutrition_breakdown': 'Nutrition Breakdown',
-    'meals.where_to_get': 'Where to get am',
+    'meals.nutrition_breakdown': 'Nutritional Breakdown',
+    'meals.where_to_get': 'Where to get it',
     
     // Dojo
     'dojo.the_dojo': 'The Dojo',
@@ -247,7 +248,6 @@ const translations: Record<Language, Record<string, string>> = {
     'common.loading': 'Loading...',
     'common.close': 'Close',
   },
-  
   fr: {
     // Common
     'app.name': 'Mboa-Zen',
@@ -278,30 +278,31 @@ const translations: Record<Language, Record<string, string>> = {
     'archetype.guardian_title': 'Le Stable',
     
     // Quiz
-    'quiz.q1': 'Quel corps vous ressemble?',
-    'quiz.q1_runner': 'Mince, long, léger - comme le bananier',
-    'quiz.q1_warrior': 'Solide, large, fort - comme l\'iroko',
-    'quiz.q1_guardian': 'Stable, doux, équilibré - comme le manguier',
-    'quiz.q2': 'Que faites-vous chaque jour?',
-    'quiz.q2_runner': 'Je marche beaucoup, école, marché, ferme',
-    'quiz.q2_warrior': 'Je porte des choses lourdes, pousse, construis',
-    'quiz.q2_guardian': 'Je reste au magasin, au bureau, à la maison',
-    'quiz.q3': 'Après avoir mangé du fufu, comment vous sentez-vous?',
-    'quiz.q3_runner': 'Affamé à nouveau rapidement (brûlure rapide)',
-    'quiz.q3_warrior': 'Fort pour un long travail',
-    'quiz.q3_guardian': 'Fatigué si je mange trop',
-    'quiz.q4': 'Avez-vous des douleurs ou des conditions particulières?',
-    'quiz.q4_no': 'Non, je peux tout faire',
-    'quiz.q4_yes': 'Oui: douleurs au genou/dos, gros ventre, accouchement récent, 50+ ans, médecin dit pas de saut',
-    'quiz.q5': 'Que voulez-vous?',
-    'quiz.q5_runner': 'Je veux de l\'énergie pour marcher, ne pas me fatiguer',
-    'quiz.q5_warrior': 'Je veux des muscles, des bras forts',
-    'quiz.q5_guardian': 'Je veux l\'équilibre, me sentir bien',
+    'quiz.q1': 'Comment décririez-vous votre silhouette?',
+    'quiz.q1_runner': 'Mince et élancé',
+    'quiz.q1_warrior': 'Moyen et athlétique',
+    'quiz.q1_guardian': 'Large et solide',
+    'quiz.q2': 'Quand vous mangez un grand repas, que se passe-t-il?',
+    'quiz.q2_runner': 'Je reste le même poids',
+    'quiz.q2_warrior': 'Je me sens plein d\'énergie',
+    'quiz.q2_guardian': 'Je me sens lourd',
+    'quiz.q3': 'Quel type d\'activité vous semble le plus naturel?',
+    'quiz.q3_runner': 'Longues marches et course',
+    'quiz.q3_warrior': 'Soulever et pousser',
+    'quiz.q3_guardian': 'Mouvements doux',
+    'quiz.q4': 'Comment votre corps réagit-il à l\'exercice?',
+    'quiz.q4_runner': 'Je deviens mince mais pas musclé',
+    'quiz.q4_warrior': 'Je vois des résultats rapidement',
+    'quiz.q4_guardian': 'J\'ai besoin d\'efforts prolongés pour des changements',
+    'quiz.q5': 'Quelle est votre priorité en matière de fitness?',
+    'quiz.q5_runner': 'Endurance et résistance',
+    'quiz.q5_warrior': 'Puissance et force',
+    'quiz.q5_guardian': 'Équilibre et récupération',
     
     // Hub
-    'hub.daily_mindset': 'MENTALITÉ QUOTIDIENNE',
+    'hub.daily_mindset': 'Mentalité Quotidienne',
     'hub.hello': 'Bonjour',
-    'hub.today_checkin': "VÉRIFICATION DU JOUR",
+    'hub.today_checkin': "Vérification du jour",
     'hub.hydration': 'Avez-vous bu au moins 3 verres d\'eau aujourd\'hui?',
     'hub.nutrition': 'Avez-vous mangé un repas local équilibré aujourd\'hui?',
     'hub.training': 'Avez-vous bougé ou fait de l\'exercice aujourd\'hui?',
@@ -365,34 +366,14 @@ const translations: Record<Language, Record<string, string>> = {
   },
 };
 
-// ─── HELPER FUNCTIONS ──────────────────────────────────────────────────
+// ─── LANGUAGE PROVIDER ──────────────────────────────────────────────────
 
-export const getLanguageLabel = (lang: Language): string => {
-  const map: Record<Language, string> = {
-    en: 'English',
-    pidgin: 'Pidgin',
-    fr: 'Français',
-  };
-  return map[lang] || 'English';
-};
-
-export const getLanguageFlag = (lang: Language): string => {
-  const map: Record<Language, string> = {
-    en: '🇬🇧',
-    pidgin: '🇨🇲',
-    fr: '🇫🇷',
-  };
-  return map[lang] || '🇬🇧';
-};
-
-// ─── LANGUAGE PROVIDER ─────────────────────────────────────────────────
-
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>('en');
 
   useEffect(() => {
     // Load saved language
-    AsyncStorage.getItem('mboa-zen-language').then((saved) => {
+    AsyncStorage.getItem('mboa-zen-language').then((saved: string | null) => {
       if (saved === 'pidgin' || saved === 'fr' || saved === 'en') {
         setLanguage(saved as Language);
       }
@@ -405,7 +386,8 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const t = (key: string): string => {
-    return translations[language][key] || translations['en'][key] || key;
+    const lang = language as keyof typeof translations;
+    return translations[lang][key] || translations['en'][key] || key;
   };
 
   return (
@@ -421,4 +403,4 @@ export const useLanguage = () => {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
-}; 
+};
