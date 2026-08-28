@@ -1,4 +1,6 @@
 {
-  "buildCommand": "npm run build:web",
-  "outputDirectory": "dist"
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": "web-build",
+  "framework": "expo",
+  "installCommand": "npm install --legacy-peer-deps"
 }
