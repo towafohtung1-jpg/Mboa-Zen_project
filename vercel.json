@@ -3,3 +3,4 @@
   "outputDirectory": "web-build",
   "installCommand": "npm install --legacy-peer-deps"
 }
+

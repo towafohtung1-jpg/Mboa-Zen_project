@@ -432,6 +432,13 @@ const HubScreen = () => {
     logCheckInHistory,
     lastCheckinDate,
     setLastCheckinDate,
+    // ─── WATER STATE ─────────────────────────────────────────────────────
+    waterIntake,
+    waterGoal,
+    waterHistory,
+    setWaterIntake,
+    resetWater,
+    logWaterHistory,
   } = useUserStore();
 
   const [guidesExpanded, setGuidesExpanded] = useState(false);
@@ -483,6 +490,22 @@ const HubScreen = () => {
     if (checkIns[key]) toggleCheckIn(key);
     const allDone = Object.values(newAnswers).filter(a => a !== null).length === 3;
     if (allDone) setLastCheckinDate(todayStr);
+  };
+
+  // ─── WATER FUNCTIONS ──────────────────────────────────────────────────
+  const handleAddWater = () => {
+    if (waterIntake < 20) {
+      const newAmount = waterIntake + 1;
+      setWaterIntake(newAmount);
+      // Auto-save to history when goal is reached
+      if (newAmount >= waterGoal) {
+        logWaterHistory();
+      }
+    }
+  };
+
+  const handleResetWater = () => {
+    resetWater();
   };
 
   // Daily proverb — fixed for the day
@@ -592,6 +615,43 @@ const HubScreen = () => {
             <Text style={styles.author}>— {dailyProverb.origin}</Text>
             <View style={styles.divider} />
             <Text style={styles.lesson}>{dailyProverb.lesson}</Text>
+          </View>
+
+          {/* ─── WATER TRACKING ──────────────────────────────────────────── */}
+          <View style={styles.waterContainer}>
+            <Text style={styles.sectionLabel}>💧 WATER</Text>
+            <View style={styles.waterProgressContainer}>
+              <View style={styles.waterProgressBg}>
+                <View 
+                  style={[
+                    styles.waterProgressFill,
+                    { 
+                      width: `${Math.min((waterIntake / waterGoal) * 100, 100)}%`,
+                      backgroundColor: waterIntake >= waterGoal ? Colors.mboaGreen : Colors.zenGold
+                    }
+                  ]} 
+                />
+              </View>
+              <Text style={styles.waterProgressText}>
+                {waterIntake} / {waterGoal} glasses
+              </Text>
+            </View>
+            <View style={styles.waterButtons}>
+              <TouchableOpacity 
+                style={styles.waterButton}
+                onPress={handleAddWater}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.waterButtonText}>💧 Add Glass</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.waterButton, styles.waterResetButton]}
+                onPress={handleResetWater}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.waterButtonText, styles.waterResetText]}>↺ Reset</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Previous month summary — first day of new month only */}
@@ -800,6 +860,59 @@ const styles = StyleSheet.create({
   lesson: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, lineHeight: 22 },
 
   sectionLabel: { fontSize: 11, ...FONTS.bold, color: Colors.earthBlack, letterSpacing: 2, marginBottom: 12, marginTop: 4 },
+
+  // ─── WATER STYLES ──────────────────────────────────────────────────────
+  waterContainer: {
+    width: '100%',
+    backgroundColor: Colors.softBg,
+    borderRadius: 18,
+    padding: 20,
+    marginBottom: 20,
+  },
+  waterProgressContainer: {
+    marginVertical: 12,
+  },
+  waterProgressBg: {
+    height: 12,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 6,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  waterProgressFill: {
+    height: 12,
+    borderRadius: 6,
+  },
+  waterProgressText: {
+    fontSize: 14,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    textAlign: 'center',
+  },
+  waterButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  waterButton: {
+    flex: 1,
+    backgroundColor: Colors.mboaGreen,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  waterResetButton: {
+    backgroundColor: '#EEEEEE',
+    flex: 0.5,
+  },
+  waterButtonText: {
+    fontSize: 14,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+  },
+  waterResetText: {
+    color: Colors.textMuted,
+  },
 
   // Previous month summary
   prevMonthCard: { width: '100%', backgroundColor: '#F1FAF3', borderRadius: 18, padding: 20, marginBottom: 20, borderWidth: 2, borderColor: Colors.mboaGreen },

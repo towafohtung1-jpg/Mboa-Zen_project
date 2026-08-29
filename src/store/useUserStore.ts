@@ -26,6 +26,11 @@ interface UserState {
   checkInHistory: Record<string, DailyCheckIn>;
   lastCheckinDate: string | null;
 
+  // ─── WATER TRACKING ──────────────────────────────────────────────────
+  waterIntake: number;      // glasses drunk today
+  waterGoal: number;        // daily goal (default 8)
+  waterHistory: Record<string, number>; // date -> glasses
+
   // Actions
   setArchetype: (archetype: Archetype) => void;
   setUserName: (name: string) => void;
@@ -38,6 +43,11 @@ interface UserState {
   logCheckInHistory: () => void;
   setLastCheckinDate: (date: string) => void;
   resetUser: () => void;
+
+  // ─── WATER ACTIONS ──────────────────────────────────────────────────
+  setWaterIntake: (amount: number) => void;
+  resetWater: () => void;
+  logWaterHistory: () => void;
 }
 
 export const useUserStore = create<UserState>()(
@@ -58,6 +68,11 @@ export const useUserStore = create<UserState>()(
       },
       checkInHistory: {},
       lastCheckinDate: null,
+
+      // ─── WATER INITIAL STATE ──────────────────────────────────────────
+      waterIntake: 0,
+      waterGoal: 8,
+      waterHistory: {},
 
       // Setters
       setArchetype: (archetype) => set({ archetype }),
@@ -107,6 +122,32 @@ export const useUserStore = create<UserState>()(
         });
       },
 
+      // ─── WATER ACTIONS ──────────────────────────────────────────────────
+      setWaterIntake: (amount) => set({ waterIntake: amount }),
+      
+      resetWater: () => {
+        const today = new Date().toISOString().split('T')[0];
+        const { waterIntake, waterHistory } = get();
+        set({
+          waterIntake: 0,
+          waterHistory: {
+            ...waterHistory,
+            [today]: waterIntake,
+          },
+        });
+      },
+      
+      logWaterHistory: () => {
+        const today = new Date().toISOString().split('T')[0];
+        const { waterIntake, waterHistory } = get();
+        set({
+          waterHistory: {
+            ...waterHistory,
+            [today]: waterIntake,
+          },
+        });
+      },
+
       // Full reset
       resetUser: () => {
         set({
@@ -120,6 +161,9 @@ export const useUserStore = create<UserState>()(
           checkIns: { hydration: false, nutrition: false, training: false },
           checkInHistory: {},
           lastCheckinDate: null,
+          waterIntake: 0,
+          waterGoal: 8,
+          waterHistory: {},
         });
       },
     }),
