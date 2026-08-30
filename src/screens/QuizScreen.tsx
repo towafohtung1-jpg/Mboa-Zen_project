@@ -1,58 +1,64 @@
-import React, { useState } from 'react';
+// ─── src/screens/QuizScreen.tsx ─────────────────────────────────────────
+
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Colors } from '../constants/colors';
-import { FONTS, SIZES } from '../constants/typography';
+import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
 import { FadeInView } from '../components/common/FadeInView';
+import { useLanguage } from '../context/LanguageContext';
+
+type ArchetypeType = 'runner' | 'warrior' | 'guardian';
 
 type Props = {
   onFinish: () => void;
 };
 
-const questions = [
+// Define the questions with translation keys
+const questionKeys = [
   {
     id: 1,
-    question: 'How would you describe your body frame?',
+    questionKey: 'quiz.q1',
     options: [
-      { label: 'Thin and lean', archetype: 'runner' as const },
-      { label: 'Medium and athletic', archetype: 'warrior' as const },
-      { label: 'Broad and solid', archetype: 'guardian' as const },
+      { archetype: 'runner' as ArchetypeType, labelKey: 'quiz.q1_runner' },
+      { archetype: 'warrior' as ArchetypeType, labelKey: 'quiz.q1_warrior' },
+      { archetype: 'guardian' as ArchetypeType, labelKey: 'quiz.q1_guardian' },
     ],
   },
   {
     id: 2,
-    question: 'When you eat a large meal, what happens?',
+    questionKey: 'quiz.q2',
     options: [
-      { label: 'I stay the same weight', archetype: 'runner' as const },
-      { label: 'I feel energized', archetype: 'warrior' as const },
-      { label: 'I feel heavy', archetype: 'guardian' as const },
+      { archetype: 'runner' as ArchetypeType, labelKey: 'quiz.q2_runner' },
+      { archetype: 'warrior' as ArchetypeType, labelKey: 'quiz.q2_warrior' },
+      { archetype: 'guardian' as ArchetypeType, labelKey: 'quiz.q2_guardian' },
     ],
   },
   {
     id: 3,
-    question: 'What type of activity feels most natural?',
+    questionKey: 'quiz.q3',
     options: [
-      { label: 'Long walks and running', archetype: 'runner' as const },
-      { label: 'Lifting and pushing', archetype: 'warrior' as const },
-      { label: 'Gentle movement', archetype: 'guardian' as const },
+      { archetype: 'runner' as ArchetypeType, labelKey: 'quiz.q3_runner' },
+      { archetype: 'warrior' as ArchetypeType, labelKey: 'quiz.q3_warrior' },
+      { archetype: 'guardian' as ArchetypeType, labelKey: 'quiz.q3_guardian' },
     ],
   },
   {
     id: 4,
-    question: 'How does your body respond to exercise?',
+    questionKey: 'quiz.q4',
     options: [
-      { label: 'I get lean but not muscular', archetype: 'runner' as const },
-      { label: 'I see results quickly', archetype: 'warrior' as const },
-      { label: 'I need long effort for changes', archetype: 'guardian' as const },
+      { archetype: 'runner' as ArchetypeType, labelKey: 'quiz.q4_runner' },
+      { archetype: 'warrior' as ArchetypeType, labelKey: 'quiz.q4_warrior' },
+      { archetype: 'guardian' as ArchetypeType, labelKey: 'quiz.q4_guardian' },
     ],
   },
   {
     id: 5,
-    question: 'What is your main fitness priority?',
+    questionKey: 'quiz.q5',
     options: [
-      { label: 'Stamina and endurance', archetype: 'runner' as const },
-      { label: 'Power and strength', archetype: 'warrior' as const },
-      { label: 'Balance and recovery', archetype: 'guardian' as const },
+      { archetype: 'runner' as ArchetypeType, labelKey: 'quiz.q5_runner' },
+      { archetype: 'warrior' as ArchetypeType, labelKey: 'quiz.q5_warrior' },
+      { archetype: 'guardian' as ArchetypeType, labelKey: 'quiz.q5_guardian' },
     ],
   },
 ];
@@ -103,66 +109,96 @@ const OptionCard = ({
 };
 
 const QuizScreen = ({ onFinish }: Props) => {
-  const setArchetype = useUserStore((state) => state.setArchetype);
+  const { t, language } = useLanguage();
+  const [answers, setAnswers] = useState<ArchetypeType[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<('runner' | 'warrior' | 'guardian')[]>([]);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const setArchetype = useUserStore((state) => state.setArchetype);
 
-  const question = questions[currentQuestion];
-  const isLast = currentQuestion === questions.length - 1;
-  const progress = ((currentQuestion + 1) / questions.length) * 100;
+  const totalQuestions = questionKeys.length;
 
-  const handleAnswer = (archetype: 'runner' | 'warrior' | 'guardian') => {
-    const updatedAnswers = [...answers, archetype];
-    setAnswers(updatedAnswers);
+  // ─── Force re-render when language changes ────────────────────────────
+  useEffect(() => {
+    setRefreshKey(prev => prev + 1);
+  }, [language]);
 
-    if (!isLast) {
-      setCurrentQuestion(currentQuestion + 1);
-      return;
+  // ─── DEBUG ─────────────────────────────────────────────────────────────
+  const testTranslation = t('quiz.q1');
+  console.log('🔍 Language Debug:', {
+    currentLanguage: language,
+    testTranslation: testTranslation,
+  });
+
+  const debugInfo = `Language: ${language} | Test: ${testTranslation}`;
+
+  const handleOptionPress = (index: number) => {
+    setSelectedOption(index);
+    const currentQ = questionKeys[currentQuestion];
+    const archetype = currentQ.options[index].archetype;
+    const newAnswers = [...answers];
+    newAnswers[currentQuestion] = archetype;
+    setAnswers(newAnswers);
+
+    if (currentQuestion < totalQuestions - 1) {
+      setTimeout(() => {
+        setCurrentQuestion(currentQuestion + 1);
+        setSelectedOption(null);
+      }, 400);
+    } else {
+      // Determine the winner
+      const counts: Record<string, number> = { runner: 0, warrior: 0, guardian: 0 };
+      newAnswers.forEach((a) => {
+        if (a) counts[a] = (counts[a] || 0) + 1;
+      });
+      let winner: ArchetypeType = 'warrior';
+      let maxCount = 0;
+      Object.entries(counts).forEach(([key, count]) => {
+        if (count > maxCount) {
+          maxCount = count;
+          winner = key as ArchetypeType;
+        }
+      });
+      setArchetype(winner);
+      onFinish();
     }
-
-    const counts: Record<string, number> = { runner: 0, warrior: 0, guardian: 0 };
-    updatedAnswers.forEach((a) => {
-      counts[a] = (counts[a] || 0) + 1;
-    });
-
-    let winner: 'runner' | 'warrior' | 'guardian' = 'warrior';
-    let highest = 0;
-    Object.entries(counts).forEach(([key, value]) => {
-      if (value > highest) {
-        highest = value;
-        winner = key as 'runner' | 'warrior' | 'guardian';
-      }
-    });
-
-    setArchetype(winner);
-    onFinish();
   };
 
+  const currentQ = questionKeys[currentQuestion];
+  const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+
+  // Get translated question and options
+  const translatedQuestion = t(currentQ.questionKey);
+  const translatedOptions = currentQ.options.map((opt) => t(opt.labelKey));
+
   return (
-    <FadeInView style={styles.container}>
-      <View style={styles.topAccentBar} />
-
+    <FadeInView style={styles.container} key={refreshKey}>
       <View style={styles.content}>
-        <View style={styles.headerRow}>
-          <Text style={styles.accentLabel}>DISCOVER YOUR ARCHETYPE</Text>
-          <Text style={styles.stepCounter}>
-            {currentQuestion + 1} / {questions.length}
+        {/* ─── DEBUG VIEW ──────────────────────────────────────────────────── */}
+        <View style={styles.debugContainer}>
+          <Text style={styles.debugText}>🔍 {debugInfo}</Text>
+        </View>
+
+        <View style={styles.header}>
+          <Text style={styles.progressText}>
+            {currentQuestion + 1} / {totalQuestions}
           </Text>
+          <View style={styles.progressBarBg}>
+            <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
+          </View>
         </View>
 
-        <View style={styles.progressBarBg}>
-          <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
+        <Text style={styles.question}>{translatedQuestion}</Text>
+
+        <View style={styles.optionsContainer}>
+          {currentQ.options.map((option, index) => (
+            <OptionCard
+              key={index}
+              label={translatedOptions[index] || t(option.labelKey)}
+              onPress={() => handleOptionPress(index)}
+            />
+          ))}
         </View>
-
-        <Text style={styles.question}>{question.question}</Text>
-
-        {question.options.map((option, index) => (
-          <OptionCard
-            key={index}
-            label={option.label}
-            onPress={() => handleAnswer(option.archetype)}
-          />
-        ))}
       </View>
     </FadeInView>
   );
@@ -172,43 +208,39 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.cleanWhite,
-    alignItems: 'center',
-  },
-  topAccentBar: {
-    height: 6,
-    backgroundColor: Colors.mboaGreen,
-    width: '100%',
   },
   content: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 30,
-    width: '100%',
-    maxWidth: 480,
+    paddingTop: 60,
+    paddingBottom: 40,
   },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 14,
+  debugContainer: {
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    marginBottom: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
-  accentLabel: {
-    fontSize: 11,
-    ...FONTS.bold,
-    color: Colors.zenGold,
-    letterSpacing: 3,
-  },
-  stepCounter: {
+  debugText: {
     fontSize: 12,
-    ...FONTS.semibold,
+    color: '#333',
+    fontFamily: 'monospace',
+  },
+  header: {
+    marginBottom: 32,
+  },
+  progressText: {
+    fontSize: 14,
+    ...FONTS.medium,
     color: Colors.textMuted,
-    letterSpacing: 1,
+    marginBottom: 8,
   },
   progressBarBg: {
     height: 4,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#E0E0E0',
     borderRadius: 2,
-    marginBottom: 32,
     overflow: 'hidden',
   },
   progressBarFill: {
@@ -220,35 +252,41 @@ const styles = StyleSheet.create({
     fontSize: 22,
     ...FONTS.bold,
     color: Colors.earthBlack,
-    marginBottom: 28,
+    marginBottom: 24,
     lineHeight: 30,
+  },
+  optionsContainer: {
+    flex: 1,
+    gap: 12,
   },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 18,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: Colors.softBg,
     borderRadius: 14,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#EEEEEE',
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   radio: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     borderWidth: 2,
-    borderColor: Colors.mboaGreen,
+    borderColor: '#CCCCCC',
+    marginRight: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 14,
   },
   radioInner: {
-    width: 0,
-    height: 0,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'transparent',
   },
   optionLabel: {
-    fontSize: 15,
+    fontSize: 16,
     ...FONTS.medium,
     color: Colors.earthBlack,
     flex: 1,

@@ -404,3 +404,21 @@ export const useLanguage = () => {
   }
   return context;
 };
+
+export const getLanguageLabel = (lang: Language): string => {
+  const map: Record<Language, string> = {
+    en: 'English',
+    pidgin: 'Pidgin',
+    fr: 'Français',
+  };
+  return map[lang] || 'English';
+};
+
+export const getLanguageFlag = (lang: Language): string => {
+  const map: Record<Language, string> = {
+    en: '🇬🇧',
+    pidgin: '🇨🇲',
+    fr: '🇫🇷',
+  };
+  return map[lang] || '🇬🇧';
+};

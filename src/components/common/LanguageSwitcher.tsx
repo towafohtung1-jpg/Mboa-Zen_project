@@ -12,7 +12,46 @@ interface LanguageSwitcherProps {
 }
 
 const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ visible, onClose }) => {
-  const { language, setLanguage } = useLanguage();
+  // Use a try-catch to handle the case where useLanguage might fail
+  let language: Language = 'en';
+  let setLanguage: (lang: Language) => void = () => {};
+  let contextError = false;
+
+  try {
+    const context = useLanguage();
+    language = context.language;
+    setLanguage = context.setLanguage;
+  } catch (error) {
+    console.error('LanguageSwitcher: Failed to get language context', error);
+    contextError = true;
+    // If context fails, use defaults and show a fallback UI
+    return (
+      <Modal
+        visible={visible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={onClose}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.container}>
+            <Text style={styles.title}>🌍 Choose Language</Text>
+            <Text style={styles.subtitle}>Select your language</Text>
+            <TouchableOpacity
+              style={styles.option}
+              onPress={() => {
+                onClose();
+              }}
+            >
+              <Text style={styles.optionText}>English</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
 
   const languages: { code: Language; label: string; flag: string }[] = [
     { code: 'en', label: 'English', flag: '🇬🇧' },
