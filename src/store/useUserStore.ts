@@ -1,50 +1,31 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Archetype } from '../types';
-
-type DailyCheckIn = {
-  hydration: boolean;
-  nutrition: boolean;
-  training: boolean;
-};
 
 interface UserState {
-  // Profile
-  userId: string | null;
-  userName: string;
-  phone: string;
-  archetype: Archetype | null;
-  selectedGoal: string | null;
+  archetype: string | null;
+  phone: string | null;
   isPremium: boolean;
-
-  // Daily tracking
-  harmonyScore: number;
-  checkIns: DailyCheckIn;
-
-  // History
-  checkInHistory: Record<string, DailyCheckIn>;
-  lastCheckinDate: string | null;
-
-  // ─── WATER TRACKING ──────────────────────────────────────────────────
-  waterIntake: number;      // glasses drunk today
-  waterGoal: number;        // daily goal (default 8)
-  waterHistory: Record<string, number>; // date -> glasses
-
-  // Actions
-  setArchetype: (archetype: Archetype) => void;
-  setUserName: (name: string) => void;
+  setArchetype: (archetype: string) => void;
   setPhone: (phone: string) => void;
-  setPremium: (status: boolean) => void;
-  setSelectedGoal: (goal: string) => void;
+  setIsPremium: (isPremium: boolean) => void;
+  checkIns: {
+    hydration: boolean;
+    nutrition: boolean;
+    training: boolean;
+  };
   toggleCheckIn: (key: 'hydration' | 'nutrition' | 'training') => void;
-  calculateHarmony: () => void;
-  resetCheckIns: () => void;
+  harmonyScore: number;
+  checkInHistory: Record<string, any>;
   logCheckInHistory: () => void;
+  lastCheckinDate: string | null;
   setLastCheckinDate: (date: string) => void;
-  resetUser: () => void;
-
-  // ─── WATER ACTIONS ──────────────────────────────────────────────────
+  resetCheckIns: () => void;
+  
+  // ─── WATER TRACKING ────────────────────────────────────────────────────
+  waterIntake: number;
+  waterGoal: number;
+  waterHistory: Record<string, number>;
   setWaterIntake: (amount: number) => void;
   resetWater: () => void;
   logWaterHistory: () => void;
@@ -53,81 +34,63 @@ interface UserState {
 export const useUserStore = create<UserState>()(
   persist(
     (set, get) => ({
-      // Initial state
-      userId: null,
-      userName: '',
-      phone: '',
       archetype: null,
-      selectedGoal: null,
+      phone: null,
       isPremium: false,
-      harmonyScore: 0,
+      setArchetype: (archetype) => set({ archetype }),
+      setPhone: (phone) => set({ phone }),
+      setIsPremium: (isPremium) => set({ isPremium }),
       checkIns: {
         hydration: false,
         nutrition: false,
         training: false,
       },
-      checkInHistory: {},
-      lastCheckinDate: null,
-
-      // ─── WATER INITIAL STATE ──────────────────────────────────────────
-      waterIntake: 0,
-      waterGoal: 8,
-      waterHistory: {},
-
-      // Setters
-      setArchetype: (archetype) => set({ archetype }),
-      setUserName: (name) => set({ userName: name }),
-      setPhone: (phone) => set({ phone }),
-      setPremium: (status) => set({ isPremium: status }),
-      setSelectedGoal: (goal) => set({ selectedGoal: goal }),
-      setLastCheckinDate: (date) => set({ lastCheckinDate: date }),
-
-      // Toggle check-in and recalculate harmony atomically
-      toggleCheckIn: (key) => {
-        set((state) => {
-          const updatedCheckIns = {
+      toggleCheckIn: (key) =>
+        set((state) => ({
+          checkIns: {
             ...state.checkIns,
             [key]: !state.checkIns[key],
-          };
-          const total = Object.values(updatedCheckIns).length;
-          const completed = Object.values(updatedCheckIns).filter(Boolean).length;
-          const score = Math.round((completed / total) * 100);
-          return { checkIns: updatedCheckIns, harmonyScore: score };
-        });
-      },
-
-      calculateHarmony: () => {
-        const { checkIns } = get();
-        const total = Object.values(checkIns).length;
-        const completed = Object.values(checkIns).filter(Boolean).length;
-        set({ harmonyScore: Math.round((completed / total) * 100) });
-      },
-
-      resetCheckIns: () => {
-        set({
-          checkIns: { hydration: false, nutrition: false, training: false },
-          harmonyScore: 0,
-        });
-      },
-
-      // Save today's check-ins to history keyed by date
+          },
+        })),
+      harmonyScore: 0,
+      checkInHistory: {},
       logCheckInHistory: () => {
         const { checkIns, checkInHistory } = get();
         const today = new Date().toISOString().split('T')[0];
+        const completed = Object.values(checkIns).filter(Boolean).length;
+        const score = Math.round((completed / 3) * 100);
+        
         set({
           checkInHistory: {
             ...checkInHistory,
-            [today]: { ...checkIns },
+            [today]: { ...checkIns, harmonyScore: score },
           },
+          harmonyScore: score,
         });
       },
-
-      // ─── WATER ACTIONS ──────────────────────────────────────────────────
-      setWaterIntake: (amount) => set({ waterIntake: amount }),
+      lastCheckinDate: null,
+      setLastCheckinDate: (date) => set({ lastCheckinDate: date }),
+      resetCheckIns: () =>
+        set({
+          checkIns: { hydration: false, nutrition: false, training: false },
+        }),
+      
+      // ─── WATER TRACKING IMPLEMENTATION ────────────────────────────────
+      waterIntake: 0,
+      waterGoal: 8,
+      waterHistory: {},
+      
+      setWaterIntake: (amount) => {
+        const goal = get().waterGoal;
+        // Cap at goal
+        const capped = Math.min(amount, goal);
+        set({ waterIntake: capped });
+      },
       
       resetWater: () => {
-        const today = new Date().toISOString().split('T')[0];
         const { waterIntake, waterHistory } = get();
+        const today = new Date().toISOString().split('T')[0];
+        
         set({
           waterIntake: 0,
           waterHistory: {
@@ -138,8 +101,9 @@ export const useUserStore = create<UserState>()(
       },
       
       logWaterHistory: () => {
-        const today = new Date().toISOString().split('T')[0];
         const { waterIntake, waterHistory } = get();
+        const today = new Date().toISOString().split('T')[0];
+        
         set({
           waterHistory: {
             ...waterHistory,
@@ -147,29 +111,23 @@ export const useUserStore = create<UserState>()(
           },
         });
       },
-
-      // Full reset
-      resetUser: () => {
-        set({
-          userId: null,
-          userName: '',
-          phone: '',
-          archetype: null,
-          selectedGoal: null,
-          isPremium: false,
-          harmonyScore: 0,
-          checkIns: { hydration: false, nutrition: false, training: false },
-          checkInHistory: {},
-          lastCheckinDate: null,
-          waterIntake: 0,
-          waterGoal: 8,
-          waterHistory: {},
-        });
-      },
     }),
     {
       name: 'mboa-zen-storage',
       storage: createJSONStorage(() => AsyncStorage),
+      // ─── PERSIST WATER DATA ────────────────────────────────────────────
+      partialize: (state) => ({
+        archetype: state.archetype,
+        phone: state.phone,
+        isPremium: state.isPremium,
+        checkInHistory: state.checkInHistory,
+        harmonyScore: state.harmonyScore,
+        lastCheckinDate: state.lastCheckinDate,
+        // Water data to persist
+        waterIntake: state.waterIntake,
+        waterGoal: state.waterGoal,
+        waterHistory: state.waterHistory,
+      }),
     }
   )
 );

@@ -1,47 +1,216 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+// ─── src/screens/DojoScreen.tsx ──────────────────────────────────────
+
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Platform,
+  Alert,
+} from 'react-native';
 import { Colors } from '../constants/colors';
-import { FONTS, SIZES } from '../constants/typography';
-import workoutsData from '../data/workouts.json';
+import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
 import { FadeInView } from '../components/common/FadeInView';
-import { WorkoutExercise } from '../types';
+import { getExercisesForArchetype } from '../data/workoutOptions';
+import { offlineAgent } from '../database/offlineAgent.web';
 
-const workouts = workoutsData as WorkoutExercise[];
+// ─── DAY NAMES ──────────────────────────────────────────────────────────
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-const IMAGES: Record<string, any> = {
-  'lion_lunges.png': require('../../assets/Media/Workouts/lion_lunges.png'),
-  'shaolin_pushups.png': require('../../assets/Media/Workouts/shaolin_pushups.png'),
-  'baobab_stretches.png': require('../../assets/Media/Workouts/baobab_stretches.png'),
-  'kente_cross_steps.png': require('../../assets/Media/Workouts/kente_cross_steps.png'),
-  'river_stone_press.png': require('../../assets/Media/Workouts/river_stone_press.png'),
-  'chiefs_throne_dips.png': require('../../assets/Media/Workouts/chiefs_throne_dips.png'),
-  'mountain_walker_rises.png': require('../../assets/Media/Workouts/mountain_walker_rises.png'),
-  'earth_grounding_squats.png': require('../../assets/Media/Workouts/earth_grounding_squats.png'),
+// ─── WEB VIDEO PLAYER ──────────────────────────────────────────────────
+const WebVideo = ({ videoUrl, isPlaying }: { videoUrl: string; isPlaying: boolean }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.play().catch(() => {});
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [isPlaying]);
+
+  return (
+    <video
+      ref={videoRef}
+      src={videoUrl}
+      style={{
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain',
+        backgroundColor: 'black',
+      }}
+      loop
+      muted
+      playsInline
+    />
+  );
 };
 
 const DojoScreen = () => {
   const { archetype } = useUserStore();
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [isWorkoutComplete, setIsWorkoutComplete] = useState(false);
+  const [showNextPrompt, setShowNextPrompt] = useState(false);
+  
+  const isWeb = Platform.OS === 'web';
+  
+  // ─── GET EXERCISES FOR ARCHETYPE ──────────────────────────────────────
+  const exercises = getExercisesForArchetype(archetype || 'runner');
+  const totalExercises = exercises.length;
+  const currentExercise = exercises[currentIndex];
+  const progress = totalExercises > 0 ? ((currentIndex + 1) / totalExercises) * 100 : 0;
+  const isLastExercise = currentIndex === totalExercises - 1;
 
-  const filteredWorkouts = archetype
-    ? workouts.filter((item) => item.archetypes?.includes(archetype))
-    : workouts;
+  // ─── TIMER LOGIC ──────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!isPlaying || !currentExercise) return;
+    
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setIsPlaying(false);
+          setShowNextPrompt(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [isPlaying, currentExercise]);
 
-  const toggleExpand = (id: number) => {
-    setExpandedId(expandedId === id ? null : id);
+  // ─── RESET TIMER ON EXERCISE CHANGE ──────────────────────────────────
+  useEffect(() => {
+    setTimeLeft(currentExercise?.duration || 30);
+    setIsPlaying(false);
+    setShowNextPrompt(false);
+  }, [currentIndex]);
+
+  // ─── HANDLE EXERCISE COMPLETE ────────────────────────────────────────
+  const handleExerciseComplete = () => {
+    if (isLastExercise) {
+      setIsWorkoutComplete(true);
+      Alert.alert('🎉 Workout Complete!', 'You finished all exercises!', [
+        { text: 'OK' }
+      ]);
+    } else {
+      // Move to next exercise
+      setCurrentIndex(prev => prev + 1);
+    }
   };
+
+  // ─── NAVIGATION ──────────────────────────────────────────────────────
+  const goToPrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(prev => prev - 1);
+    }
+  };
+
+  const goToNext = () => {
+    if (!isLastExercise) {
+      setCurrentIndex(prev => prev + 1);
+    } else {
+      handleExerciseComplete();
+    }
+  };
+
+  const togglePlay = () => {
+    if (timeLeft === 0) {
+      setTimeLeft(currentExercise?.duration || 30);
+      setShowNextPrompt(false);
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const currentDay = DAY_NAMES[new Date().getDay()];
+
+  // ─── LOADING ──────────────────────────────────────────────────────────
+  if (!archetype) {
+    return (
+      <FadeInView style={styles.container}>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyTitle}>Select Your Archetype</Text>
+          <Text style={styles.emptySubtitle}>
+            Complete the quiz on the Hub screen to unlock your personalized workouts.
+          </Text>
+        </View>
+      </FadeInView>
+    );
+  }
+
+  if (exercises.length === 0) {
+    return (
+      <FadeInView style={styles.container}>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyTitle}>No Exercises Found</Text>
+          <Text style={styles.emptySubtitle}>
+            We couldn't find exercises for your archetype. Please try again.
+          </Text>
+        </View>
+      </FadeInView>
+    );
+  }
+
+  // ─── WORKOUT COMPLETE ────────────────────────────────────────────────
+  if (isWorkoutComplete) {
+    return (
+      <FadeInView style={styles.container}>
+        <View style={styles.completeContainer}>
+          <Text style={styles.completeEmoji}>🏆</Text>
+          <Text style={styles.completeTitle}>Workout Complete!</Text>
+          <Text style={styles.completeSubtitle}>Great job today!</Text>
+          <TouchableOpacity
+            style={styles.resetButton}
+            onPress={() => {
+              setIsWorkoutComplete(false);
+              setCurrentIndex(0);
+              setTimeLeft(exercises[0]?.duration || 30);
+              setShowNextPrompt(false);
+            }}
+          >
+            <Text style={styles.resetButtonText}>🔄 Start Again</Text>
+          </TouchableOpacity>
+        </View>
+      </FadeInView>
+    );
+  }
+
+  const videoUrl = currentExercise?.video || '';
 
   return (
     <FadeInView style={styles.container}>
+      {/* ─── HEADER ────────────────────────────────────────────────────── */}
       <View style={styles.headerArea}>
         <Text style={styles.eyebrow}>THE DOJO</Text>
-        <Text style={styles.header}>Your Workouts</Text>
-        {archetype && (
-          <Text style={styles.subHeader}>
-            {filteredWorkouts.length} exercises for The {archetype.charAt(0).toUpperCase() + archetype.slice(1)}
+        <Text style={styles.header}>{currentDay}</Text>
+        <Text style={styles.subHeader}>
+          {archetype.charAt(0).toUpperCase() + archetype.slice(1)} • {totalExercises} exercises
+        </Text>
+
+        {/* ─── PROGRESS BAR ────────────────────────────────────────────── */}
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBarBg}>
+            <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
+          </View>
+          <Text style={styles.progressText}>
+            {currentIndex + 1} / {totalExercises}
           </Text>
-        )}
+        </View>
       </View>
 
       <ScrollView
@@ -49,86 +218,141 @@ const DojoScreen = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {filteredWorkouts.length === 0 ? (
-          <Text style={styles.emptyText}>
-            No workouts found for your archetype yet.
-          </Text>
-        ) : (
-          filteredWorkouts.map((item) => {
-            const isExpanded = expandedId === item.id;
-            const image = IMAGES[item.image];
+        {/* ─── VIDEO PLAYER ───────────────────────────────────────────── */}
+        <View style={styles.videoContainer}>
+          {isWeb ? (
+            <WebVideo videoUrl={videoUrl} isPlaying={isPlaying} />
+          ) : (
+            <View style={styles.placeholderVideo}>
+              <Text style={styles.placeholderText}>📱 Video Player</Text>
+              <Text style={styles.placeholderSubtext}>{currentExercise?.name}</Text>
+            </View>
+          )}
+          
+          {/* ─── TIMER OVERLAY ────────────────────────────────────────── */}
+          <View style={styles.timerOverlay}>
+            <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
+          </View>
 
-            return (
-              <View key={item.id} style={styles.card}>
-                {image && (
-                  <Image source={image} style={styles.cardImage} resizeMode="contain" />
-                )}
+          {/* ─── PLAY/PAUSE OVERLAY ──────────────────────────────────── */}
+          <TouchableOpacity
+            style={styles.playOverlay}
+            onPress={togglePlay}
+            activeOpacity={0.8}
+          >
+            <View style={styles.playButtonCircle}>
+              <Text style={styles.playButtonText}>
+                {isPlaying ? '⏸' : '▶️'}
+              </Text>
+            </View>
+          </TouchableOpacity>
 
-                <View style={styles.cardBody}>
-                  <Text style={styles.name}>{item.figma_system_label}</Text>
-                  <Text style={styles.target}>{item.target_muscle_group}</Text>
-
-                  <View style={styles.metaRow}>
-                    <View style={styles.metaChip}>
-                      <Text style={styles.metaLabel}>WORK</Text>
-                      <Text style={styles.metaValue}>
-                        {item.duration_parameters.default_active_seconds}s
-                      </Text>
-                    </View>
-                    <View style={styles.metaChip}>
-                      <Text style={styles.metaLabel}>REST</Text>
-                      <Text style={styles.metaValue}>
-                        {item.duration_parameters.default_rest_seconds}s
-                      </Text>
-                    </View>
-                    <View style={styles.metaChip}>
-                      <Text style={styles.metaLabel}>REPS</Text>
-                      <Text style={styles.metaValue}>
-                        {item.duration_parameters.recommended_reps}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <Text style={styles.lineage}>{item.cultural_lineage_roots}</Text>
-
-                  {isExpanded && (
-                    <View style={styles.expandedContent}>
-                      <View style={styles.divider} />
-
-                      <Text style={styles.sectionTitle}>Movement Steps</Text>
-                      {item.movement_mechanics.map((step, index) => (
-                        <View key={index} style={styles.listRow}>
-                          <View style={styles.stepBadge}>
-                            <Text style={styles.stepBadgeText}>{index + 1}</Text>
-                          </View>
-                          <Text style={styles.itemText}>{step}</Text>
-                        </View>
-                      ))}
-
-                      <Text style={[styles.sectionTitle, { marginTop: 16 }]}>
-                        Coaching Cues
-                      </Text>
-                      {item.audio_coaching_cues.map((cue, index) => (
-                        <View key={index} style={styles.cueRow}>
-                          <Text style={styles.cueText}>"{cue}"</Text>
-                        </View>
-                      ))}
-                    </View>
-                  )}
-
+          {/* ─── COMPLETED OVERLAY ────────────────────────────────────── */}
+          {showNextPrompt && (
+            <View style={styles.completedOverlay}>
+              <View style={styles.completedBox}>
+                <Text style={styles.completedEmoji}>✅</Text>
+                <Text style={styles.completedText}>
+                  {isLastExercise ? 'Workout Complete!' : 'Exercise Complete!'}
+                </Text>
+                {!isLastExercise && (
                   <TouchableOpacity
-                    style={styles.expandButton}
-                    onPress={() => toggleExpand(item.id)}
-                    activeOpacity={0.7}
+                    style={styles.nextButton}
+                    onPress={handleExerciseComplete}
+                    activeOpacity={0.8}
                   >
-                    <Text style={styles.expandButtonText}>
-                      {isExpanded ? 'Hide Steps  ▲' : 'View Steps  ▼'}
+                    <Text style={styles.nextButtonText}>
+                      Next Exercise →
                     </Text>
                   </TouchableOpacity>
-                </View>
+                )}
+                {isLastExercise && (
+                  <TouchableOpacity
+                    style={styles.nextButton}
+                    onPress={handleExerciseComplete}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.nextButtonText}>
+                      Finish Workout 🏆
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
-            );
-          })
+            </View>
+          )}
+        </View>
+
+        {/* ─── EXERCISE INFO ──────────────────────────────────────────── */}
+        <View style={styles.exerciseInfoContainer}>
+          <Text style={styles.exerciseName}>{currentExercise?.name}</Text>
+          <Text style={styles.exerciseDescription}>{currentExercise?.description}</Text>
+          
+          <View style={styles.detailsRow}>
+            <View style={styles.detailChip}>
+              <Text style={styles.detailLabel}>Duration</Text>
+              <Text style={styles.detailValue}>{currentExercise?.duration}s</Text>
+            </View>
+            <View style={styles.detailChip}>
+              <Text style={styles.detailLabel}>Difficulty</Text>
+              <Text style={styles.detailValue}>{currentExercise?.difficulty}</Text>
+            </View>
+            {currentExercise?.sets && (
+              <View style={styles.detailChip}>
+                <Text style={styles.detailLabel}>Sets</Text>
+                <Text style={styles.detailValue}>{currentExercise.sets}</Text>
+              </View>
+            )}
+            {currentExercise?.reps && (
+              <View style={styles.detailChip}>
+                <Text style={styles.detailLabel}>Reps</Text>
+                <Text style={styles.detailValue}>{currentExercise.reps}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+
+        {/* ─── UP NEXT ────────────────────────────────────────────────── */}
+        {!isLastExercise && !showNextPrompt && exercises[currentIndex + 1] && (
+          <View style={styles.upNextContainer}>
+            <Text style={styles.upNextLabel}>⬇️ Up Next</Text>
+            <Text style={styles.upNextName}>
+              {exercises[currentIndex + 1]?.name}
+            </Text>
+          </View>
+        )}
+
+        {/* ─── NAVIGATION CONTROLS ────────────────────────────────────── */}
+        {!showNextPrompt && (
+          <View style={styles.controlsContainer}>
+            <TouchableOpacity
+              style={[styles.controlButton, currentIndex === 0 && styles.controlButtonDisabled]}
+              onPress={goToPrevious}
+              disabled={currentIndex === 0}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.controlButtonText}>◀ Prev</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.controlButtonPrimary}
+              onPress={togglePlay}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.controlButtonPrimaryText}>
+                {isPlaying ? '⏸ Pause' : '▶ Play'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.controlButton}
+              onPress={goToNext}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.controlButtonText}>
+                {isLastExercise ? '✅ Done' : 'Next ▶'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         )}
       </ScrollView>
     </FadeInView>
@@ -146,169 +370,306 @@ const styles = StyleSheet.create({
     maxWidth: 480,
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 8,
+    paddingBottom: 12,
   },
   eyebrow: {
     fontSize: 11,
     ...FONTS.bold,
     color: Colors.zenGold,
     letterSpacing: 3,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   header: {
     fontSize: 24,
     ...FONTS.bold,
     color: Colors.cleanWhite,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   subHeader: {
     fontSize: 13,
     ...FONTS.regular,
     color: Colors.textSecondary,
+    marginBottom: 12,
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  progressBarBg: {
+    flex: 1,
+    height: 6,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: 6,
+    backgroundColor: Colors.mboaGreen,
+    borderRadius: 3,
+  },
+  progressText: {
+    fontSize: 12,
+    ...FONTS.medium,
+    color: Colors.textMuted,
   },
   scrollContent: {
     width: '100%',
     alignItems: 'center',
     paddingBottom: 30,
+    paddingHorizontal: 20,
   },
-  card: {
+  videoContainer: {
     width: '100%',
     maxWidth: 480,
-    marginHorizontal: 20,
-    backgroundColor: Colors.cardBg,
-    borderRadius: 18,
-    marginBottom: 16,
+    height: 250,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 12,
     overflow: 'hidden',
-    borderLeftWidth: 4,
-    borderLeftColor: Colors.mboaGreen,
+    position: 'relative',
+    marginBottom: 16,
   },
-  cardImage: {
+  placeholderVideo: {
     width: '100%',
-    height: 130,
-    backgroundColor: '#000',
+    height: 250,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.05)',
   },
-  cardBody: {
-    padding: 18,
+  placeholderText: {
+    fontSize: 32,
+    color: Colors.textMuted,
   },
-  name: {
+  placeholderSubtext: {
+    fontSize: 16,
+    color: Colors.textMuted,
+    marginTop: 8,
+  },
+  timerOverlay: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  timerText: {
     fontSize: 18,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+  },
+  playOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  playButtonCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: Colors.cleanWhite,
+  },
+  playButtonText: {
+    fontSize: 28,
+    color: Colors.cleanWhite,
+  },
+  completedOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+  completedBox: {
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.mboaGreen,
+  },
+  completedEmoji: {
+    fontSize: 48,
+    marginBottom: 8,
+  },
+  completedText: {
+    fontSize: 20,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+    marginBottom: 16,
+  },
+  nextButton: {
+    backgroundColor: Colors.mboaGreen,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 10,
+  },
+  nextButtonText: {
+    fontSize: 16,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+  },
+  exerciseInfoContainer: {
+    width: '100%',
+    maxWidth: 480,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  exerciseName: {
+    fontSize: 20,
     ...FONTS.bold,
     color: Colors.cleanWhite,
     marginBottom: 4,
   },
-  target: {
-    fontSize: 13,
-    ...FONTS.regular,
-    color: Colors.textSecondary,
-    marginBottom: 14,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    marginBottom: 14,
-  },
-  metaChip: {
-    flex: 1,
-    backgroundColor: Colors.cardBgLight,
-    borderRadius: 10,
-    paddingVertical: 8,
-    marginRight: 8,
-    alignItems: 'center',
-  },
-  metaLabel: {
-    fontSize: 9,
-    ...FONTS.bold,
-    color: Colors.textMuted,
-    letterSpacing: 1,
-    marginBottom: 3,
-  },
-  metaValue: {
-    fontSize: 13,
-    ...FONTS.semibold,
-    color: Colors.zenGold,
-  },
-  lineage: {
-    fontSize: 12,
-    ...FONTS.regular,
-    color: Colors.textMuted,
-    fontStyle: 'italic',
-    lineHeight: 18,
-  },
-  expandedContent: {
-    marginTop: 4,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: Colors.borderDark,
-    marginVertical: 14,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-    marginBottom: 10,
-  },
-  listRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 10,
-  },
-  stepBadge: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: Colors.mboaGreen,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-    marginTop: 1,
-  },
-  stepBadgeText: {
-    fontSize: 10,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-  },
-  itemText: {
-    flex: 1,
+  exerciseDescription: {
     fontSize: 14,
     ...FONTS.regular,
     color: Colors.textSecondary,
-    lineHeight: 20,
+    marginBottom: 12,
   },
-  cueRow: {
-    backgroundColor: 'rgba(255, 205, 0, 0.08)',
-    borderLeftWidth: 3,
-    borderLeftColor: Colors.zenGold,
-    borderRadius: 8,
-    paddingVertical: 8,
+  detailsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  detailChip: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
     paddingHorizontal: 12,
-    marginBottom: 8,
-  },
-  cueText: {
-    fontSize: 13,
-    ...FONTS.medium,
-    color: Colors.zenGold,
-    fontStyle: 'italic',
-    lineHeight: 19,
-  },
-  expandButton: {
-    marginTop: 14,
-    paddingVertical: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
     alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: Colors.borderDark,
   },
-  expandButtonText: {
-    fontSize: 13,
-    ...FONTS.semibold,
-    color: Colors.mboaGreen,
-    letterSpacing: 0.5,
-  },
-  emptyText: {
-    textAlign: 'center',
+  detailLabel: {
+    fontSize: 10,
+    ...FONTS.medium,
     color: Colors.textMuted,
-    marginTop: 40,
+  },
+  detailValue: {
+    fontSize: 14,
+    ...FONTS.bold,
+    color: Colors.zenGold,
+  },
+  upNextContainer: {
+    width: '100%',
+    maxWidth: 480,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 12,
+    padding: 14,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  upNextLabel: {
+    fontSize: 11,
+    ...FONTS.medium,
+    color: Colors.textMuted,
+    marginBottom: 4,
+  },
+  upNextName: {
     fontSize: 16,
-    paddingHorizontal: 20,
+    ...FONTS.bold,
+    color: Colors.zenGold,
+  },
+  controlsContainer: {
+    width: '100%',
+    maxWidth: 480,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 16,
+  },
+  controlButton: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  controlButtonDisabled: {
+    opacity: 0.3,
+  },
+  controlButtonPrimary: {
+    flex: 1.5,
+    backgroundColor: Colors.mboaGreen,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  controlButtonText: {
+    fontSize: 14,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+  },
+  controlButtonPrimaryText: {
+    fontSize: 14,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 16,
+    ...FONTS.regular,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  completeContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  completeEmoji: {
+    fontSize: 80,
+    marginBottom: 16,
+  },
+  completeTitle: {
+    fontSize: 28,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+    marginBottom: 4,
+  },
+  completeSubtitle: {
+    fontSize: 16,
+    ...FONTS.regular,
+    color: Colors.textSecondary,
+    marginBottom: 24,
+  },
+  resetButton: {
+    backgroundColor: Colors.mboaGreen,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+  },
+  resetButtonText: {
+    fontSize: 16,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
   },
 });
 

@@ -1,16 +1,26 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+// ─── src/screens/NurtureScreen.tsx ──────────────────────────────────────
+
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from 'react-native';
 import { Colors } from '../constants/colors';
-import { FONTS, SIZES } from '../constants/typography';
-import recipesData from '../data/recipes.json';
+import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
 import { FadeInView } from '../components/common/FadeInView';
-import { Recipe, MealTime } from '../types';
+import { getMealOptions, getBodyTypeFromArchetype } from '../data/mealOptions';
+import { MealOption, MealFoodItem } from '../types';
+import { useLanguage } from '../context/LanguageContext';
+import { offlineAgent } from '../database/offlineAgent';
 
-const recipes = recipesData as Recipe[];
-
-// Local image lookup — filenames match the "image" field in recipes.json
-const IMAGES: Record<string, any> = {
+// Food images mapping
+const FOOD_IMAGES: Record<string, any> = {
   'runner_breakfast_puffpuff_pap.png': require('../../assets/Media/Culinary/runner_breakfast_puffpuff_pap.png'),
   'runner_lunch_sweetpotato_rice_greens_meat.png': require('../../assets/Media/Culinary/runner_lunch_sweetpotato_rice_greens_meat.png'),
   'runner_supper_grilledfish_miondo.png': require('../../assets/Media/Culinary/runner_supper_grilledfish_miondo.png'),
@@ -22,133 +32,198 @@ const IMAGES: Record<string, any> = {
   'guardian_supper_peppersoup_gardenegg.png': require('../../assets/Media/Culinary/guardian_supper_peppersoup_gardenegg.png'),
 };
 
-const MEAL_TIME_ORDER: MealTime[] = ['breakfast', 'lunch', 'supper'];
+const MEAL_TIMES = [
+  { key: 'breakfast' as const, label: '🍳 Breakfast', emoji: '🌅' },
+  { key: 'lunch' as const, label: '🥗 Lunch', emoji: '☀️' },
+  { key: 'supper' as const, label: '🍲 Supper', emoji: '🌙' },
+];
 
-const MEAL_TIME_LABELS: Record<MealTime, string> = {
-  breakfast: 'BREAKFAST',
-  lunch: 'LUNCH',
-  supper: 'SUPPER',
+const NutritionBar = ({ label, value, max, color }: { label: string; value: number; max: number; color: string }) => {
+  const percentage = Math.min((value / max) * 100, 100);
+  return (
+    <View style={styles.nutritionBarWrapper}>
+      <Text style={styles.nutritionBarLabel}>{label}</Text>
+      <View style={styles.nutritionBarBg}>
+        <View style={[styles.nutritionBarFill, { width: `${percentage}%`, backgroundColor: color }]} />
+      </View>
+      <Text style={styles.nutritionBarValue}>{value}</Text>
+    </View>
+  );
+};
+
+const MealCard = ({ meal, onLogMeal }: { meal: MealOption; onLogMeal: (meal: MealOption) => void }) => {
+  const [expanded, setExpanded] = useState(false);
+  const foodImage = meal.image ? FOOD_IMAGES[meal.image] : null;
+
+  return (
+    <View style={styles.mealCard}>
+      {foodImage && (
+        <Image
+          source={foodImage}
+          style={styles.mealCardImage}
+          resizeMode="cover"
+        />
+      )}
+      <TouchableOpacity
+        style={styles.mealCardHeader}
+        onPress={() => setExpanded(!expanded)}
+        activeOpacity={0.8}
+      >
+        <View style={styles.mealCardTitleRow}>
+          <View style={styles.optionBadge}>
+            <Text style={styles.optionBadgeText}>Option {meal.option_number}</Text>
+          </View>
+          <Text style={styles.mealCardToggle}>{expanded ? '▲' : '▼'}</Text>
+        </View>
+        <Text style={styles.mealCardName}>{meal.meal_name}</Text>
+        <View style={styles.quickNutrition}>
+          <View style={styles.quickNutritionItem}>
+            <Text style={styles.quickNutritionValue}>{meal.nutrition.calories}</Text>
+            <Text style={styles.quickNutritionLabel}>kcal</Text>
+          </View>
+          <View style={styles.quickNutritionDivider} />
+          <View style={styles.quickNutritionItem}>
+            <Text style={styles.quickNutritionValue}>{meal.nutrition.protein}g</Text>
+            <Text style={styles.quickNutritionLabel}>protein</Text>
+          </View>
+          <View style={styles.quickNutritionDivider} />
+          <View style={styles.quickNutritionItem}>
+            <Text style={styles.quickNutritionValue}>{meal.nutrition.carbohydrates}g</Text>
+            <Text style={styles.quickNutritionLabel}>carbs</Text>
+          </View>
+          <View style={styles.quickNutritionDivider} />
+          <View style={styles.quickNutritionItem}>
+            <Text style={styles.quickNutritionValue}>{meal.nutrition.fiber}g</Text>
+            <Text style={styles.quickNutritionLabel}>fiber</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+
+      {expanded && (
+        <View style={styles.mealCardBody}>
+          <View style={styles.sectionDivider} />
+          <Text style={styles.bodyTitle}>What You Need</Text>
+          {meal.foods.map((food: MealFoodItem, index: number) => (
+            <View key={index} style={styles.foodRow}>
+              <View style={styles.foodDot} />
+              <View style={styles.foodInfo}>
+                <Text style={styles.foodName}>{food.name}</Text>
+                <Text style={styles.foodQty}>{food.quantity}</Text>
+                {food.notes && <Text style={styles.foodNotes}>{food.notes}</Text>}
+              </View>
+            </View>
+          ))}
+          <View style={styles.sectionDivider} />
+          <Text style={styles.bodyTitle}>Nutritional Breakdown</Text>
+          <NutritionBar label="Calories" value={meal.nutrition.calories} max={800} color={Colors.zenGold} />
+          <NutritionBar label="Protein" value={meal.nutrition.protein} max={60} color={Colors.mboaGreen} />
+          <NutritionBar label="Carbs" value={meal.nutrition.carbohydrates} max={100} color="#FF9800" />
+          <NutritionBar label="Fat" value={meal.nutrition.fat} max={40} color="#9C27B0" />
+          <NutritionBar label="Fiber" value={meal.nutrition.fiber} max={20} color="#00BCD4" />
+          <View style={styles.sectionDivider} />
+          <Text style={styles.bodyTitle}>Why This Is Good For You</Text>
+          <Text style={styles.whyGoodText}>{meal.why_good}</Text>
+          <View style={styles.availableBox}>
+            <Text style={styles.availableLabel}>📍 Where to get it</Text>
+            <Text style={styles.availableText}>{meal.available_from}</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.logMealButton}
+            onPress={() => onLogMeal(meal)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.logMealButtonText}>✓ I Ate This</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </View>
+  );
 };
 
 const NurtureScreen = () => {
+  const { t, language } = useLanguage();
   const { archetype } = useUserStore();
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [selectedMealTime, setSelectedMealTime] = useState<'breakfast' | 'lunch' | 'supper'>('breakfast');
+  const [todayCalories, setTodayCalories] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const archetypeMap: Record<string, string> = {
-    runner: 'The Runner',
-    warrior: 'The Warrior',
-    guardian: 'The Guardian',
+  useEffect(() => {
+    setRefreshKey(prev => prev + 1);
+  }, [language]);
+
+  const bodyType = getBodyTypeFromArchetype(archetype);
+
+  const profileLabels: Record<string, { main: string; sub: string }> = {
+    slim: { main: 'The Runner', sub: 'Slim Body' },
+    strong: { main: 'The Warrior', sub: 'Strong Body' },
+    steady: { main: 'The Guardian', sub: 'The Steady' },
   };
 
-  const currentArchetypeLabel = archetype ? archetypeMap[archetype] : null;
-
-  const filteredRecipes = currentArchetypeLabel
-    ? recipes.filter((item) => item.archetype === currentArchetypeLabel)
-    : recipes;
-
-  const toggleExpand = (id: number) => {
-    setExpandedId(expandedId === id ? null : id);
+  const profileDescriptions: Record<string, string> = {
+    slim: 'High energy foods to fuel an active, fast-burning body.',
+    strong: 'Protein-rich meals to support physical work and muscle recovery.',
+    steady: 'Balanced, lower glycemic foods to support weight management.',
   };
 
-  const renderCard = (item: Recipe) => {
-    const isExpanded = expandedId === item.id;
-    const image = IMAGES[item.image];
+  const mealOptions = bodyType ? getMealOptions(bodyType, selectedMealTime) : [];
 
-    return (
-      <View key={item.id} style={styles.card}>
-        {image && (
-          <Image source={image} style={styles.cardImage} resizeMode="cover" />
-        )}
-
-        <View style={styles.cardBody}>
-          <Text style={styles.mealName}>{item.meal_name}</Text>
-          <Text style={styles.focus}>{item.profile_focus}</Text>
-
-          <View style={styles.macroRow}>
-            <View style={styles.macroChip}>
-              <Text style={styles.macroLabel}>CARBS</Text>
-              <Text style={styles.macroValue} numberOfLines={1}>
-                {item.macronutrients.carbohydrates}
-              </Text>
-            </View>
-            <View style={styles.macroChip}>
-              <Text style={styles.macroLabel}>PROTEIN</Text>
-              <Text style={styles.macroValue} numberOfLines={1}>
-                {item.macronutrients.protein}
-              </Text>
-            </View>
-            <View style={styles.macroChip}>
-              <Text style={styles.macroLabel}>FATS</Text>
-              <Text style={styles.macroValue} numberOfLines={1}>
-                {item.macronutrients.lipids}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.staplesRow}>
-            {item.market_staples_required.slice(0, 4).map((staple, i) => (
-              <View key={i} style={styles.stapleChip}>
-                <Text style={styles.stapleText}>{staple}</Text>
-              </View>
-            ))}
-            {item.market_staples_required.length > 4 && (
-              <View style={styles.stapleChip}>
-                <Text style={styles.stapleText}>
-                  +{item.market_staples_required.length - 4}
-                </Text>
-              </View>
-            )}
-          </View>
-
-          {isExpanded && (
-            <View style={styles.expandedContent}>
-              <View style={styles.divider} />
-
-              <Text style={styles.sectionTitle}>Ingredients</Text>
-              {item.ingredients.map((ing, index) => (
-                <View key={index} style={styles.listRow}>
-                  <Text style={styles.bullet}>•</Text>
-                  <Text style={styles.itemText}>{ing}</Text>
-                </View>
-              ))}
-
-              <Text style={[styles.sectionTitle, { marginTop: 16 }]}>
-                Instructions
-              </Text>
-              {item.cooking_steps.map((step, index) => (
-                <View key={index} style={styles.listRow}>
-                  <View style={styles.stepBadge}>
-                    <Text style={styles.stepBadgeText}>{index + 1}</Text>
-                  </View>
-                  <Text style={styles.itemText}>{step}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-          <TouchableOpacity
-            style={styles.expandButton}
-            onPress={() => toggleExpand(item.id)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.expandButtonText}>
-              {isExpanded ? 'Hide Recipe  ▲' : 'View Recipe  ▼'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
+  const handleLogMeal = async (meal: MealOption) => {
+    try {
+      await offlineAgent.logMeal(
+        selectedMealTime,
+        meal.id,
+        null,
+        meal.nutrition.calories,
+        `Logged from Nurture screen: ${meal.meal_name}`
+      );
+      const newTotal = await offlineAgent.getTodayCalories();
+      setTodayCalories(newTotal);
+      Alert.alert(
+        'Meal Logged!',
+        `${meal.meal_name} (${meal.nutrition.calories} kcal) saved offline. Today's total: ${newTotal} kcal`,
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      console.error('Failed to log meal:', error);
+      Alert.alert('Error', 'Could not log meal. Please try again.');
+    }
   };
 
   return (
-    <FadeInView style={styles.container}>
+    <FadeInView style={styles.container} key={refreshKey}>
       <View style={styles.headerArea}>
         <Text style={styles.eyebrow}>YOUR MEALS</Text>
-        <Text style={styles.header}>Your Meals</Text>        {currentArchetypeLabel && (
-          <Text style={styles.subHeader}>
-            Full day meal plan for {currentArchetypeLabel}
-          </Text>
+        <Text style={styles.header}>
+          {bodyType ? profileLabels[bodyType].main : 'Nurture Your Body'}
+        </Text>
+        {bodyType && (
+          <Text style={styles.profileSub}>{profileLabels[bodyType].sub}</Text>
         )}
+        {bodyType && (
+          <Text style={styles.subHeader}>{profileDescriptions[bodyType]}</Text>
+        )}
+        <View style={styles.calorieBanner}>
+          <Text style={styles.calorieBannerLabel}>Today's Calories</Text>
+          <Text style={styles.calorieBannerValue}>{todayCalories} kcal</Text>
+        </View>
+        <View style={styles.tabRow}>
+          {MEAL_TIMES.map((tab) => (
+            <TouchableOpacity
+              key={tab.key}
+              style={[styles.tab, selectedMealTime === tab.key && styles.tabActive]}
+              onPress={() => setSelectedMealTime(tab.key)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.tabEmoji}>{tab.emoji}</Text>
+              <Text style={[styles.tabLabel, selectedMealTime === tab.key && styles.tabLabelActive]}>
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <Text style={styles.chooseText}>
+          Choose any meal below. All options suit your body profile.
+        </Text>
       </View>
 
       <ScrollView
@@ -156,225 +231,88 @@ const NurtureScreen = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {filteredRecipes.length === 0 ? (
-          <Text style={styles.emptyText}>
-            No meals found for your archetype yet.
-          </Text>
-        ) : (
-          MEAL_TIME_ORDER.map((mealTime) => {
-            const mealsForTime = filteredRecipes.filter(
-              (item) => item.meal_time === mealTime
-            );
-
-            if (mealsForTime.length === 0) return null;
-
-            return (
-              <View key={mealTime} style={styles.section}>
-                <Text style={styles.sectionLabel}>
-                  {MEAL_TIME_LABELS[mealTime]}
-                </Text>
-                {mealsForTime.map((item) => renderCard(item))}
-              </View>
-            );
-          })
-        )}
+        <View style={styles.section}>
+          {mealOptions.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>No meals found</Text>
+              <Text style={styles.emptySubtitle}>
+                Complete your archetype quiz on the Home screen to unlock your personalized meal options.
+              </Text>
+            </View>
+          ) : (
+            mealOptions.map((meal) => (
+              <MealCard key={meal.id} meal={meal} onLogMeal={handleLogMeal} />
+            ))
+          )}
+          <View style={styles.disclaimerBox}>
+            <Text style={styles.disclaimerText}>
+              ⚠️ These meal suggestions are general wellness guidance only. Nutritional values are approximate. Consult a qualified nutritionist for personalized dietary advice.
+            </Text>
+          </View>
+          <View style={{ height: 20 }} />
+        </View>
       </ScrollView>
     </FadeInView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.softBg,
-    alignItems: 'center',
-  },
-  headerArea: {
-    width: '100%',
-    maxWidth: 480,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 8,
-  },
-  eyebrow: {
-    fontSize: 11,
-    ...FONTS.bold,
-    color: Colors.zenGold,
-    letterSpacing: 3,
-    marginBottom: 6,
-  },
-  header: {
-    fontSize: 24,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-    marginBottom: 4,
-  },
-  subHeader: {
-    fontSize: 13,
-    ...FONTS.regular,
-    color: Colors.textMuted,
-  },
-  scrollContent: {
-    width: '100%',
-    alignItems: 'center',
-    paddingBottom: 30,
-  },
-  section: {
-    width: '100%',
-    maxWidth: 480,
-    paddingHorizontal: 20,
-  },
-  sectionLabel: {
-    fontSize: 12,
-    ...FONTS.bold,
-    color: Colors.mboaGreen,
-    letterSpacing: 2,
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  card: {
-    backgroundColor: Colors.cleanWhite,
-    borderRadius: 18,
-    marginBottom: 16,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-  cardImage: {
-    width: '100%',
-    height: 160,
-  },
-  cardBody: {
-    padding: 18,
-  },
-  mealName: {
-    fontSize: 18,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-    marginBottom: 4,
-    lineHeight: 24,
-  },
-  focus: {
-    fontSize: 13,
-    ...FONTS.regular,
-    color: Colors.textMuted,
-    fontStyle: 'italic',
-    marginBottom: 14,
-  },
-  macroRow: {
-    flexDirection: 'row',
-    marginBottom: 14,
-  },
-  macroChip: {
-    flex: 1,
-    backgroundColor: Colors.softBg,
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 6,
-    marginRight: 8,
-    alignItems: 'center',
-  },
-  macroLabel: {
-    fontSize: 9,
-    ...FONTS.bold,
-    color: Colors.textMuted,
-    letterSpacing: 1,
-    marginBottom: 3,
-  },
-  macroValue: {
-    fontSize: 10,
-    ...FONTS.semibold,
-    color: Colors.mboaGreen,
-    textAlign: 'center',
-  },
-  staplesRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 4,
-  },
-  stapleChip: {
-    backgroundColor: '#F1FAF3',
-    borderRadius: 14,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginRight: 6,
-    marginBottom: 6,
-  },
-  stapleText: {
-    fontSize: 12,
-    ...FONTS.medium,
-    color: Colors.mboaGreen,
-  },
-  expandedContent: {
-    marginTop: 4,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#EEEEEE',
-    marginVertical: 14,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-    marginBottom: 10,
-  },
-  listRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  bullet: {
-    fontSize: 14,
-    color: Colors.mboaGreen,
-    marginRight: 8,
-    lineHeight: 20,
-  },
-  stepBadge: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: Colors.mboaGreen,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-    marginTop: 1,
-  },
-  stepBadgeText: {
-    fontSize: 10,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-  },
-  itemText: {
-    flex: 1,
-    fontSize: 14,
-    ...FONTS.regular,
-    color: Colors.textMuted,
-    lineHeight: 20,
-  },
-  expandButton: {
-    marginTop: 14,
-    paddingVertical: 10,
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
-  },
-  expandButtonText: {
-    fontSize: 13,
-    ...FONTS.semibold,
-    color: Colors.mboaGreen,
-    letterSpacing: 0.5,
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: Colors.textMuted,
-    marginTop: 40,
-    fontSize: 16,
-    paddingHorizontal: 20,
-  },
+  container: { flex: 1, backgroundColor: Colors.softBg, alignItems: 'center' },
+  headerArea: { width: '100%', maxWidth: 480, paddingHorizontal: 20, paddingTop: 20, paddingBottom: 4, backgroundColor: Colors.softBg },
+  eyebrow: { fontSize: 11, ...FONTS.bold, color: Colors.zenGold, letterSpacing: 3, marginBottom: 6 },
+  header: { fontSize: 24, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 2 },
+  profileSub: { fontSize: 13, ...FONTS.semibold, color: Colors.mboaGreen, letterSpacing: 1, marginBottom: 4 },
+  subHeader: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, lineHeight: 20, marginBottom: 16 },
+  calorieBanner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F1FAF3', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 10, marginBottom: 16, borderWidth: 1, borderColor: Colors.mboaGreen },
+  calorieBannerLabel: { fontSize: 13, ...FONTS.bold, color: Colors.earthBlack },
+  calorieBannerValue: { fontSize: 18, ...FONTS.bold, color: Colors.mboaGreen },
+  tabRow: { flexDirection: 'row', backgroundColor: Colors.cleanWhite, borderRadius: 14, padding: 4 },
+  tab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 10, borderRadius: 10 },
+  tabActive: { backgroundColor: Colors.mboaGreen },
+  tabEmoji: { fontSize: 14, marginRight: 6 },
+  tabLabel: { fontSize: 13, ...FONTS.bold, color: Colors.textMuted },
+  tabLabelActive: { color: Colors.cleanWhite },
+  chooseText: { fontSize: 12, ...FONTS.regular, color: Colors.textMuted, fontStyle: 'italic', marginTop: 12, marginBottom: 8 },
+  scrollContent: { width: '100%', alignItems: 'center', paddingTop: 8 },
+  section: { width: '100%', maxWidth: 480, paddingHorizontal: 20, paddingBottom: 20 },
+  mealCard: { backgroundColor: Colors.cleanWhite, borderRadius: 18, marginBottom: 14, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 10, elevation: 2 },
+  mealCardImage: { width: '100%', height: 150 },
+  mealCardHeader: { padding: 18 },
+  mealCardTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  optionBadge: { backgroundColor: '#F1FAF3', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, borderWidth: 1, borderColor: Colors.mboaGreen },
+  optionBadgeText: { fontSize: 11, ...FONTS.bold, color: Colors.mboaGreen },
+  mealCardToggle: { fontSize: 12, ...FONTS.bold, color: Colors.textMuted },
+  mealCardName: { fontSize: 17, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 14, lineHeight: 23 },
+  quickNutrition: { flexDirection: 'row', backgroundColor: Colors.softBg, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 8, alignItems: 'center', justifyContent: 'space-around' },
+  quickNutritionItem: { alignItems: 'center', flex: 1 },
+  quickNutritionValue: { fontSize: 15, ...FONTS.bold, color: Colors.earthBlack },
+  quickNutritionLabel: { fontSize: 10, ...FONTS.regular, color: Colors.textMuted, marginTop: 2 },
+  quickNutritionDivider: { width: 1, height: 28, backgroundColor: '#E0E0E0' },
+  mealCardBody: { paddingHorizontal: 18, paddingBottom: 18 },
+  sectionDivider: { height: 1, backgroundColor: '#F0F0F0', marginVertical: 14 },
+  bodyTitle: { fontSize: 13, ...FONTS.bold, color: Colors.earthBlack, letterSpacing: 0.5, marginBottom: 12 },
+  foodRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 },
+  foodDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.mboaGreen, marginTop: 6, marginRight: 12 },
+  foodInfo: { flex: 1 },
+  foodName: { fontSize: 14, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 2 },
+  foodQty: { fontSize: 12, ...FONTS.regular, color: Colors.textMuted },
+  foodNotes: { fontSize: 11, ...FONTS.regular, color: Colors.mboaGreen, fontStyle: 'italic', marginTop: 2 },
+  nutritionBarWrapper: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  nutritionBarLabel: { fontSize: 12, ...FONTS.medium, color: Colors.earthBlack, width: 60 },
+  nutritionBarBg: { flex: 1, height: 6, backgroundColor: '#F0F0F0', borderRadius: 3, overflow: 'hidden', marginHorizontal: 8 },
+  nutritionBarFill: { height: 6, borderRadius: 3 },
+  nutritionBarValue: { fontSize: 11, ...FONTS.bold, color: Colors.textMuted, width: 40, textAlign: 'right' },
+  whyGoodText: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, lineHeight: 21, marginBottom: 14 },
+  availableBox: { backgroundColor: '#F1FAF3', borderRadius: 10, padding: 12, borderLeftWidth: 3, borderLeftColor: Colors.mboaGreen },
+  availableLabel: { fontSize: 11, ...FONTS.bold, color: Colors.mboaGreen, marginBottom: 4 },
+  availableText: { fontSize: 12, ...FONTS.regular, color: Colors.textMuted },
+  logMealButton: { backgroundColor: Colors.mboaGreen, borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 14 },
+  logMealButtonText: { fontSize: 15, ...FONTS.bold, color: Colors.cleanWhite, letterSpacing: 0.5 },
+  emptyState: { paddingVertical: 60, alignItems: 'center' },
+  emptyTitle: { fontSize: 18, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 8, textAlign: 'center' },
+  emptySubtitle: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, textAlign: 'center', lineHeight: 22, paddingHorizontal: 20 },
+  disclaimerBox: { backgroundColor: '#FFF8E1', borderRadius: 12, padding: 14, marginTop: 8, borderLeftWidth: 3, borderLeftColor: Colors.zenGold },
+  disclaimerText: { fontSize: 12, ...FONTS.regular, color: Colors.earthBlack, lineHeight: 18 },
 });
 
 export default NurtureScreen;

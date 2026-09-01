@@ -1,3 +1,5 @@
+// ─── src/screens/HubScreen.tsx ─────────────────────────────────────────
+
 import React, { useMemo, useState, useEffect } from 'react';
 import {
   View,
@@ -14,6 +16,7 @@ import { useUserStore } from '../store/useUserStore';
 import proverbs from '../data/proverbs.json';
 import { FadeInView } from '../components/common/FadeInView';
 import { AnimatedButton } from '../components/common/AnimatedButton';
+import { useLanguage } from '../context/LanguageContext';
 
 // ─── GUIDE CARDS ──────────────────────────────────────────────────────────
 
@@ -422,6 +425,7 @@ type Answer = 'yes' | 'not_yet' | null;
 // ─── MAIN HUB SCREEN ──────────────────────────────────────────────────────
 
 const HubScreen = () => {
+  const { t, language } = useLanguage();
   const {
     archetype,
     setArchetype,
@@ -442,6 +446,27 @@ const HubScreen = () => {
   } = useUserStore();
 
   const [guidesExpanded, setGuidesExpanded] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // ─── Force re-render when language changes ────────────────────────────
+  useEffect(() => {
+    setRefreshKey(prev => prev + 1);
+  }, [language]);
+
+  // ─── WATER FUNCTIONS ──────────────────────────────────────────────────
+  const handleAddWater = () => {
+    if (waterIntake < 20) {
+      const newAmount = waterIntake + 1;
+      setWaterIntake(newAmount);
+      if (newAmount >= waterGoal) {
+        logWaterHistory();
+      }
+    }
+  };
+
+  const handleResetWater = () => {
+    resetWater();
+  };
 
   // Date helpers
   const todayStr = new Date().toISOString().split('T')[0];
@@ -492,22 +517,6 @@ const HubScreen = () => {
     if (allDone) setLastCheckinDate(todayStr);
   };
 
-  // ─── WATER FUNCTIONS ──────────────────────────────────────────────────
-  const handleAddWater = () => {
-    if (waterIntake < 20) {
-      const newAmount = waterIntake + 1;
-      setWaterIntake(newAmount);
-      // Auto-save to history when goal is reached
-      if (newAmount >= waterGoal) {
-        logWaterHistory();
-      }
-    }
-  };
-
-  const handleResetWater = () => {
-    resetWater();
-  };
-
   // Daily proverb — fixed for the day
   const dailyProverb: any = useMemo(() => {
     const dayOfYear = Math.floor(
@@ -552,9 +561,9 @@ const HubScreen = () => {
   };
 
   const options: { id: 'runner' | 'warrior' | 'guardian'; label: string }[] = [
-    { id: 'runner', label: 'The Runner' },
-    { id: 'warrior', label: 'The Warrior' },
-    { id: 'guardian', label: 'The Guardian' },
+    { id: 'runner', label: t('archetype.runner_title') },
+    { id: 'warrior', label: t('archetype.warrior_title') },
+    { id: 'guardian', label: t('archetype.guardian_title') },
   ];
 
   const questions: {
@@ -562,20 +571,20 @@ const HubScreen = () => {
     emoji: string;
     question: string;
   }[] = [
-    { key: 'hydration', emoji: '💧', question: 'Have you drunk at least 3 cups of water today?' },
-    { key: 'nutrition', emoji: '🍽️', question: 'Have you eaten a balanced local meal today?' },
-    { key: 'training', emoji: '💪', question: 'Have you moved or exercised today?' },
+    { key: 'hydration', emoji: '💧', question: t('hub.hydration') },
+    { key: 'nutrition', emoji: '🍽️', question: t('hub.nutrition') },
+    { key: 'training', emoji: '💪', question: t('hub.training') },
   ];
 
   // Archetype selection screen
   if (!archetype) {
     return (
-      <FadeInView style={styles.container}>
+      <FadeInView style={styles.container} key={refreshKey}>
         <View style={styles.section}>
-          <Text style={styles.eyebrow}>YOUR JOURNEY</Text>
-          <Text style={styles.header}>Find Your Archetype</Text>
+          <Text style={styles.eyebrow}>{t('hub.your_journey')}</Text>
+          <Text style={styles.header}>{t('hub.find_your_archetype')}</Text>
           <Text style={styles.subHeader}>
-            Select your path to unlock your personalized plan.
+            {t('hub.select_your_path')}
           </Text>
           {options.map((option) => (
             <AnimatedButton
@@ -594,7 +603,7 @@ const HubScreen = () => {
   const guideCards = getDailyGuides(archetype);
 
   return (
-    <FadeInView style={styles.container}>
+    <FadeInView style={styles.container} key={refreshKey}>
       <ScrollView
         style={{ width: '100%' }}
         contentContainerStyle={styles.scrollContent}
@@ -603,9 +612,9 @@ const HubScreen = () => {
         <View style={styles.section}>
 
           {/* Header */}
-          <Text style={styles.eyebrow}>DAILY MINDSET</Text>
+          <Text style={styles.eyebrow}>{t('hub.daily_mindset')}</Text>
           <Text style={styles.header}>
-            Hello, {archetype.charAt(0).toUpperCase() + archetype.slice(1)}
+            {t('hub.hello')}, {archetype.charAt(0).toUpperCase() + archetype.slice(1)}
           </Text>
 
           {/* Proverb */}
@@ -619,7 +628,7 @@ const HubScreen = () => {
 
           {/* ─── WATER TRACKING ──────────────────────────────────────────── */}
           <View style={styles.waterContainer}>
-            <Text style={styles.sectionLabel}>💧 WATER</Text>
+            <Text style={styles.sectionLabel}>💧 {t('hub.water_tracker')}</Text>
             <View style={styles.waterProgressContainer}>
               <View style={styles.waterProgressBg}>
                 <View 
@@ -633,7 +642,7 @@ const HubScreen = () => {
                 />
               </View>
               <Text style={styles.waterProgressText}>
-                {waterIntake} / {waterGoal} glasses
+                {waterIntake} / {waterGoal} {t('hub.drops')}
               </Text>
             </View>
             <View style={styles.waterButtons}>
@@ -642,14 +651,14 @@ const HubScreen = () => {
                 onPress={handleAddWater}
                 activeOpacity={0.8}
               >
-                <Text style={styles.waterButtonText}>💧 Add Glass</Text>
+                <Text style={styles.waterButtonText}>💧 {t('hub.add_glass')}</Text>
               </TouchableOpacity>
               <TouchableOpacity 
                 style={[styles.waterButton, styles.waterResetButton]}
                 onPress={handleResetWater}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.waterButtonText, styles.waterResetText]}>↺ Reset</Text>
+                <Text style={[styles.waterButtonText, styles.waterResetText]}>↺ {t('hub.reset')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -657,7 +666,7 @@ const HubScreen = () => {
           {/* Previous month summary — first day of new month only */}
           {showPrevMonthSummary && (
             <>
-              <Text style={styles.sectionLabel}>LAST MONTH'S SUMMARY</Text>
+              <Text style={styles.sectionLabel}>{t('hub.last_months_summary')}</Text>
               <PrevMonthSummary
                 checkInHistory={checkInHistory}
                 monthName={prevMonthName}
@@ -668,14 +677,14 @@ const HubScreen = () => {
           )}
 
           {/* Q&A Check-In */}
-          <Text style={styles.sectionLabel}>TODAY'S CHECK-IN</Text>
+          <Text style={styles.sectionLabel}>{t('hub.today_checkin')}</Text>
 
           {todayAlreadyAnswered ? (
             // Already completed today — show summary state
             <View style={styles.alreadyDoneCard}>
-              <Text style={styles.alreadyDoneTitle}>✓ Today's check-in complete</Text>
+              <Text style={styles.alreadyDoneTitle}>✓ {t('hub.checkin_complete')}</Text>
               <Text style={styles.alreadyDoneSubtitle}>
-                Come back tomorrow for a fresh check-in.
+                {t('hub.come_back_tomorrow')}
               </Text>
               <View style={[styles.progressBarBgLarge, { marginTop: 14 }]}>
                 <View
@@ -696,7 +705,7 @@ const HubScreen = () => {
             // Q&A form
             <View style={styles.checkInCard}>
               <Text style={styles.checkInIntro}>
-                Answer three quick questions about your day. Be honest — this is for you.
+                {t('hub.checkin_intro')}
               </Text>
 
               {/* Progress bar fills as questions are answered */}
@@ -714,8 +723,8 @@ const HubScreen = () => {
                 />
               </View>
               <Text style={styles.progressHint}>
-                {answeredCount}/3 answered
-                {allAnswered ? ' — your progress is ready below' : ''}
+                {answeredCount}/3 {t('hub.answered')}
+                {allAnswered ? ` — ${t('hub.progress_ready')}` : ''}
               </Text>
 
               <View style={styles.questionsDivider} />
@@ -740,7 +749,7 @@ const HubScreen = () => {
                           styles.qaBtnText,
                           answer === 'yes' && styles.qaBtnTextWhite,
                         ]}>
-                          ✓  YES
+                          ✓  {t('hub.yes')}
                         </Text>
                       </TouchableOpacity>
 
@@ -756,7 +765,7 @@ const HubScreen = () => {
                           styles.qaBtnText,
                           answer === 'not_yet' && styles.qaBtnNoTextActive,
                         ]}>
-                          NOT YET
+                          {t('hub.not_yet')}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -770,7 +779,7 @@ const HubScreen = () => {
           {allAnswered && (
             <>
               <View style={styles.harmonyReveal}>
-                <Text style={styles.harmonyRevealLabel}>TODAY'S HARMONY</Text>
+                <Text style={styles.harmonyRevealLabel}>{t('hub.todays_harmony')}</Text>
                 <Text style={[styles.harmonyRevealScore, { color: getHarmonyColor(harmonyScore) }]}>
                   {harmonyScore}% — {getHarmonyLabel(harmonyScore)}
                 </Text>
@@ -787,16 +796,16 @@ const HubScreen = () => {
                 </View>
                 <Text style={styles.harmonyMessage}>
                   {harmonyScore === 100
-                    ? 'Perfect day! Every habit completed. Keep this up.'
+                    ? t('hub.perfect_day')
                     : harmonyScore >= 66
-                    ? 'Great effort today. You are on the right track.'
+                    ? t('hub.great_effort')
                     : harmonyScore >= 33
-                    ? 'A start is a start. Tomorrow aim for one more.'
-                    : 'Every day is a new chance. Tomorrow begins again.'}
+                    ? t('hub.start_is_start')
+                    : t('hub.every_day_chance')}
                 </Text>
               </View>
 
-              <Text style={styles.sectionLabel}>THIS MONTH'S PROGRESS</Text>
+              <Text style={styles.sectionLabel}>{t('hub.this_months_progress')}</Text>
               <MonthlyCalendar
                 checkInHistory={checkInHistory}
                 streak={streak}
@@ -810,9 +819,9 @@ const HubScreen = () => {
             onPress={() => setGuidesExpanded(!guidesExpanded)}
             activeOpacity={0.8}
           >
-            <Text style={styles.sectionLabel}>TODAY'S WELLNESS GUIDES</Text>
+            <Text style={styles.sectionLabel}>{t('hub.wellness_guides')}</Text>
             <Text style={styles.guidesToggle}>
-              {guidesExpanded ? '▲ Hide' : '▼ Show'}
+              {guidesExpanded ? t('hub.hide') : t('hub.show')}
             </Text>
           </TouchableOpacity>
 
@@ -820,16 +829,16 @@ const HubScreen = () => {
 
           {/* Share — ALWAYS VISIBLE */}
           <View style={styles.shareCard}>
-            <Text style={styles.shareTitle}>Know someone who needs this?</Text>
+            <Text style={styles.shareTitle}>{t('hub.share_title')}</Text>
             <Text style={styles.shareSubtitle}>
-              Share Mboa-Zen with a friend. Free to install and works offline.
+              {t('hub.share_subtitle')}
             </Text>
             <TouchableOpacity
               style={styles.shareButton}
               onPress={handleShare}
               activeOpacity={0.8}
             >
-              <Text style={styles.shareButtonText}>📲  Share Mboa-Zen</Text>
+              <Text style={styles.shareButtonText}>📲  {t('hub.share_button')}</Text>
             </TouchableOpacity>
           </View>
 

@@ -1,113 +1,175 @@
 import { create } from 'zustand';
-import { WorkoutExercise } from '../types';
-import { WORKOUTS_DATABASE } from '../data/workouts';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Archetype } from '../types';
 
-interface WorkoutState {
-  currentExercise: WorkoutExercise | null;
-  allExercises: WorkoutExercise[];
-  isActive: boolean;
-  isPaused: boolean;
-  timeRemaining: number;
-  isRestPhase: boolean;
-  currentRep: number;
-  completedExercises: number[];
-  
-  loadExercises: () => void;
-  selectExercise: (exercise: WorkoutExercise) => void;
-  startTimer: () => void;
-  pauseTimer: () => void;
-  resetTimer: () => void;
-  tickTimer: () => void;
+type DailyCheckIn = {
+  hydration: boolean;
+  nutrition: boolean;
+  training: boolean;
+};
+
+interface UserState {
+  // Profile
+  userId: string | null;
+  userName: string;
+  phone: string;
+  archetype: Archetype | null;
+  selectedGoal: string | null;
+  isPremium: boolean;
+
+  // Daily tracking
+  harmonyScore: number;
+  checkIns: DailyCheckIn;
+
+  // History
+  checkInHistory: Record<string, DailyCheckIn>;
+  lastCheckinDate: string | null;
+
+  // ─── WATER TRACKING ──────────────────────────────────────────────────
+  waterIntake: number;
+  waterGoal: number;
+  waterHistory: Record<string, number>;
+
+  // Actions
+  setArchetype: (archetype: Archetype) => void;
+  setUserName: (name: string) => void;
+  setPhone: (phone: string) => void;
+  setPremium: (status: boolean) => void;
+  setSelectedGoal: (goal: string) => void;
+  toggleCheckIn: (key: 'hydration' | 'nutrition' | 'training') => void;
+  calculateHarmony: () => void;
+  resetCheckIns: () => void;
+  logCheckInHistory: () => void;
+  setLastCheckinDate: (date: string) => void;
+  resetUser: () => void;
+
+  // ─── WATER ACTIONS ──────────────────────────────────────────────────
+  setWaterIntake: (amount: number) => void;
+  resetWater: () => void;
+  logWaterHistory: () => void;
 }
 
-export const useWorkoutStore = create<WorkoutState>((set, get) => ({
-  currentExercise: null,
-  allExercises: [],
-  isActive: false,
-  isPaused: false,
-  timeRemaining: 0,
-  isRestPhase: false,
-  currentRep: 0,
-  completedExercises: [],
+export const useUserStore = create<UserState>()(
+  persist(
+    (set, get) => ({
+      // Initial state
+      userId: null,
+      userName: '',
+      phone: '',
+      archetype: null,
+      selectedGoal: null,
+      isPremium: false,
+      harmonyScore: 0,
+      checkIns: {
+        hydration: false,
+        nutrition: false,
+        training: false,
+      },
+      checkInHistory: {},
+      lastCheckinDate: null,
 
-  loadExercises: () => {
-    set({ 
-      allExercises: WORKOUTS_DATABASE, 
-      currentExercise: WORKOUTS_DATABASE[0] || null,
-      timeRemaining: WORKOUTS_DATABASE[0]?.duration_parameters.default_active_seconds || 0
-    });
-  },
+      // ─── WATER INITIAL STATE ──────────────────────────────────────────
+      waterIntake: 0,
+      waterGoal: 8,
+      waterHistory: {},
 
-  selectExercise: (exercise) => {
-    set({
-      currentExercise: exercise,
-      timeRemaining: exercise.duration_parameters.default_active_seconds,
-      isActive: false,
-      isPaused: false,
-      isRestPhase: false,
-      currentRep: 0,
-    });
-  },
+      // Setters
+      setArchetype: (archetype) => set({ archetype }),
+      setUserName: (name) => set({ userName: name }),
+      setPhone: (phone) => set({ phone }),
+      setPremium: (status) => set({ isPremium: status }),
+      setSelectedGoal: (goal) => set({ selectedGoal: goal }),
+      setLastCheckinDate: (date) => set({ lastCheckinDate: date }),
 
-  startTimer: () => {
-    const { currentExercise } = get();
-    if (!currentExercise) return;
-    set({ 
-      isActive: true, 
-      isPaused: false 
-    });
-  },
-
-  pauseTimer: () => set((state) => ({ isPaused: !state.isPaused })),
-
-  resetTimer: () => {
-    const { currentExercise } = get();
-    if (!currentExercise) return;
-    set({ 
-      isActive: false, 
-      isPaused: false, 
-      timeRemaining: currentExercise.duration_parameters.default_active_seconds, 
-      isRestPhase: false, 
-      currentRep: 0 
-    });
-  },
-
- tickTimer: () => { 
-  // 1. Fetch the values from state first
-  const { timeRemaining, isRestPhase, currentExercise, currentRep } = get();
-  
-  // 2. Run the safety check immediately after
-  if (!currentExercise) return;
-
-  if (timeRemaining <= 1) {
-    if (!isRestPhase) {
-      // Transition from Active Phase -> Rest Phase
-      set({ 
-        isRestPhase: true, 
-        timeRemaining: currentExercise.duration_parameters.default_rest_seconds 
-      });
-    } else {
-      // Rest Phase over. Check if target repetitions have been fulfilled
-      const nextRep = currentRep + 1;
-      if (nextRep >= currentExercise.duration_parameters.recommended_reps) {
-        // Workout Complete
-        set((state) => ({
-          isActive: false,
-          isRestPhase: false,
-          timeRemaining: 0,
-          completedExercises: [...state.completedExercises, currentExercise.id]
-        }));
-      } else {
-        // Move into the next exercise cycle/rep
-        set({
-          isRestPhase: false,
-          currentRep: nextRep,
-          timeRemaining: currentExercise.duration_parameters.default_active_seconds
+      // Toggle check-in and recalculate harmony atomically
+      toggleCheckIn: (key) => {
+        set((state) => {
+          const updatedCheckIns = {
+            ...state.checkIns,
+            [key]: !state.checkIns[key],
+          };
+          const total = Object.values(updatedCheckIns).length;
+          const completed = Object.values(updatedCheckIns).filter(Boolean).length;
+          const score = Math.round((completed / total) * 100);
+          return { checkIns: updatedCheckIns, harmonyScore: score };
         });
-      }
+      },
+
+      calculateHarmony: () => {
+        const { checkIns } = get();
+        const total = Object.values(checkIns).length;
+        const completed = Object.values(checkIns).filter(Boolean).length;
+        set({ harmonyScore: Math.round((completed / total) * 100) });
+      },
+
+      resetCheckIns: () => {
+        set({
+          checkIns: { hydration: false, nutrition: false, training: false },
+          harmonyScore: 0,
+        });
+      },
+
+      // Save today's check-ins to history keyed by date
+      logCheckInHistory: () => {
+        const { checkIns, checkInHistory } = get();
+        const today = new Date().toISOString().split('T')[0];
+        set({
+          checkInHistory: {
+            ...checkInHistory,
+            [today]: { ...checkIns },
+          },
+        });
+      },
+
+      // ─── WATER ACTIONS ──────────────────────────────────────────────────
+      setWaterIntake: (amount) => set({ waterIntake: amount }),
+      
+      resetWater: () => {
+        const today = new Date().toISOString().split('T')[0];
+        const { waterIntake, waterHistory } = get();
+        set({
+          waterIntake: 0,
+          waterHistory: {
+            ...waterHistory,
+            [today]: waterIntake,
+          },
+        });
+      },
+      
+      logWaterHistory: () => {
+        const today = new Date().toISOString().split('T')[0];
+        const { waterIntake, waterHistory } = get();
+        set({
+          waterHistory: {
+            ...waterHistory,
+            [today]: waterIntake,
+          },
+        });
+      },
+
+      // Full reset
+      resetUser: () => {
+        set({
+          userId: null,
+          userName: '',
+          phone: '',
+          archetype: null,
+          selectedGoal: null,
+          isPremium: false,
+          harmonyScore: 0,
+          checkIns: { hydration: false, nutrition: false, training: false },
+          checkInHistory: {},
+          lastCheckinDate: null,
+          waterIntake: 0,
+          waterGoal: 8,
+          waterHistory: {},
+        });
+      },
+    }),
+    {
+      name: 'mboa-zen-storage',
+      storage: createJSONStorage(() => AsyncStorage),
     }
-  } else {
-    set({ timeRemaining: timeRemaining - 1 });
-  }
-},
-}));
+  )
+);

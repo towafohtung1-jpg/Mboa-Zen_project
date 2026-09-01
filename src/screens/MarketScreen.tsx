@@ -1,473 +1,663 @@
-import React from 'react';
+// ─── src/screens/MarketScreen.tsx ──────────────────────────────────────
+
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  FlatList,
+  ScrollView,
   TouchableOpacity,
   Alert,
+  Platform,
+  Linking,
 } from 'react-native';
 import { Colors } from '../constants/colors';
-import coaches from '../data/coaches.json';
+import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
+import { FadeInView } from '../components/common/FadeInView';
+
+// ─── COACHES DATA ──────────────────────────────────────────────────────
+const COACHES = [
+  {
+    id: '1',
+    name: 'Coach Marie',
+    specialty: 'Nutrition & Meal Planning',
+    location: 'Yaoundé',
+    rating: 4.9,
+    price: 'FCFA 5,000/session',
+    image: '👩‍🍳',
+    available: true,
+  },
+  {
+    id: '2',
+    name: 'Coach Jean',
+    specialty: 'Strength Training & Fitness',
+    location: 'Douala',
+    rating: 4.8,
+    price: 'FCFA 4,500/session',
+    image: '🏋️',
+    available: true,
+  },
+  {
+    id: '3',
+    name: 'Coach Sarah',
+    specialty: 'Wellness & Lifestyle',
+    location: 'Buea',
+    rating: 4.7,
+    price: 'FCFA 4,000/session',
+    image: '🧘',
+    available: true,
+  },
+];
 
 const MarketScreen = () => {
-  const { isPremium, setPremium } = useUserStore();
+  const { archetype, isPremium, setIsPremium } = useUserStore();
+  const [selectedPayment, setSelectedPayment] = useState<'momo' | 'orange' | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleBook = (name: string) => {
-    Alert.alert(
-      'Coach Booking',
-      `Booking session with ${name}.\n\nIn production, this will launch Mobile Money payment.`
-    );
+  // ─── HANDLE PREMIUM UPGRADE ──────────────────────────────────────────
+  const handleUpgrade = async () => {
+    if (!selectedPayment) {
+      Alert.alert('Select Payment Method', 'Please select MTN MoMo or Orange Money.');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Successful payment
+      setIsPremium(true);
+      Alert.alert(
+        '🎉 Premium Activated!',
+        'You now have access to all premium features.\n\n' +
+        '✅ Exclusive workouts\n' +
+        '✅ Personalized meal plans\n' +
+        '✅ Coach booking\n' +
+        '✅ Advanced analytics',
+        [{ text: 'Great!' }]
+      );
+    } catch (error) {
+      Alert.alert('Payment Failed', 'Please try again or use a different payment method.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  const handleUpgrade = () => {
-    setPremium(true);
-    Alert.alert(
-      'Premium Activated',
-      'Welcome to Mboa-Zen Premium (demo mode).'
-    );
-  };
+  // ─── HANDLE COACH BOOKING ────────────────────────────────────────────
+  const handleBookCoach = (coach: any) => {
+    if (!isPremium) {
+      Alert.alert(
+        'Premium Required',
+        'Book a coach session with your premium subscription.\n\n' +
+        'Subscribe now for FCFA 2,500/month',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Upgrade Now', onPress: () => {} }
+        ]
+      );
+      return;
+    }
 
-  const handleMobileMoney = (provider: 'MTN MoMo' | 'Orange Money') => {
     Alert.alert(
-      `${provider} Payment`,
-      `You will be redirected to ${provider} to complete the upgrade.\n\n(Demo mode)`
+      `Book ${coach.name}`,
+      `${coach.specialty}\n${coach.location}\n${coach.price}\n\n⭐ ${coach.rating} rating\n\nWould you like to book a session?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Book Session', 
+          onPress: () => {
+            // In a real app, this would send a booking request
+            Alert.alert('✅ Booking Requested!', 
+              `You have requested a session with ${coach.name}.\nThey will contact you shortly.`
+            );
+          }
+        }
+      ]
     );
   };
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        ListHeaderComponent={
-          <>
-            <View style={styles.headerArea}>
-              <Text style={styles.header}>The Market</Text>
-              <Text style={styles.subheader}>
-                Coaches, premium tools, and upgrade options
+    <FadeInView style={styles.container}>
+      <ScrollView
+        style={{ width: '100%' }}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ─── HEADER ────────────────────────────────────────────────────── */}
+        <View style={styles.headerArea}>
+          <Text style={styles.eyebrow}>THE MARKET</Text>
+          <Text style={styles.header}>Premium Features</Text>
+          <Text style={styles.subHeader}>
+            {isPremium ? '🎉 You have full access!' : 'Upgrade to unlock everything'}
+          </Text>
+        </View>
+
+        {/* ─── PREMIUM STATUS CARD ──────────────────────────────────────── */}
+        <View style={[styles.premiumCard, isPremium && styles.premiumCardActive]}>
+          <View style={styles.premiumHeader}>
+            <Text style={styles.premiumBadge}>
+              {isPremium ? '✅ PREMIUM' : '⭐ PREMIUM'}
+            </Text>
+            {isPremium && (
+              <View style={styles.activeBadge}>
+                <Text style={styles.activeBadgeText}>ACTIVE</Text>
+              </View>
+            )}
+          </View>
+          <Text style={styles.premiumPrice}>
+            {isPremium ? 'You have full access' : 'FCFA 2,500 / month'}
+          </Text>
+          <Text style={styles.premiumDescription}>
+            {isPremium 
+              ? 'Enjoy all premium features including exclusive workouts and meal plans.'
+              : 'Unlock premium content and features to get the most out of Mboa-Zen.'}
+          </Text>
+        </View>
+
+        {/* ─── FEATURES LIST ────────────────────────────────────────────── */}
+        <View style={styles.featuresContainer}>
+          <Text style={styles.sectionTitle}>What You Get</Text>
+          
+          <View style={styles.featureItem}>
+            <Text style={styles.featureIcon}>🏋️</Text>
+            <View style={styles.featureContent}>
+              <Text style={styles.featureName}>Exclusive Workouts</Text>
+              <Text style={styles.featureDescription}>
+                {isPremium 
+                  ? 'All premium workouts unlocked' 
+                  : 'Advanced workouts and progress tracking'}
               </Text>
             </View>
+            {isPremium ? (
+              <Text style={styles.featureStatus}>✅</Text>
+            ) : (
+              <Text style={styles.featureLock}>🔒</Text>
+            )}
+          </View>
 
-            {/* Premium Card */}
-            <View style={styles.premiumCard}>
-              <View style={styles.premiumBadge}>
-                <Text style={styles.premiumBadgeText}>PREMIUM</Text>
-              </View>
-
-              <Text style={styles.premiumTitle}>
-                Unlock full Mboa-Zen
+          <View style={styles.featureItem}>
+            <Text style={styles.featureIcon}>🍽️</Text>
+            <View style={styles.featureContent}>
+              <Text style={styles.featureName}>Personalized Meal Plans</Text>
+              <Text style={styles.featureDescription}>
+                {isPremium 
+                  ? 'All meal plans unlocked' 
+                  : 'Custom meal plans based on your goals'}
               </Text>
+            </View>
+            {isPremium ? (
+              <Text style={styles.featureStatus}>✅</Text>
+            ) : (
+              <Text style={styles.featureLock}>🔒</Text>
+            )}
+          </View>
 
-              <Text style={styles.premiumPrice}>
-                FCFA 2,500<Text style={styles.premiumPerMonth}> /month</Text>
+          <View style={styles.featureItem}>
+            <Text style={styles.featureIcon}>👨‍🏫</Text>
+            <View style={styles.featureContent}>
+              <Text style={styles.featureName}>Coach Booking</Text>
+              <Text style={styles.featureDescription}>
+                {isPremium 
+                  ? 'Book any coach anytime' 
+                  : '1-on-1 sessions with certified coaches'}
               </Text>
+            </View>
+            {isPremium ? (
+              <Text style={styles.featureStatus}>✅</Text>
+            ) : (
+              <Text style={styles.featureLock}>🔒</Text>
+            )}
+          </View>
 
-              {/* Feature list */}
-              <View style={styles.featureList}>
-                <View style={styles.featureRow}>
-                  <Text style={styles.featureCheck}>✓</Text>
-                  <Text style={styles.featureText}>
-                    Advanced macro analytics
-                  </Text>
-                </View>
-                <View style={styles.featureRow}>
-                  <Text style={styles.featureCheck}>✓</Text>
-                  <Text style={styles.featureText}>
-                    Full recipe history & custom meal builder
-                  </Text>
-                </View>
-                <View style={styles.featureRow}>
-                  <Text style={styles.featureCheck}>✓</Text>
-                  <Text style={styles.featureText}>
-                    Offline workout access
-                  </Text>
-                </View>
-                <View style={styles.featureRow}>
-                  <Text style={styles.featureCheck}>✓</Text>
-                  <Text style={styles.featureText}>
-                    Direct coach booking priority
-                  </Text>
+          <View style={styles.featureItem}>
+            <Text style={styles.featureIcon}>📊</Text>
+            <View style={styles.featureContent}>
+              <Text style={styles.featureName}>Advanced Analytics</Text>
+              <Text style={styles.featureDescription}>
+                {isPremium 
+                  ? 'Full analytics dashboard' 
+                  : 'Track your progress with detailed insights'}
+              </Text>
+            </View>
+            {isPremium ? (
+              <Text style={styles.featureStatus}>✅</Text>
+            ) : (
+              <Text style={styles.featureLock}>🔒</Text>
+            )}
+          </View>
+        </View>
+
+        {/* ─── PAYMENT SECTION ──────────────────────────────────────────── */}
+        {!isPremium && (
+          <View style={styles.paymentContainer}>
+            <Text style={styles.sectionTitle}>Pay with</Text>
+
+            <TouchableOpacity
+              style={[
+                styles.paymentOption,
+                selectedPayment === 'momo' && styles.paymentOptionSelected,
+              ]}
+              onPress={() => setSelectedPayment('momo')}
+              activeOpacity={0.8}
+            >
+              <View style={styles.paymentLeft}>
+                <Text style={styles.paymentIcon}>📱</Text>
+                <View>
+                  <Text style={styles.paymentName}>MTN MoMo</Text>
+                  <Text style={styles.paymentSubtext}>Mobile Money</Text>
                 </View>
               </View>
-
-              {/* Mobile Money buttons */}
-              {isPremium ? (
-                <View style={styles.activeBox}>
-                  <Text style={styles.activeTitle}>PREMIUM ACTIVE</Text>
-                  <Text style={styles.activeSubtitle}>
-                    You have full access to all features
-                  </Text>
+              {selectedPayment === 'momo' && (
+                <View style={styles.paymentCheck}>
+                  <Text style={styles.paymentCheckText}>✓</Text>
                 </View>
-              ) : (
-                <>
-                  <View style={styles.momoRow}>
-                    <TouchableOpacity
-                      style={[styles.momoButton, styles.mtnButton]}
-                      onPress={() => handleMobileMoney('MTN MoMo')}
-                    >
-                      <Text style={styles.momoButtonText}>Pay with MTN MoMo</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[styles.momoButton, styles.orangeButton]}
-                      onPress={() => handleMobileMoney('Orange Money')}
-                    >
-                      <Text style={styles.momoButtonText}>Pay with Orange Money</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <TouchableOpacity
-                    style={styles.demoButton}
-                    onPress={handleUpgrade}
-                  >
-                    <Text style={styles.demoButtonText}>
-                      Activate demo (skip payment)
-                    </Text>
-                  </TouchableOpacity>
-                </>
               )}
-            </View>
+            </TouchableOpacity>
 
-            {/* Section title */}
-            <Text style={styles.sectionTitle}>Available Coaches</Text>
-            <Text style={styles.sectionSubtitle}>
-              Book a 1-on-1 session with certified local guides
-            </Text>
-          </>
-        }
-        data={coaches as any}
-        keyExtractor={(item: any) => item.id.toString()}
-        renderItem={({ item }) => {
-          const initials = (item.coach_name || '')
-            .split(' ')
-            .map((w: string) => w[0])
-            .join('')
-            .slice(0, 2)
-            .toUpperCase();
-
-          return (
-            <View style={styles.coachCard}>
-              <View style={styles.coachAvatar}>
-                <Text style={styles.coachInitials}>{initials}</Text>
-              </View>
-
-              <View style={styles.coachInfo}>
-                <Text style={styles.coachName}>{item.coach_name}</Text>
-                <Text style={styles.coachSpecialty}>{item.specialty}</Text>
-
-                <View style={styles.coachMetaRow}>
-                  <Text style={styles.coachRate}>{item.hourly_rate}</Text>
-                  <View style={styles.coachStatusBadge}>
-                    <Text style={styles.coachStatusText}>
-                      {item.status}
-                    </Text>
-                  </View>
+            <TouchableOpacity
+              style={[
+                styles.paymentOption,
+                selectedPayment === 'orange' && styles.paymentOptionSelected,
+              ]}
+              onPress={() => setSelectedPayment('orange')}
+              activeOpacity={0.8}
+            >
+              <View style={styles.paymentLeft}>
+                <Text style={styles.paymentIcon}>📱</Text>
+                <View>
+                  <Text style={styles.paymentName}>Orange Money</Text>
+                  <Text style={styles.paymentSubtext}>Mobile Money</Text>
                 </View>
               </View>
+              {selectedPayment === 'orange' && (
+                <View style={styles.paymentCheck}>
+                  <Text style={styles.paymentCheckText}>✓</Text>
+                </View>
+              )}
+            </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.bookButton}
-                onPress={() => handleBook(item.coach_name)}
-              >
-                <Text style={styles.bookButtonText}>Book</Text>
-              </TouchableOpacity>
-            </View>
-          );
-        }}
-        ListFooterComponent={
-          <View style={styles.becomeCoachCard}>
-            <Text style={styles.becomeCoachTitle}>Are you a coach?</Text>
-            <Text style={styles.becomeCoachText}>
-              Join Mboa-Zen as a certified guide and reach
-              users across West Africa.
-            </Text>
-            <TouchableOpacity style={styles.becomeCoachButton}>
-              <Text style={styles.becomeCoachButtonText}>
-                Become a Coach
+            <TouchableOpacity
+              style={[
+                styles.upgradeButton,
+                isProcessing && styles.upgradeButtonDisabled,
+              ]}
+              onPress={handleUpgrade}
+              disabled={isProcessing}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.upgradeButtonText}>
+                {isProcessing ? 'Processing...' : '🔓 Upgrade Now'}
               </Text>
             </TouchableOpacity>
+
+            <Text style={styles.paymentNote}>
+              Secure payment via MTN MoMo or Orange Money
+            </Text>
           </View>
-        }
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            No coaches available right now.
+        )}
+
+        {/* ─── COACHES SECTION ──────────────────────────────────────────── */}
+        <View style={styles.coachesContainer}>
+          <Text style={styles.sectionTitle}>
+            {isPremium ? '👨‍🏫 Book a Coach' : '👨‍🏫 Available Coaches'}
           </Text>
-        }
-      />
-    </View>
+          {!isPremium && (
+            <Text style={styles.coachesSubtext}>
+              Upgrade to premium to book a session
+            </Text>
+          )}
+
+          {COACHES.map((coach) => (
+            <TouchableOpacity
+              key={coach.id}
+              style={[
+                styles.coachCard,
+                !isPremium && styles.coachCardLocked,
+              ]}
+              onPress={() => handleBookCoach(coach)}
+              activeOpacity={0.8}
+            >
+              <View style={styles.coachHeader}>
+                <Text style={styles.coachAvatar}>{coach.image}</Text>
+                <View style={styles.coachInfo}>
+                  <Text style={styles.coachName}>{coach.name}</Text>
+                  <Text style={styles.coachSpecialty}>{coach.specialty}</Text>
+                  <View style={styles.coachMeta}>
+                    <Text style={styles.coachLocation}>📍 {coach.location}</Text>
+                    <Text style={styles.coachRating}>⭐ {coach.rating}</Text>
+                  </View>
+                </View>
+                {isPremium && (
+                  <View style={styles.coachBookButton}>
+                    <Text style={styles.coachBookText}>Book</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.coachPrice}>{coach.price}</Text>
+              {!isPremium && (
+                <View style={styles.coachLockOverlay}>
+                  <Text style={styles.coachLockText}>🔒</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={{ height: 30 }} />
+      </ScrollView>
+    </FadeInView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.cleanWhite,
+    backgroundColor: Colors.softBg,
+    alignItems: 'center',
   },
-
-  // Header
+  scrollContent: {
+    width: '100%',
+    alignItems: 'center',
+    paddingBottom: 30,
+  },
   headerArea: {
-    paddingTop: 18,
-    paddingHorizontal: 16,
-    paddingBottom: 8,
+    width: '100%',
+    maxWidth: 480,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 12,
+  },
+  eyebrow: {
+    fontSize: 11,
+    ...FONTS.bold,
+    color: Colors.zenGold,
+    letterSpacing: 3,
+    marginBottom: 4,
   },
   header: {
-    fontSize: 26,
-    fontWeight: 'bold',
+    fontSize: 24,
+    ...FONTS.bold,
     color: Colors.earthBlack,
-    marginBottom: 4,
+    marginBottom: 2,
   },
-  subheader: {
-    fontSize: 13,
+  subHeader: {
+    fontSize: 14,
+    ...FONTS.regular,
     color: Colors.textMuted,
   },
-
-  // Premium card
+  // ─── PREMIUM CARD ──────────────────────────────────────────────────────
   premiumCard: {
-    backgroundColor: Colors.zenGold,
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 20,
+    width: '100%',
+    maxWidth: 480,
+    backgroundColor: Colors.cleanWhite,
+    borderRadius: 16,
     padding: 20,
-    borderRadius: 18,
-  },
-  premiumBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: Colors.earthBlack,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-    marginBottom: 12,
-  },
-  premiumBadgeText: {
-    color: Colors.zenGold,
-    fontSize: 11,
-    fontWeight: 'bold',
-    letterSpacing: 2,
-  },
-  premiumTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: Colors.earthBlack,
-    marginBottom: 6,
-  },
-  premiumPrice: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: Colors.earthBlack,
+    marginHorizontal: 20,
     marginBottom: 16,
-  },
-  premiumPerMonth: {
-    fontSize: 14,
-    fontWeight: 'normal',
-    color: Colors.earthBlack,
-  },
-
-  // Features
-  featureList: {
-    marginBottom: 18,
-  },
-  featureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  featureCheck: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: Colors.mboaGreen,
-    marginRight: 10,
-    width: 20,
-  },
-  featureText: {
-    fontSize: 14,
-    color: Colors.earthBlack,
-    flex: 1,
-  },
-
-  // Mobile Money
-  momoRow: {
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-  momoButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginHorizontal: 3,
-  },
-  mtnButton: {
-    backgroundColor: '#FFCC00',
-  },
-  orangeButton: {
-    backgroundColor: '#FF7900',
-  },
-  momoButtonText: {
-    color: Colors.cleanWhite,
-    fontWeight: 'bold',
-    fontSize: 13,
-  },
-  demoButton: {
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  demoButtonText: {
-    color: Colors.earthBlack,
-    fontSize: 12,
-    textDecorationLine: 'underline',
-  },
-
-  // Active state
-  activeBox: {
-    backgroundColor: Colors.mboaGreen,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  activeTitle: {
-    color: Colors.cleanWhite,
-    fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 2,
-  },
-  activeSubtitle: {
-    color: Colors.cleanWhite,
-    fontSize: 12,
-    marginTop: 4,
-    opacity: 0.9,
-  },
-
-  // Section
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: Colors.earthBlack,
-    paddingHorizontal: 16,
-    marginBottom: 4,
-  },
-  sectionSubtitle: {
-    fontSize: 12,
-    color: Colors.textMuted,
-    paddingHorizontal: 16,
-    marginBottom: 14,
-  },
-
-  // Coach card
-  coachCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.softBg,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    padding: 14,
-    borderRadius: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
     borderLeftWidth: 4,
     borderLeftColor: Colors.mboaGreen,
   },
-  coachAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  premiumCardActive: {
+    borderLeftColor: '#FFD700',
+  },
+  premiumHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  premiumBadge: {
+    fontSize: 12,
+    ...FONTS.bold,
+    color: Colors.mboaGreen,
+    letterSpacing: 1,
+  },
+  activeBadge: {
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  activeBadgeText: {
+    fontSize: 10,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+  },
+  premiumPrice: {
+    fontSize: 22,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    marginBottom: 4,
+  },
+  premiumDescription: {
+    fontSize: 14,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    lineHeight: 20,
+  },
+  // ─── FEATURES ──────────────────────────────────────────────────────────
+  featuresContainer: {
+    width: '100%',
+    maxWidth: 480,
+    backgroundColor: Colors.cleanWhite,
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 20,
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    marginBottom: 12,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  featureIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  featureContent: {
+    flex: 1,
+  },
+  featureName: {
+    fontSize: 14,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+  },
+  featureDescription: {
+    fontSize: 12,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+  },
+  featureStatus: {
+    fontSize: 18,
+  },
+  featureLock: {
+    fontSize: 18,
+    color: Colors.textMuted,
+  },
+  // ─── PAYMENT ──────────────────────────────────────────────────────────
+  paymentContainer: {
+    width: '100%',
+    maxWidth: 480,
+    backgroundColor: Colors.cleanWhite,
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 20,
+    marginBottom: 16,
+  },
+  paymentOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E0E0E0',
+    marginBottom: 10,
+  },
+  paymentOptionSelected: {
+    borderColor: Colors.mboaGreen,
+    backgroundColor: '#F1FAF3',
+  },
+  paymentLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  paymentIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  paymentName: {
+    fontSize: 15,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+  },
+  paymentSubtext: {
+    fontSize: 12,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+  },
+  paymentCheck: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     backgroundColor: Colors.mboaGreen,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
   },
-  coachInitials: {
+  paymentCheckText: {
+    fontSize: 14,
     color: Colors.cleanWhite,
-    fontWeight: 'bold',
+  },
+  upgradeButton: {
+    backgroundColor: Colors.mboaGreen,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  upgradeButtonDisabled: {
+    opacity: 0.6,
+  },
+  upgradeButtonText: {
     fontSize: 16,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+  },
+  paymentNote: {
+    fontSize: 12,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  // ─── COACHES ──────────────────────────────────────────────────────────
+  coachesContainer: {
+    width: '100%',
+    maxWidth: 480,
+    backgroundColor: Colors.cleanWhite,
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 20,
+  },
+  coachesSubtext: {
+    fontSize: 12,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    marginBottom: 12,
+  },
+  coachCard: {
+    backgroundColor: Colors.softBg,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 10,
+    position: 'relative',
+  },
+  coachCardLocked: {
+    opacity: 0.6,
+  },
+  coachHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  coachAvatar: {
+    fontSize: 32,
+    marginRight: 12,
   },
   coachInfo: {
     flex: 1,
   },
   coachName: {
     fontSize: 15,
-    fontWeight: 'bold',
+    ...FONTS.bold,
     color: Colors.earthBlack,
   },
   coachSpecialty: {
     fontSize: 12,
+    ...FONTS.regular,
     color: Colors.textMuted,
+  },
+  coachMeta: {
+    flexDirection: 'row',
+    gap: 12,
     marginTop: 2,
   },
-  coachMetaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 6,
-  },
-  coachRate: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: Colors.mboaGreen,
-    marginRight: 10,
-  },
-  coachStatusBadge: {
-    backgroundColor: Colors.mboaGreen,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-  },
-  coachStatusText: {
-    color: Colors.cleanWhite,
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  bookButton: {
-    backgroundColor: Colors.earthBlack,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  bookButtonText: {
-    color: Colors.cleanWhite,
-    fontWeight: 'bold',
-    fontSize: 13,
-  },
-
-  // Become a coach
-  becomeCoachCard: {
-    backgroundColor: Colors.earthBlack,
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 30,
-    padding: 20,
-    borderRadius: 14,
-    alignItems: 'center',
-  },
-  becomeCoachTitle: {
-    color: Colors.zenGold,
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 6,
-  },
-  becomeCoachText: {
-    color: Colors.cleanWhite,
-    fontSize: 13,
-    textAlign: 'center',
-    marginBottom: 14,
-    opacity: 0.85,
-    lineHeight: 20,
-  },
-  becomeCoachButton: {
-    borderWidth: 1,
-    borderColor: Colors.zenGold,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  becomeCoachButtonText: {
-    color: Colors.zenGold,
-    fontWeight: 'bold',
-    fontSize: 13,
-    letterSpacing: 1,
-  },
-
-  // Empty
-  emptyText: {
-    textAlign: 'center',
+  coachLocation: {
+    fontSize: 11,
+    ...FONTS.regular,
     color: Colors.textMuted,
-    marginTop: 20,
+  },
+  coachRating: {
+    fontSize: 11,
+    ...FONTS.regular,
+    color: Colors.zenGold,
+  },
+  coachPrice: {
+    fontSize: 12,
+    ...FONTS.medium,
+    color: Colors.mboaGreen,
+    marginTop: 4,
+  },
+  coachBookButton: {
+    backgroundColor: Colors.mboaGreen,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  coachBookText: {
+    fontSize: 12,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+  },
+  coachLockOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 12,
+  },
+  coachLockText: {
+    fontSize: 32,
   },
 });
 
