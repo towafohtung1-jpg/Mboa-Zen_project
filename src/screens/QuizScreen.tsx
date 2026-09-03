@@ -6,7 +6,7 @@ import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
 import { FadeInView } from '../components/common/FadeInView';
-import { useLanguage } from '../context/LanguageContext';
+
 
 type ArchetypeType = 'runner' | 'warrior' | 'guardian';
 
@@ -109,7 +109,7 @@ const OptionCard = ({
 };
 
 const QuizScreen = ({ onFinish }: Props) => {
-  const { t, language } = useLanguage();
+  
   const [answers, setAnswers] = useState<ArchetypeType[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -119,9 +119,7 @@ const QuizScreen = ({ onFinish }: Props) => {
   const totalQuestions = questionKeys.length;
 
   // ─── Force re-render when language changes ────────────────────────────
-  useEffect(() => {
-    setRefreshKey(prev => prev + 1);
-  }, [language]);
+  
 
   // ─── DEBUG ─────────────────────────────────────────────────────────────
   const testTranslation = t('quiz.q1');
@@ -294,3 +292,4 @@ const styles = StyleSheet.create({
 });
 
 export default QuizScreen;
+

@@ -1,5 +1,3 @@
-// ─── src/screens/HubScreen.tsx ─────────────────────────────────────────
-
 import React, { useMemo, useState, useEffect } from 'react';
 import {
   View,
@@ -16,7 +14,6 @@ import { useUserStore } from '../store/useUserStore';
 import proverbs from '../data/proverbs.json';
 import { FadeInView } from '../components/common/FadeInView';
 import { AnimatedButton } from '../components/common/AnimatedButton';
-import { useLanguage } from '../context/LanguageContext';
 
 // ─── GUIDE CARDS ──────────────────────────────────────────────────────────
 
@@ -425,7 +422,6 @@ type Answer = 'yes' | 'not_yet' | null;
 // ─── MAIN HUB SCREEN ──────────────────────────────────────────────────────
 
 const HubScreen = () => {
-  const { t, language } = useLanguage();
   const {
     archetype,
     setArchetype,
@@ -436,37 +432,9 @@ const HubScreen = () => {
     logCheckInHistory,
     lastCheckinDate,
     setLastCheckinDate,
-    // ─── WATER STATE ─────────────────────────────────────────────────────
-    waterIntake,
-    waterGoal,
-    waterHistory,
-    setWaterIntake,
-    resetWater,
-    logWaterHistory,
   } = useUserStore();
 
   const [guidesExpanded, setGuidesExpanded] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  // ─── Force re-render when language changes ────────────────────────────
-  useEffect(() => {
-    setRefreshKey(prev => prev + 1);
-  }, [language]);
-
-  // ─── WATER FUNCTIONS ──────────────────────────────────────────────────
-  const handleAddWater = () => {
-    if (waterIntake < 20) {
-      const newAmount = waterIntake + 1;
-      setWaterIntake(newAmount);
-      if (newAmount >= waterGoal) {
-        logWaterHistory();
-      }
-    }
-  };
-
-  const handleResetWater = () => {
-    resetWater();
-  };
 
   // Date helpers
   const todayStr = new Date().toISOString().split('T')[0];
@@ -561,9 +529,9 @@ const HubScreen = () => {
   };
 
   const options: { id: 'runner' | 'warrior' | 'guardian'; label: string }[] = [
-    { id: 'runner', label: t('archetype.runner_title') },
-    { id: 'warrior', label: t('archetype.warrior_title') },
-    { id: 'guardian', label: t('archetype.guardian_title') },
+    { id: 'runner', label: 'The Runner' },
+    { id: 'warrior', label: 'The Warrior' },
+    { id: 'guardian', label: 'The Guardian' },
   ];
 
   const questions: {
@@ -571,20 +539,20 @@ const HubScreen = () => {
     emoji: string;
     question: string;
   }[] = [
-    { key: 'hydration', emoji: '💧', question: t('hub.hydration') },
-    { key: 'nutrition', emoji: '🍽️', question: t('hub.nutrition') },
-    { key: 'training', emoji: '💪', question: t('hub.training') },
+    { key: 'hydration', emoji: '💧', question: 'Have you drunk at least 3 cups of water today?' },
+    { key: 'nutrition', emoji: '🍽️', question: 'Have you eaten a balanced local meal today?' },
+    { key: 'training', emoji: '💪', question: 'Have you moved or exercised today?' },
   ];
 
   // Archetype selection screen
   if (!archetype) {
     return (
-      <FadeInView style={styles.container} key={refreshKey}>
+      <FadeInView style={styles.container}>
         <View style={styles.section}>
-          <Text style={styles.eyebrow}>{t('hub.your_journey')}</Text>
-          <Text style={styles.header}>{t('hub.find_your_archetype')}</Text>
+          <Text style={styles.eyebrow}>YOUR JOURNEY</Text>
+          <Text style={styles.header}>Find Your Archetype</Text>
           <Text style={styles.subHeader}>
-            {t('hub.select_your_path')}
+            Select your path to unlock your personalized plan.
           </Text>
           {options.map((option) => (
             <AnimatedButton
@@ -603,7 +571,7 @@ const HubScreen = () => {
   const guideCards = getDailyGuides(archetype);
 
   return (
-    <FadeInView style={styles.container} key={refreshKey}>
+    <FadeInView style={styles.container}>
       <ScrollView
         style={{ width: '100%' }}
         contentContainerStyle={styles.scrollContent}
@@ -612,9 +580,9 @@ const HubScreen = () => {
         <View style={styles.section}>
 
           {/* Header */}
-          <Text style={styles.eyebrow}>{t('hub.daily_mindset')}</Text>
+          <Text style={styles.eyebrow}>DAILY MINDSET</Text>
           <Text style={styles.header}>
-            {t('hub.hello')}, {archetype.charAt(0).toUpperCase() + archetype.slice(1)}
+            Hello, {archetype.charAt(0).toUpperCase() + archetype.slice(1)}
           </Text>
 
           {/* Proverb */}
@@ -626,47 +594,10 @@ const HubScreen = () => {
             <Text style={styles.lesson}>{dailyProverb.lesson}</Text>
           </View>
 
-          {/* ─── WATER TRACKING ──────────────────────────────────────────── */}
-          <View style={styles.waterContainer}>
-            <Text style={styles.sectionLabel}>💧 {t('hub.water_tracker')}</Text>
-            <View style={styles.waterProgressContainer}>
-              <View style={styles.waterProgressBg}>
-                <View 
-                  style={[
-                    styles.waterProgressFill,
-                    { 
-                      width: `${Math.min((waterIntake / waterGoal) * 100, 100)}%`,
-                      backgroundColor: waterIntake >= waterGoal ? Colors.mboaGreen : Colors.zenGold
-                    }
-                  ]} 
-                />
-              </View>
-              <Text style={styles.waterProgressText}>
-                {waterIntake} / {waterGoal} {t('hub.drops')}
-              </Text>
-            </View>
-            <View style={styles.waterButtons}>
-              <TouchableOpacity 
-                style={styles.waterButton}
-                onPress={handleAddWater}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.waterButtonText}>💧 {t('hub.add_glass')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.waterButton, styles.waterResetButton]}
-                onPress={handleResetWater}
-                activeOpacity={0.8}
-              >
-                <Text style={[styles.waterButtonText, styles.waterResetText]}>↺ {t('hub.reset')}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
           {/* Previous month summary — first day of new month only */}
           {showPrevMonthSummary && (
             <>
-              <Text style={styles.sectionLabel}>{t('hub.last_months_summary')}</Text>
+              <Text style={styles.sectionLabel}>LAST MONTH'S SUMMARY</Text>
               <PrevMonthSummary
                 checkInHistory={checkInHistory}
                 monthName={prevMonthName}
@@ -677,14 +608,14 @@ const HubScreen = () => {
           )}
 
           {/* Q&A Check-In */}
-          <Text style={styles.sectionLabel}>{t('hub.today_checkin')}</Text>
+          <Text style={styles.sectionLabel}>TODAY'S CHECK-IN</Text>
 
           {todayAlreadyAnswered ? (
             // Already completed today — show summary state
             <View style={styles.alreadyDoneCard}>
-              <Text style={styles.alreadyDoneTitle}>✓ {t('hub.checkin_complete')}</Text>
+              <Text style={styles.alreadyDoneTitle}>✓ Today's check-in complete</Text>
               <Text style={styles.alreadyDoneSubtitle}>
-                {t('hub.come_back_tomorrow')}
+                Come back tomorrow for a fresh check-in.
               </Text>
               <View style={[styles.progressBarBgLarge, { marginTop: 14 }]}>
                 <View
@@ -705,7 +636,7 @@ const HubScreen = () => {
             // Q&A form
             <View style={styles.checkInCard}>
               <Text style={styles.checkInIntro}>
-                {t('hub.checkin_intro')}
+                Answer three quick questions about your day. Be honest — this is for you.
               </Text>
 
               {/* Progress bar fills as questions are answered */}
@@ -723,8 +654,8 @@ const HubScreen = () => {
                 />
               </View>
               <Text style={styles.progressHint}>
-                {answeredCount}/3 {t('hub.answered')}
-                {allAnswered ? ` — ${t('hub.progress_ready')}` : ''}
+                {answeredCount}/3 answered
+                {allAnswered ? ' — your progress is ready below' : ''}
               </Text>
 
               <View style={styles.questionsDivider} />
@@ -749,7 +680,7 @@ const HubScreen = () => {
                           styles.qaBtnText,
                           answer === 'yes' && styles.qaBtnTextWhite,
                         ]}>
-                          ✓  {t('hub.yes')}
+                          ✓  YES
                         </Text>
                       </TouchableOpacity>
 
@@ -765,7 +696,7 @@ const HubScreen = () => {
                           styles.qaBtnText,
                           answer === 'not_yet' && styles.qaBtnNoTextActive,
                         ]}>
-                          {t('hub.not_yet')}
+                          NOT YET
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -779,7 +710,7 @@ const HubScreen = () => {
           {allAnswered && (
             <>
               <View style={styles.harmonyReveal}>
-                <Text style={styles.harmonyRevealLabel}>{t('hub.todays_harmony')}</Text>
+                <Text style={styles.harmonyRevealLabel}>TODAY'S HARMONY</Text>
                 <Text style={[styles.harmonyRevealScore, { color: getHarmonyColor(harmonyScore) }]}>
                   {harmonyScore}% — {getHarmonyLabel(harmonyScore)}
                 </Text>
@@ -796,16 +727,16 @@ const HubScreen = () => {
                 </View>
                 <Text style={styles.harmonyMessage}>
                   {harmonyScore === 100
-                    ? t('hub.perfect_day')
+                    ? 'Perfect day! Every habit completed. Keep this up.'
                     : harmonyScore >= 66
-                    ? t('hub.great_effort')
+                    ? 'Great effort today. You are on the right track.'
                     : harmonyScore >= 33
-                    ? t('hub.start_is_start')
-                    : t('hub.every_day_chance')}
+                    ? 'A start is a start. Tomorrow aim for one more.'
+                    : 'Every day is a new chance. Tomorrow begins again.'}
                 </Text>
               </View>
 
-              <Text style={styles.sectionLabel}>{t('hub.this_months_progress')}</Text>
+              <Text style={styles.sectionLabel}>THIS MONTH'S PROGRESS</Text>
               <MonthlyCalendar
                 checkInHistory={checkInHistory}
                 streak={streak}
@@ -819,9 +750,9 @@ const HubScreen = () => {
             onPress={() => setGuidesExpanded(!guidesExpanded)}
             activeOpacity={0.8}
           >
-            <Text style={styles.sectionLabel}>{t('hub.wellness_guides')}</Text>
+            <Text style={styles.sectionLabel}>TODAY'S WELLNESS GUIDES</Text>
             <Text style={styles.guidesToggle}>
-              {guidesExpanded ? t('hub.hide') : t('hub.show')}
+              {guidesExpanded ? '▲ Hide' : '▼ Show'}
             </Text>
           </TouchableOpacity>
 
@@ -829,16 +760,16 @@ const HubScreen = () => {
 
           {/* Share — ALWAYS VISIBLE */}
           <View style={styles.shareCard}>
-            <Text style={styles.shareTitle}>{t('hub.share_title')}</Text>
+            <Text style={styles.shareTitle}>Know someone who needs this?</Text>
             <Text style={styles.shareSubtitle}>
-              {t('hub.share_subtitle')}
+              Share Mboa-Zen with a friend. Free to install and works offline.
             </Text>
             <TouchableOpacity
               style={styles.shareButton}
               onPress={handleShare}
               activeOpacity={0.8}
             >
-              <Text style={styles.shareButtonText}>📲  {t('hub.share_button')}</Text>
+              <Text style={styles.shareButtonText}>📲  Share Mboa-Zen</Text>
             </TouchableOpacity>
           </View>
 
@@ -869,59 +800,6 @@ const styles = StyleSheet.create({
   lesson: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, lineHeight: 22 },
 
   sectionLabel: { fontSize: 11, ...FONTS.bold, color: Colors.earthBlack, letterSpacing: 2, marginBottom: 12, marginTop: 4 },
-
-  // ─── WATER STYLES ──────────────────────────────────────────────────────
-  waterContainer: {
-    width: '100%',
-    backgroundColor: Colors.softBg,
-    borderRadius: 18,
-    padding: 20,
-    marginBottom: 20,
-  },
-  waterProgressContainer: {
-    marginVertical: 12,
-  },
-  waterProgressBg: {
-    height: 12,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 6,
-    overflow: 'hidden',
-    marginBottom: 8,
-  },
-  waterProgressFill: {
-    height: 12,
-    borderRadius: 6,
-  },
-  waterProgressText: {
-    fontSize: 14,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-    textAlign: 'center',
-  },
-  waterButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  waterButton: {
-    flex: 1,
-    backgroundColor: Colors.mboaGreen,
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  waterResetButton: {
-    backgroundColor: '#EEEEEE',
-    flex: 0.5,
-  },
-  waterButtonText: {
-    fontSize: 14,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-  },
-  waterResetText: {
-    color: Colors.textMuted,
-  },
 
   // Previous month summary
   prevMonthCard: { width: '100%', backgroundColor: '#F1FAF3', borderRadius: 18, padding: 20, marginBottom: 20, borderWidth: 2, borderColor: Colors.mboaGreen },

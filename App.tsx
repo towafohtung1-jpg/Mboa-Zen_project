@@ -13,8 +13,6 @@ import { loadUserState } from './src/utils/storage';
 import { useUserStore } from './src/store/useUserStore';
 import { useFonts } from './src/utils/useFonts';
 import { AnimatedLogo } from './src/components/common/AnimatedLogo';
-// ─── ADD THIS IMPORT ────────────────────────────────────────────────────
-import { LanguageProvider } from './src/context/LanguageContext';
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -27,30 +25,50 @@ export default function App() {
   const setPhone = useUserStore((state) => state.setPhone);
   const userPhone = useUserStore((state) => state.phone);
 
+  // ─── DEBUG: Track loading time ──────────────────────────────────────
+  console.log('🕐 App starting...', new Date().toISOString());
+
   useEffect(() => {
+    console.log('🕐 useEffect running...', new Date().toISOString());
+    
     const init = async () => {
-      if (!fontsLoaded) return;
-
-      const saved = await loadUserState();
-      console.log('APP INIT - Saved state:', saved);
-
-      if (saved && saved.onboardingComplete) {
-        console.log('APP INIT - Found saved state, going to app');
-        if (saved.archetype) {
-          setArchetype(saved.archetype as any);
-        }
-        if (saved.phone) {
-          setPhone(saved.phone);
-        }
-        setStep('app');
-      } else {
-        console.log('APP INIT - No saved state, starting onboarding');
+      console.log('🕐 init() started...', new Date().toISOString());
+      
+      if (!fontsLoaded) {
+        console.log('🕐 fontsLoaded is false, waiting...');
+        return;
       }
 
+      console.log('🕐 fontsLoaded is true, loading state...');
+      
+      try {
+        const saved = await loadUserState();
+        console.log('🕐 loadUserState completed:', saved);
+
+        if (saved && saved.onboardingComplete) {
+          console.log('🕐 Found saved state, going to app');
+          if (saved.archetype) {
+            setArchetype(saved.archetype as any);
+          }
+          if (saved.phone) {
+            setPhone(saved.phone);
+          }
+          setStep('app');
+        } else {
+          console.log('🕐 No saved state, starting onboarding');
+        }
+      } catch (error) {
+        console.error('🕐 Error in init:', error);
+      }
+
+      console.log('🕐 Setting loading to false');
       setLoading(false);
     };
+    
     init();
   }, [fontsLoaded]);
+
+  console.log('🕐 Rendering, loading:', loading, 'fontsLoaded:', fontsLoaded);
 
   if (!fontsLoaded || loading) {
     return (
@@ -63,12 +81,15 @@ export default function App() {
         }}
       >
         <AnimatedLogo size={100} showText={true} />
+        <ActivityIndicator color={Colors.mboaGreen} />
       </View>
     );
   }
 
   // ─── RENDER SCREENS ────────────────────────────────────────────────────
   const renderScreen = () => {
+    console.log('🕐 Rendering screen for step:', step);
+    
     if (step === 'onboarding') {
       return <OnboardingScreen onFinish={() => setStep('goal')} />;
     }
@@ -110,10 +131,5 @@ export default function App() {
     return <RootNavigator />;
   };
 
-  // ─── WRAP EVERYTHING WITH LANGUAGE PROVIDER ──────────────────────────
-  return (
-    <LanguageProvider>
-      {renderScreen()}
-    </LanguageProvider>
-  );
+  return <>{renderScreen()}</>;
 }

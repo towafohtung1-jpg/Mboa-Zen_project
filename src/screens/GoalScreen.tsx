@@ -11,14 +11,14 @@ import {
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
-import { useLanguage } from '../context/LanguageContext';
+
 
 type Props = {
   onFinish: () => void;
 };
 
 const GoalScreen = ({ onFinish }: Props) => {
-  const { t } = useLanguage();
+  
 
   const goals = [
     { id: 'lose_weight', icon: '🔥' },
@@ -205,3 +205,4 @@ const styles = StyleSheet.create({
 });
 
 export default GoalScreen;
+

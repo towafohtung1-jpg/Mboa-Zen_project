@@ -16,7 +16,7 @@ import { useUserStore } from '../store/useUserStore';
 import { FadeInView } from '../components/common/FadeInView';
 import { getMealOptions, getBodyTypeFromArchetype } from '../data/mealOptions';
 import { MealOption, MealFoodItem } from '../types';
-import { useLanguage } from '../context/LanguageContext';
+
 import { offlineAgent } from '../database/offlineAgent';
 
 // Food images mapping
@@ -141,15 +141,13 @@ const MealCard = ({ meal, onLogMeal }: { meal: MealOption; onLogMeal: (meal: Mea
 };
 
 const NurtureScreen = () => {
-  const { t, language } = useLanguage();
+  
   const { archetype } = useUserStore();
   const [selectedMealTime, setSelectedMealTime] = useState<'breakfast' | 'lunch' | 'supper'>('breakfast');
   const [todayCalories, setTodayCalories] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  useEffect(() => {
-    setRefreshKey(prev => prev + 1);
-  }, [language]);
+  
 
   const bodyType = getBodyTypeFromArchetype(archetype);
 
@@ -316,3 +314,4 @@ const styles = StyleSheet.create({
 });
 
 export default NurtureScreen;
+

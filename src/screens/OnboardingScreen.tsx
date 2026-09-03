@@ -1,3 +1,5 @@
+// ─── src/screens/OnboardingScreen.tsx ────────────────────────────────
+
 import React, { useState } from 'react';
 import {
   View,
@@ -10,24 +12,23 @@ import {
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
-// ─── ADD THIS IMPORT ────────────────────────────────────────────────────
-import { useLanguage } from '../context/LanguageContext';
-import LanguageSwitcher from '../components/common/LanguageSwitcher';
+// ─── REMOVED: 
+// ─── REMOVED: import LanguageSwitcher from '../components/common/LanguageSwitcher';
 
 interface OnboardingScreenProps {
   onFinish: () => void;
 }
 
 const OnboardingScreen = ({ onFinish }: OnboardingScreenProps) => {
-  // ─── USE LANGUAGE HOOK ────────────────────────────────────────────────
-  const { t, language } = useLanguage();
-  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  // ─── REMOVED: 
+  // ─── REMOVED: const [showLanguageModal, setShowLanguageModal] = useState(false);
 
   return (
     <FadeInView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.earthBlack} />
       
-      {/* Language Button */}
+      {/* ─── REMOVED: Language Button ────────────────────────────────── */}
+      {/* 
       <TouchableOpacity
         style={styles.languageButton}
         onPress={() => setShowLanguageModal(true)}
@@ -37,6 +38,7 @@ const OnboardingScreen = ({ onFinish }: OnboardingScreenProps) => {
           🌍 {language.toUpperCase()}
         </Text>
       </TouchableOpacity>
+      */}
 
       <View style={styles.content}>
         {/* Logo */}
@@ -46,36 +48,27 @@ const OnboardingScreen = ({ onFinish }: OnboardingScreenProps) => {
           resizeMode="contain"
         />
 
-        <Text style={styles.title}>{t('onboarding.title')}</Text>
-        <Text style={styles.subtitle}>{t('onboarding.subtitle')}</Text>
+        <Text style={styles.title}>Local Food. Real Strength.</Text>
+        <Text style={styles.subtitle}>
+          Nutrition plans built around the foods you already know and trust.
+        </Text>
 
         <TouchableOpacity
           style={styles.button}
           onPress={onFinish}
           activeOpacity={0.8}
         >
-          <Text style={styles.buttonText}>{t('onboarding.continue')}</Text>
+          <Text style={styles.buttonText}>Start Journey</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Language Modal */}
-      {showLanguageModal && (
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Select Language</Text>
-            <LanguageSwitcher 
-              visible={showLanguageModal} 
-              onClose={() => setShowLanguageModal(false)} 
-            />
-            <TouchableOpacity
-              style={styles.modalCloseButton}
-              onPress={() => setShowLanguageModal(false)}
-            >
-              <Text style={styles.modalCloseText}>{t('common.close')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
+      {/* ─── REMOVED: Language Modal ────────────────────────────────── */}
+      {/* 
+      <LanguageSwitcher 
+        visible={showLanguageModal} 
+        onClose={() => setShowLanguageModal(false)} 
+      />
+      */}
     </FadeInView>
   );
 };
@@ -146,42 +139,7 @@ const styles = StyleSheet.create({
     color: Colors.cleanWhite,
     letterSpacing: 1,
   },
-  modalOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    backgroundColor: Colors.cleanWhite,
-    borderRadius: 24,
-    padding: 24,
-    width: '80%',
-    maxWidth: 400,
-  },
-  modalTitle: {
-    fontSize: 18,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  modalCloseButton: {
-    marginTop: 16,
-    paddingVertical: 12,
-    alignItems: 'center',
-    backgroundColor: Colors.softBg,
-    borderRadius: 12,
-  },
-  modalCloseText: {
-    fontSize: 14,
-    ...FONTS.bold,
-    color: Colors.textMuted,
-  },
 });
 
 export default OnboardingScreen;
+
