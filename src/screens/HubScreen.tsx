@@ -25,17 +25,17 @@ const ARCHETYPE_DATA: Record<
 > = {
   runner: {
     image: require('../../assets/Media/Archetype/runner_hero.jpeg'),
-    title: 'The Swift',
+    title: 'The Runner (Swift)',
     subtitle: 'Fast Leg - You move fast, walk plenty, burn energy quick',
   },
   warrior: {
     image: require('../../assets/Media/Archetype/warrior_hero.jpeg'),
-    title: 'The Strong',
+    title: 'The Warrior (Strong)',
     subtitle: 'Strong Hand - You carry heavy, work hard, need strength',
   },
   guardian: {
     image: require('../../assets/Media/Archetype/guardian_hero.jpeg'),
-    title: 'The Steady',
+    title: 'The Guardian (Steady)',
     subtitle: 'Strong Heart - You balance life, need steady health',
   },
 };
