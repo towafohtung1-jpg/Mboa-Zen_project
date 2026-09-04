@@ -3,6 +3,8 @@
 import React from 'react';
 import { TabNavigator } from './TabNavigator';
 
-export const RootNavigator = () => {
+const RootNavigator = () => {
   return <TabNavigator />;
 };
+
+export default RootNavigator;

@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';  // ← ADD THIS
-import { RootNavigator } from './src/navigation/RootNavigator';import OnboardingScreen from './src/screens/OnboardingScreen';
+import { NavigationContainer } from '@react-navigation/native';
+import RootNavigator from './src/navigation/RootNavigator';
+import OnboardingScreen from './src/screens/OnboardingScreen';
 import GoalScreen from './src/screens/GoalScreen';
 import QuizScreen from './src/screens/QuizScreen';
 import PhoneScreen from './src/screens/PhoneScreen';
@@ -65,7 +66,6 @@ export default function App() {
     );
   }
 
-  // ─── RENDER SCREENS ────────────────────────────────────────────────────
   const renderScreen = () => {
     if (step === 'onboarding') {
       return <OnboardingScreen onFinish={() => setStep('goal')} />;

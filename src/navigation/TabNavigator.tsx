@@ -8,6 +8,7 @@ import ScanScreen from '../screens/ScanScreen';
 import DojoScreen from '../screens/DojoScreen';
 import MarketScreen from '../screens/MarketScreen';
 import { Colors } from '../constants/colors';
+import { FONTS } from '../constants/typography';
 
 const Tab = createBottomTabNavigator();
 
@@ -37,6 +38,7 @@ export const TabNavigator = () => {
           fontSize: 12,
           fontWeight: '600',
           marginTop: 2,
+          ...FONTS.medium,
         },
         tabBarIcon: ({ focused }) => (
           <Image
