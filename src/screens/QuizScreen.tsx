@@ -1,74 +1,27 @@
 // ─── src/screens/QuizScreen.tsx ─────────────────────────────────────────
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
 import { FadeInView } from '../components/common/FadeInView';
-
-
-type ArchetypeType = 'runner' | 'warrior' | 'guardian';
+import { quizQuestions, calculateQuizResult, ArchetypeType } from '../data/quizLogic';
 
 type Props = {
   onFinish: () => void;
 };
 
-// Define the questions with translation keys
-const questionKeys = [
-  {
-    id: 1,
-    questionKey: 'quiz.q1',
-    options: [
-      { archetype: 'runner' as ArchetypeType, labelKey: 'quiz.q1_runner' },
-      { archetype: 'warrior' as ArchetypeType, labelKey: 'quiz.q1_warrior' },
-      { archetype: 'guardian' as ArchetypeType, labelKey: 'quiz.q1_guardian' },
-    ],
-  },
-  {
-    id: 2,
-    questionKey: 'quiz.q2',
-    options: [
-      { archetype: 'runner' as ArchetypeType, labelKey: 'quiz.q2_runner' },
-      { archetype: 'warrior' as ArchetypeType, labelKey: 'quiz.q2_warrior' },
-      { archetype: 'guardian' as ArchetypeType, labelKey: 'quiz.q2_guardian' },
-    ],
-  },
-  {
-    id: 3,
-    questionKey: 'quiz.q3',
-    options: [
-      { archetype: 'runner' as ArchetypeType, labelKey: 'quiz.q3_runner' },
-      { archetype: 'warrior' as ArchetypeType, labelKey: 'quiz.q3_warrior' },
-      { archetype: 'guardian' as ArchetypeType, labelKey: 'quiz.q3_guardian' },
-    ],
-  },
-  {
-    id: 4,
-    questionKey: 'quiz.q4',
-    options: [
-      { archetype: 'runner' as ArchetypeType, labelKey: 'quiz.q4_runner' },
-      { archetype: 'warrior' as ArchetypeType, labelKey: 'quiz.q4_warrior' },
-      { archetype: 'guardian' as ArchetypeType, labelKey: 'quiz.q4_guardian' },
-    ],
-  },
-  {
-    id: 5,
-    questionKey: 'quiz.q5',
-    options: [
-      { archetype: 'runner' as ArchetypeType, labelKey: 'quiz.q5_runner' },
-      { archetype: 'warrior' as ArchetypeType, labelKey: 'quiz.q5_warrior' },
-      { archetype: 'guardian' as ArchetypeType, labelKey: 'quiz.q5_guardian' },
-    ],
-  },
-];
-
 const OptionCard = ({
   label,
+  icon,
   onPress,
+  isSelected,
 }: {
   label: string;
+  icon?: string;
   onPress: () => void;
+  isSelected: boolean;
 }) => {
   const scale = useState(new Animated.Value(1))[0];
 
@@ -93,110 +46,122 @@ const OptionCard = ({
   return (
     <Animated.View style={{ transform: [{ scale }] }}>
       <TouchableOpacity
-        style={styles.option}
+        style={[
+          styles.option,
+          isSelected && styles.optionSelected,
+        ]}
         onPress={onPress}
         onPressIn={pressIn}
         onPressOut={pressOut}
         activeOpacity={1}
       >
-        <View style={styles.radio}>
-          <View style={styles.radioInner} />
+        <View style={[styles.radio, isSelected && styles.radioSelected]}>
+          {isSelected && <View style={styles.radioInner} />}
         </View>
-        <Text style={styles.optionLabel}>{label}</Text>
+        {icon && <Text style={styles.optionIcon}>{icon}</Text>}
+        <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
+          {label}
+        </Text>
       </TouchableOpacity>
     </Animated.View>
   );
 };
 
 const QuizScreen = ({ onFinish }: Props) => {
-  
   const [answers, setAnswers] = useState<ArchetypeType[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [forceGuardian, setForceGuardian] = useState(false);
   const setArchetype = useUserStore((state) => state.setArchetype);
 
-  const totalQuestions = questionKeys.length;
-
-  // ─── Force re-render when language changes ────────────────────────────
-  
-
-  // ─── DEBUG ─────────────────────────────────────────────────────────────
-  const testTranslation = t('quiz.q1');
-  console.log('🔍 Language Debug:', {
-    currentLanguage: language,
-    testTranslation: testTranslation,
-  });
-
-  const debugInfo = `Language: ${language} | Test: ${testTranslation}`;
+  const totalQuestions = quizQuestions.length;
+  const currentQ = quizQuestions[currentQuestion];
+  const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+  const isLast = currentQuestion === totalQuestions - 1;
 
   const handleOptionPress = (index: number) => {
     setSelectedOption(index);
-    const currentQ = questionKeys[currentQuestion];
-    const archetype = currentQ.options[index].archetype;
+    const selected = currentQ.options[index];
+    
+    if (selected.forceGuardian) {
+      setForceGuardian(true);
+    }
+
     const newAnswers = [...answers];
-    newAnswers[currentQuestion] = archetype;
+    newAnswers[currentQuestion] = selected.archetype;
     setAnswers(newAnswers);
 
-    if (currentQuestion < totalQuestions - 1) {
-      setTimeout(() => {
+    setTimeout(() => {
+      if (isLast) {
+        finishQuiz(newAnswers);
+      } else {
         setCurrentQuestion(currentQuestion + 1);
         setSelectedOption(null);
-      }, 400);
-    } else {
-      // Determine the winner
-      const counts: Record<string, number> = { runner: 0, warrior: 0, guardian: 0 };
-      newAnswers.forEach((a) => {
-        if (a) counts[a] = (counts[a] || 0) + 1;
-      });
-      let winner: ArchetypeType = 'warrior';
-      let maxCount = 0;
-      Object.entries(counts).forEach(([key, count]) => {
-        if (count > maxCount) {
-          maxCount = count;
-          winner = key as ArchetypeType;
-        }
-      });
-      setArchetype(winner);
-      onFinish();
-    }
+      }
+    }, 500);
   };
 
-  const currentQ = questionKeys[currentQuestion];
-  const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+  const finishQuiz = (finalAnswers: ArchetypeType[]) => {
+    let resultArchetype: ArchetypeType;
 
-  // Get translated question and options
-  const translatedQuestion = t(currentQ.questionKey);
-  const translatedOptions = currentQ.options.map((opt) => t(opt.labelKey));
+    if (forceGuardian) {
+      resultArchetype = 'guardian';
+    } else {
+      const result = calculateQuizResult(finalAnswers);
+      resultArchetype = result.archetype;
+    }
+
+    setArchetype(resultArchetype);
+    onFinish();
+  };
 
   return (
-    <FadeInView style={styles.container} key={refreshKey}>
+    <FadeInView style={styles.container}>
       <View style={styles.content}>
-        {/* ─── DEBUG VIEW ──────────────────────────────────────────────────── */}
-        <View style={styles.debugContainer}>
-          <Text style={styles.debugText}>🔍 {debugInfo}</Text>
-        </View>
-
         <View style={styles.header}>
-          <Text style={styles.progressText}>
-            {currentQuestion + 1} / {totalQuestions}
-          </Text>
+          <View style={styles.headerRow}>
+            <Text style={styles.accentLabel}>DISCOVER YOUR ARCHETYPE</Text>
+            <Text style={styles.stepCounter}>
+              {currentQuestion + 1} / {totalQuestions}
+            </Text>
+          </View>
           <View style={styles.progressBarBg}>
             <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
           </View>
         </View>
 
-        <Text style={styles.question}>{translatedQuestion}</Text>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <Text style={styles.questionNumber}>Question {currentQuestion + 1}</Text>
+          <Text style={styles.question}>{currentQ.question}</Text>
 
-        <View style={styles.optionsContainer}>
-          {currentQ.options.map((option, index) => (
-            <OptionCard
-              key={index}
-              label={translatedOptions[index] || t(option.labelKey)}
-              onPress={() => handleOptionPress(index)}
-            />
-          ))}
-        </View>
+          <View style={styles.optionsContainer}>
+            {currentQ.options.map((option: { id: string; label: string; archetype: ArchetypeType; icon?: string; image?: string; forceGuardian?: boolean }, index: number) => (
+              <OptionCard
+                key={option.id}
+                label={option.label}
+                icon={option.icon}
+                onPress={() => handleOptionPress(index)}
+                isSelected={selectedOption === index}
+              />
+            ))}
+          </View>
+
+          {currentQuestion === 0 && (
+            <View style={styles.imageHintContainer}>
+              <Text style={styles.imageHintText}>🌴 Plantain • 🌳 Iroko • 🌿 Mango</Text>
+            </View>
+          )}
+
+          {currentQuestion === 3 && (
+            <View style={styles.safetyNote}>
+              <Text style={styles.safetyNoteText}>
+                ⚠️ If you have any health conditions, we'll recommend the safest path for you.
+              </Text>
+            </View>
+          )}
+
+          <View style={{ height: 20 }} />
+        </ScrollView>
       </View>
     </FadeInView>
   );
@@ -213,27 +178,26 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
   },
-  debugContainer: {
-    backgroundColor: '#f0f0f0',
-    padding: 10,
-    marginBottom: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  debugText: {
-    fontSize: 12,
-    color: '#333',
-    fontFamily: 'monospace',
-  },
   header: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
-  progressText: {
-    fontSize: 14,
-    ...FONTS.medium,
-    color: Colors.textMuted,
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
+  },
+  accentLabel: {
+    fontSize: 11,
+    ...FONTS.bold,
+    color: Colors.zenGold,
+    letterSpacing: 3,
+  },
+  stepCounter: {
+    fontSize: 14,
+    ...FONTS.semibold,
+    color: Colors.textMuted,
+    letterSpacing: 1,
   },
   progressBarBg: {
     height: 4,
@@ -246,6 +210,13 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.mboaGreen,
     borderRadius: 2,
   },
+  questionNumber: {
+    fontSize: 12,
+    ...FONTS.medium,
+    color: Colors.textMuted,
+    marginBottom: 8,
+    letterSpacing: 1,
+  },
   question: {
     fontSize: 22,
     ...FONTS.bold,
@@ -254,7 +225,6 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
   optionsContainer: {
-    flex: 1,
     gap: 12,
   },
   option: {
@@ -267,21 +237,32 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'transparent',
   },
+  optionSelected: {
+    borderColor: Colors.mboaGreen,
+    backgroundColor: '#F1FAF3',
+  },
   radio: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     borderWidth: 2,
-    borderColor: '#CCCCCC',
+    borderColor: '#D0D0D0',
     marginRight: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  radioSelected: {
+    borderColor: Colors.mboaGreen,
+  },
   radioInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: 'transparent',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: Colors.mboaGreen,
+  },
+  optionIcon: {
+    fontSize: 24,
+    marginRight: 12,
   },
   optionLabel: {
     fontSize: 16,
@@ -289,7 +270,35 @@ const styles = StyleSheet.create({
     color: Colors.earthBlack,
     flex: 1,
   },
+  optionLabelSelected: {
+    color: Colors.mboaGreen,
+  },
+  imageHintContainer: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: Colors.softBg,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  imageHintText: {
+    fontSize: 14,
+    ...FONTS.medium,
+    color: Colors.textMuted,
+  },
+  safetyNote: {
+    marginTop: 16,
+    padding: 14,
+    backgroundColor: '#FFF8E1',
+    borderRadius: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.zenGold,
+  },
+  safetyNoteText: {
+    fontSize: 13,
+    ...FONTS.regular,
+    color: Colors.earthBlack,
+    lineHeight: 20,
+  },
 });
 
 export default QuizScreen;
-

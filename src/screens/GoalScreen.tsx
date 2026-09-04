@@ -12,19 +12,16 @@ import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
 
-
 type Props = {
   onFinish: () => void;
 };
 
 const GoalScreen = ({ onFinish }: Props) => {
-  
-
   const goals = [
-    { id: 'lose_weight', icon: '🔥' },
-    { id: 'build_strength', icon: '💪' },
-    { id: 'stay_active', icon: '🚶' },
-    { id: 'eat_better', icon: '🥗' },
+    { id: 'lose_weight', icon: '🔥', label: 'Lose Weight', desc: 'Burn fat and slim down healthily' },
+    { id: 'build_strength', icon: '💪', label: 'Build Strength', desc: 'Gain muscle and get stronger' },
+    { id: 'stay_active', icon: '🚶', label: 'Stay Active', desc: 'Maintain good health and energy' },
+    { id: 'eat_better', icon: '🥗', label: 'Eat Better', desc: 'Make smarter everyday food choices' },
   ];
 
   const [selectedGoal, setSelectedGoal] = React.useState<string | null>(null);
@@ -37,9 +34,9 @@ const GoalScreen = ({ onFinish }: Props) => {
       >
         <View style={styles.headerArea}>
           <Text style={styles.eyebrow}>YOUR JOURNEY</Text>
-          <Text style={styles.title}>{t('goals.title')}</Text>
+          <Text style={styles.title}>What is your main health goal?</Text>
           <Text style={styles.subtitle}>
-            Choose one main focus. Don't worry — you can always adjust later.
+            Choose one main focus. You can always adjust later.
           </Text>
         </View>
 
@@ -56,9 +53,9 @@ const GoalScreen = ({ onFinish }: Props) => {
             >
               <Text style={styles.goalIcon}>{goal.icon}</Text>
               <View style={styles.goalContent}>
-                <Text style={styles.goalTitle}>{t(`goals.${goal.id}`)}</Text>
+                <Text style={styles.goalTitle}>{goal.label}</Text>
                 <Text style={styles.goalDescription}>
-                  {t(`goals.${goal.id}_desc`)}
+                  {goal.desc}
                 </Text>
               </View>
               <View style={[
@@ -78,9 +75,7 @@ const GoalScreen = ({ onFinish }: Props) => {
           disabled={!selectedGoal}
           activeOpacity={0.8}
         >
-          <Text style={styles.continueButtonText}>
-            {t('common.continue')}
-          </Text>
+          <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -88,7 +83,7 @@ const GoalScreen = ({ onFinish }: Props) => {
           onPress={onFinish}
           activeOpacity={0.8}
         >
-          <Text style={styles.skipButtonText}>{t('common.skip')}</Text>
+          <Text style={styles.skipButtonText}>Skip</Text>
         </TouchableOpacity>
       </ScrollView>
     </FadeInView>
@@ -205,4 +200,3 @@ const styles = StyleSheet.create({
 });
 
 export default GoalScreen;
-

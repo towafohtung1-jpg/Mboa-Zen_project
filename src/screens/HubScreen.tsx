@@ -1,3 +1,5 @@
+// ─── src/screens/HubScreen.tsx ─────────────────────────────────────────
+
 import React, { useMemo, useState, useEffect } from 'react';
 import {
   View,
@@ -14,6 +16,29 @@ import { useUserStore } from '../store/useUserStore';
 import proverbs from '../data/proverbs.json';
 import { FadeInView } from '../components/common/FadeInView';
 import { AnimatedButton } from '../components/common/AnimatedButton';
+
+// ─── ARCHETYPE DATA ──────────────────────────────────────────────────────
+
+const ARCHETYPE_DATA: Record<
+  string,
+  { image: any; title: string; subtitle: string }
+> = {
+  runner: {
+    image: require('../../assets/Media/Archetype/runner_hero.jpeg'),
+    title: 'The Swift',
+    subtitle: 'Fast Leg - You move fast, walk plenty, burn energy quick',
+  },
+  warrior: {
+    image: require('../../assets/Media/Archetype/warrior_hero.jpeg'),
+    title: 'The Strong',
+    subtitle: 'Strong Hand - You carry heavy, work hard, need strength',
+  },
+  guardian: {
+    image: require('../../assets/Media/Archetype/guardian_hero.jpeg'),
+    title: 'The Steady',
+    subtitle: 'Strong Heart - You balance life, need steady health',
+  },
+};
 
 // ─── GUIDE CARDS ──────────────────────────────────────────────────────────
 
@@ -435,24 +460,21 @@ const HubScreen = () => {
   } = useUserStore();
 
   const [guidesExpanded, setGuidesExpanded] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Date helpers
   const todayStr = new Date().toISOString().split('T')[0];
   const today = new Date();
   const isFirstDayOfMonth = today.getDate() === 1;
 
-  // Previous month info for end-of-month summary
   const prevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
   const prevMonthName = prevMonth.toLocaleString('default', { month: 'long' });
   const prevMonthYear = prevMonth.getFullYear();
 
-  // Show previous month summary only on first day of month
   const [showPrevMonthSummary, setShowPrevMonthSummary] = useState(isFirstDayOfMonth);
 
-  // Has today already been fully answered?
   const todayAlreadyAnswered = lastCheckinDate === todayStr;
 
-  // Local answer state — resets when component mounts fresh
   const [answers, setAnswers] = useState<{
     hydration: Answer;
     nutrition: Answer;
@@ -467,7 +489,6 @@ const HubScreen = () => {
   const allAnswered = answeredCount === 3;
   const progressPercent = Math.round((answeredCount / 3) * 100);
 
-  // Handle YES
   const handleYes = (key: 'hydration' | 'nutrition' | 'training') => {
     const newAnswers = { ...answers, [key]: 'yes' as Answer };
     setAnswers(newAnswers);
@@ -476,7 +497,6 @@ const HubScreen = () => {
     if (allDone) setLastCheckinDate(todayStr);
   };
 
-  // Handle NOT YET
   const handleNotYet = (key: 'hydration' | 'nutrition' | 'training') => {
     const newAnswers = { ...answers, [key]: 'not_yet' as Answer };
     setAnswers(newAnswers);
@@ -485,7 +505,6 @@ const HubScreen = () => {
     if (allDone) setLastCheckinDate(todayStr);
   };
 
-  // Daily proverb — fixed for the day
   const dailyProverb: any = useMemo(() => {
     const dayOfYear = Math.floor(
       (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
@@ -493,7 +512,6 @@ const HubScreen = () => {
     return (proverbs as any[])[dayOfYear % proverbs.length];
   }, []);
 
-  // Streak calculator
   const streak = useMemo(() => {
     let count = 0;
     for (let i = 1; i <= 30; i++) {
@@ -510,7 +528,6 @@ const HubScreen = () => {
     return count;
   }, [checkInHistory]);
 
-  // Auto-log to history on every check-in change
   useEffect(() => {
     logCheckInHistory();
   }, [checkIns]);
@@ -529,9 +546,9 @@ const HubScreen = () => {
   };
 
   const options: { id: 'runner' | 'warrior' | 'guardian'; label: string }[] = [
-    { id: 'runner', label: 'The Runner' },
-    { id: 'warrior', label: 'The Warrior' },
-    { id: 'guardian', label: 'The Guardian' },
+    { id: 'runner', label: 'The Swift' },
+    { id: 'warrior', label: 'The Strong' },
+    { id: 'guardian', label: 'The Steady' },
   ];
 
   const questions: {
@@ -547,12 +564,12 @@ const HubScreen = () => {
   // Archetype selection screen
   if (!archetype) {
     return (
-      <FadeInView style={styles.container}>
+      <FadeInView style={styles.container} key={refreshKey}>
         <View style={styles.section}>
           <Text style={styles.eyebrow}>YOUR JOURNEY</Text>
           <Text style={styles.header}>Find Your Archetype</Text>
           <Text style={styles.subHeader}>
-            Select your path to unlock your personalized plan.
+            Select your path to wellness
           </Text>
           {options.map((option) => (
             <AnimatedButton
@@ -569,9 +586,10 @@ const HubScreen = () => {
   }
 
   const guideCards = getDailyGuides(archetype);
+  const archetypeData = ARCHETYPE_DATA[archetype];
 
   return (
-    <FadeInView style={styles.container}>
+    <FadeInView style={styles.container} key={refreshKey}>
       <ScrollView
         style={{ width: '100%' }}
         contentContainerStyle={styles.scrollContent}
@@ -579,13 +597,20 @@ const HubScreen = () => {
       >
         <View style={styles.section}>
 
-          {/* Header */}
-          <Text style={styles.eyebrow}>DAILY MINDSET</Text>
-          <Text style={styles.header}>
-            Hello, {archetype.charAt(0).toUpperCase() + archetype.slice(1)}
-          </Text>
+          {/* ─── ARCHETYPE HERO ────────────────────────────────────────── */}
+          <View style={styles.heroContainer}>
+            <Image
+              source={archetypeData.image}
+              style={styles.heroImage}
+              resizeMode="cover"
+            />
+            <View style={styles.heroOverlay}>
+              <Text style={styles.heroTitle}>{archetypeData.title}</Text>
+              <Text style={styles.heroSubtitle}>{archetypeData.subtitle}</Text>
+            </View>
+          </View>
 
-          {/* Proverb */}
+          {/* Daily Proverb */}
           <View style={styles.proverbCard}>
             <View style={styles.accentLine} />
             <Text style={styles.proverb}>"{dailyProverb.proverb}"</Text>
@@ -597,7 +622,7 @@ const HubScreen = () => {
           {/* Previous month summary — first day of new month only */}
           {showPrevMonthSummary && (
             <>
-              <Text style={styles.sectionLabel}>LAST MONTH'S SUMMARY</Text>
+              <Text style={styles.sectionLabel}>Last Month's Summary</Text>
               <PrevMonthSummary
                 checkInHistory={checkInHistory}
                 monthName={prevMonthName}
@@ -608,14 +633,13 @@ const HubScreen = () => {
           )}
 
           {/* Q&A Check-In */}
-          <Text style={styles.sectionLabel}>TODAY'S CHECK-IN</Text>
+          <Text style={styles.sectionLabel}>Today's Check-In</Text>
 
           {todayAlreadyAnswered ? (
-            // Already completed today — show summary state
             <View style={styles.alreadyDoneCard}>
-              <Text style={styles.alreadyDoneTitle}>✓ Today's check-in complete</Text>
+              <Text style={styles.alreadyDoneTitle}>✓ Check-in Complete!</Text>
               <Text style={styles.alreadyDoneSubtitle}>
-                Come back tomorrow for a fresh check-in.
+                Come back tomorrow to continue your streak
               </Text>
               <View style={[styles.progressBarBgLarge, { marginTop: 14 }]}>
                 <View
@@ -633,13 +657,11 @@ const HubScreen = () => {
               </Text>
             </View>
           ) : (
-            // Q&A form
             <View style={styles.checkInCard}>
               <Text style={styles.checkInIntro}>
-                Answer three quick questions about your day. Be honest — this is for you.
+                3 simple questions to track your daily health
               </Text>
 
-              {/* Progress bar fills as questions are answered */}
               <View style={styles.progressBarBg}>
                 <View
                   style={[
@@ -655,7 +677,7 @@ const HubScreen = () => {
               </View>
               <Text style={styles.progressHint}>
                 {answeredCount}/3 answered
-                {allAnswered ? ' — your progress is ready below' : ''}
+                {allAnswered ? ` — Ready to see your harmony!` : ''}
               </Text>
 
               <View style={styles.questionsDivider} />
@@ -680,7 +702,7 @@ const HubScreen = () => {
                           styles.qaBtnText,
                           answer === 'yes' && styles.qaBtnTextWhite,
                         ]}>
-                          ✓  YES
+                          ✓  Yes
                         </Text>
                       </TouchableOpacity>
 
@@ -696,7 +718,7 @@ const HubScreen = () => {
                           styles.qaBtnText,
                           answer === 'not_yet' && styles.qaBtnNoTextActive,
                         ]}>
-                          NOT YET
+                          Not Yet
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -706,11 +728,11 @@ const HubScreen = () => {
             </View>
           )}
 
-          {/* Harmony + Calendar — only after all 3 answered */}
+          {/* Harmony + Calendar */}
           {allAnswered && (
             <>
               <View style={styles.harmonyReveal}>
-                <Text style={styles.harmonyRevealLabel}>TODAY'S HARMONY</Text>
+                <Text style={styles.harmonyRevealLabel}>Today's Harmony Score</Text>
                 <Text style={[styles.harmonyRevealScore, { color: getHarmonyColor(harmonyScore) }]}>
                   {harmonyScore}% — {getHarmonyLabel(harmonyScore)}
                 </Text>
@@ -727,16 +749,16 @@ const HubScreen = () => {
                 </View>
                 <Text style={styles.harmonyMessage}>
                   {harmonyScore === 100
-                    ? 'Perfect day! Every habit completed. Keep this up.'
+                    ? "Perfect! You're in complete harmony! 🌟"
                     : harmonyScore >= 66
-                    ? 'Great effort today. You are on the right track.'
+                    ? 'Great effort! Keep going! 💪'
                     : harmonyScore >= 33
-                    ? 'A start is a start. Tomorrow aim for one more.'
-                    : 'Every day is a new chance. Tomorrow begins again.'}
+                    ? 'Every journey starts with one step! 🌱'
+                    : 'Tomorrow is a new chance to start! 🌅'}
                 </Text>
               </View>
 
-              <Text style={styles.sectionLabel}>THIS MONTH'S PROGRESS</Text>
+              <Text style={styles.sectionLabel}>This Month's Progress</Text>
               <MonthlyCalendar
                 checkInHistory={checkInHistory}
                 streak={streak}
@@ -744,32 +766,32 @@ const HubScreen = () => {
             </>
           )}
 
-          {/* Wellness Guides — ALWAYS VISIBLE */}
+          {/* Wellness Guides */}
           <TouchableOpacity
             style={styles.guidesHeader}
             onPress={() => setGuidesExpanded(!guidesExpanded)}
             activeOpacity={0.8}
           >
-            <Text style={styles.sectionLabel}>TODAY'S WELLNESS GUIDES</Text>
+            <Text style={styles.sectionLabel}>Wellness Guides</Text>
             <Text style={styles.guidesToggle}>
-              {guidesExpanded ? '▲ Hide' : '▼ Show'}
+              {guidesExpanded ? 'Hide' : 'Show'}
             </Text>
           </TouchableOpacity>
 
           {guidesExpanded && <GuideCardList guideCards={guideCards} />}
 
-          {/* Share — ALWAYS VISIBLE */}
+          {/* Share */}
           <View style={styles.shareCard}>
-            <Text style={styles.shareTitle}>Know someone who needs this?</Text>
+            <Text style={styles.shareTitle}>Share Mboa-Zen</Text>
             <Text style={styles.shareSubtitle}>
-              Share Mboa-Zen with a friend. Free to install and works offline.
+              Help others discover wellness the Cameroon way
             </Text>
             <TouchableOpacity
               style={styles.shareButton}
               onPress={handleShare}
               activeOpacity={0.8}
             >
-              <Text style={styles.shareButtonText}>📲  Share Mboa-Zen</Text>
+              <Text style={styles.shareButtonText}>📲  Share App</Text>
             </TouchableOpacity>
           </View>
 
@@ -792,6 +814,39 @@ const styles = StyleSheet.create({
   subHeader: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, lineHeight: 22, marginBottom: 28 },
   archetypeButton: { width: '100%', height: 56, borderRadius: 12, marginBottom: 12 },
 
+  // ─── HERO STYLES ──────────────────────────────────────────────────────
+  heroContainer: {
+    width: '100%',
+    height: 200,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 20,
+    position: 'relative',
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  heroTitle: {
+    fontSize: 24,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+  },
+  heroSubtitle: {
+    fontSize: 14,
+    ...FONTS.regular,
+    color: 'rgba(255,255,255,0.85)',
+    marginTop: 2,
+  },
+
   proverbCard: { width: '100%', padding: 24, backgroundColor: Colors.softBg, borderRadius: 18, position: 'relative', marginBottom: 28 },
   accentLine: { position: 'absolute', top: 16, left: 0, width: 4, height: 40, backgroundColor: Colors.zenGold, borderTopRightRadius: 4, borderBottomRightRadius: 4 },
   proverb: { fontSize: 18, ...FONTS.medium, marginBottom: 12, color: Colors.earthBlack, lineHeight: 28, fontStyle: 'italic', marginLeft: 12 },
@@ -801,19 +856,16 @@ const styles = StyleSheet.create({
 
   sectionLabel: { fontSize: 11, ...FONTS.bold, color: Colors.earthBlack, letterSpacing: 2, marginBottom: 12, marginTop: 4 },
 
-  // Previous month summary
   prevMonthCard: { width: '100%', backgroundColor: '#F1FAF3', borderRadius: 18, padding: 20, marginBottom: 20, borderWidth: 2, borderColor: Colors.mboaGreen },
   prevMonthTitle: { fontSize: 16, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 6 },
   prevMonthSubtitle: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, marginBottom: 16 },
   prevMonthDismiss: { backgroundColor: Colors.mboaGreen, paddingVertical: 14, borderRadius: 12, alignItems: 'center', marginTop: 16 },
   prevMonthDismissText: { fontSize: 15, ...FONTS.bold, color: Colors.cleanWhite },
 
-  // Already done today
   alreadyDoneCard: { width: '100%', backgroundColor: Colors.softBg, borderRadius: 18, padding: 20, marginBottom: 20 },
   alreadyDoneTitle: { fontSize: 15, ...FONTS.bold, color: Colors.mboaGreen, marginBottom: 4 },
   alreadyDoneSubtitle: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted },
 
-  // Q&A Check-In
   checkInCard: { width: '100%', backgroundColor: Colors.softBg, borderRadius: 18, padding: 20, marginBottom: 20 },
   checkInIntro: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, lineHeight: 20, marginBottom: 16, fontStyle: 'italic' },
   progressBarBg: { height: 8, backgroundColor: '#E0E0E0', borderRadius: 4, overflow: 'hidden', marginBottom: 6 },
@@ -832,7 +884,6 @@ const styles = StyleSheet.create({
   qaBtnTextWhite: { color: Colors.cleanWhite },
   qaBtnNoTextActive: { color: Colors.cleanWhite },
 
-  // Harmony reveal
   harmonyReveal: { width: '100%', backgroundColor: Colors.softBg, borderRadius: 18, padding: 20, marginBottom: 20 },
   harmonyRevealLabel: { fontSize: 11, ...FONTS.bold, color: Colors.textMuted, letterSpacing: 2, marginBottom: 8 },
   harmonyRevealScore: { fontSize: 24, ...FONTS.bold, marginBottom: 14 },
@@ -840,7 +891,6 @@ const styles = StyleSheet.create({
   progressBarFillLarge: { height: 10, borderRadius: 5 },
   harmonyMessage: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, lineHeight: 22, fontStyle: 'italic' },
 
-  // Calendar
   calendarCard: { width: '100%', backgroundColor: Colors.softBg, borderRadius: 18, padding: 20, marginBottom: 20 },
   calendarTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
   calendarMonth: { fontSize: 15, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 4 },
@@ -857,7 +907,6 @@ const styles = StyleSheet.create({
   legendDot: { width: 10, height: 10, borderRadius: 5, marginRight: 4 },
   legendText: { fontSize: 10, ...FONTS.regular, color: Colors.textMuted },
 
-  // Monthly report
   reportCard: { width: '100%', backgroundColor: Colors.cleanWhite, borderRadius: 14, padding: 16, marginTop: 16 },
   reportTitle: { fontSize: 14, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 14 },
   reportRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
@@ -868,7 +917,6 @@ const styles = StyleSheet.create({
   reportOverall: { fontSize: 14, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 8 },
   reportHabit: { fontSize: 13, ...FONTS.medium, marginBottom: 4 },
 
-  // Guides
   guidesHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, marginTop: 4 },
   guidesToggle: { fontSize: 12, ...FONTS.bold, color: Colors.mboaGreen },
   guideCard: { width: '100%', backgroundColor: Colors.softBg, borderRadius: 14, marginBottom: 12, padding: 16, borderLeftWidth: 4 },
@@ -878,7 +926,6 @@ const styles = StyleSheet.create({
   guideToggle: { fontSize: 11, ...FONTS.bold, marginLeft: 8 },
   guideTip: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, lineHeight: 20, marginTop: 8 },
 
-  // Share
   shareCard: { width: '100%', backgroundColor: '#F1FAF3', borderRadius: 18, padding: 20, marginTop: 8, borderWidth: 1, borderColor: Colors.mboaGreen, alignItems: 'center' },
   shareTitle: { fontSize: 16, ...FONTS.bold, color: Colors.earthBlack, textAlign: 'center', marginBottom: 8 },
   shareSubtitle: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, textAlign: 'center', lineHeight: 20, marginBottom: 16 },

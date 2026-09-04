@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { RootNavigator } from './src/navigation/RootNavigator';
-import OnboardingScreen from './src/screens/OnboardingScreen';
+import { NavigationContainer } from '@react-navigation/native';  // ← ADD THIS
+import { RootNavigator } from './src/navigation/RootNavigator';import OnboardingScreen from './src/screens/OnboardingScreen';
 import GoalScreen from './src/screens/GoalScreen';
 import QuizScreen from './src/screens/QuizScreen';
 import PhoneScreen from './src/screens/PhoneScreen';
@@ -25,50 +25,30 @@ export default function App() {
   const setPhone = useUserStore((state) => state.setPhone);
   const userPhone = useUserStore((state) => state.phone);
 
-  // ─── DEBUG: Track loading time ──────────────────────────────────────
-  console.log('🕐 App starting...', new Date().toISOString());
-
   useEffect(() => {
-    console.log('🕐 useEffect running...', new Date().toISOString());
-    
     const init = async () => {
-      console.log('🕐 init() started...', new Date().toISOString());
-      
-      if (!fontsLoaded) {
-        console.log('🕐 fontsLoaded is false, waiting...');
-        return;
-      }
+      if (!fontsLoaded) return;
 
-      console.log('🕐 fontsLoaded is true, loading state...');
-      
-      try {
-        const saved = await loadUserState();
-        console.log('🕐 loadUserState completed:', saved);
+      const saved = await loadUserState();
+      console.log('APP INIT - Saved state:', saved);
 
-        if (saved && saved.onboardingComplete) {
-          console.log('🕐 Found saved state, going to app');
-          if (saved.archetype) {
-            setArchetype(saved.archetype as any);
-          }
-          if (saved.phone) {
-            setPhone(saved.phone);
-          }
-          setStep('app');
-        } else {
-          console.log('🕐 No saved state, starting onboarding');
+      if (saved && saved.onboardingComplete) {
+        console.log('APP INIT - Found saved state, going to app');
+        if (saved.archetype) {
+          setArchetype(saved.archetype as any);
         }
-      } catch (error) {
-        console.error('🕐 Error in init:', error);
+        if (saved.phone) {
+          setPhone(saved.phone);
+        }
+        setStep('app');
+      } else {
+        console.log('APP INIT - No saved state, starting onboarding');
       }
 
-      console.log('🕐 Setting loading to false');
       setLoading(false);
     };
-    
     init();
   }, [fontsLoaded]);
-
-  console.log('🕐 Rendering, loading:', loading, 'fontsLoaded:', fontsLoaded);
 
   if (!fontsLoaded || loading) {
     return (
@@ -81,15 +61,12 @@ export default function App() {
         }}
       >
         <AnimatedLogo size={100} showText={true} />
-        <ActivityIndicator color={Colors.mboaGreen} />
       </View>
     );
   }
 
   // ─── RENDER SCREENS ────────────────────────────────────────────────────
   const renderScreen = () => {
-    console.log('🕐 Rendering screen for step:', step);
-    
     if (step === 'onboarding') {
       return <OnboardingScreen onFinish={() => setStep('goal')} />;
     }
@@ -128,7 +105,11 @@ export default function App() {
       );
     }
 
-    return <RootNavigator />;
+    return (
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
+    );
   };
 
   return <>{renderScreen()}</>;
