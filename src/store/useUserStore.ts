@@ -2,7 +2,36 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const isWeb = typeof window !== 'undefined';
+
+// Web storage adapter
+const webStorage = {
+  getItem: (key: string) => {
+    try {
+      const value = isWeb ? localStorage.getItem(key) : null;
+      return value ? JSON.parse(value) : null;
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key: string, value: any) => {
+    try {
+      if (isWeb) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+    } catch {}
+  },
+  removeItem: (key: string) => {
+    try {
+      if (isWeb) {
+        localStorage.removeItem(key);
+      }
+    } catch {}
+  },
+};
+
 interface UserState {
+  // ... your existing state
   archetype: string | null;
   phone: string | null;
   isPremium: boolean;
@@ -21,8 +50,7 @@ interface UserState {
   lastCheckinDate: string | null;
   setLastCheckinDate: (date: string) => void;
   resetCheckIns: () => void;
-  
-  // ─── WATER TRACKING ────────────────────────────────────────────────────
+  // Water tracking
   waterIntake: number;
   waterGoal: number;
   waterHistory: Record<string, number>;
@@ -34,6 +62,7 @@ interface UserState {
 export const useUserStore = create<UserState>()(
   persist(
     (set, get) => ({
+      // ... your existing state
       archetype: null,
       phone: null,
       isPremium: false,
@@ -59,7 +88,6 @@ export const useUserStore = create<UserState>()(
         const today = new Date().toISOString().split('T')[0];
         const completed = Object.values(checkIns).filter(Boolean).length;
         const score = Math.round((completed / 3) * 100);
-        
         set({
           checkInHistory: {
             ...checkInHistory,
@@ -74,23 +102,17 @@ export const useUserStore = create<UserState>()(
         set({
           checkIns: { hydration: false, nutrition: false, training: false },
         }),
-      
-      // ─── WATER TRACKING IMPLEMENTATION ────────────────────────────────
       waterIntake: 0,
       waterGoal: 8,
       waterHistory: {},
-      
       setWaterIntake: (amount) => {
         const goal = get().waterGoal;
-        // Cap at goal
         const capped = Math.min(amount, goal);
         set({ waterIntake: capped });
       },
-      
       resetWater: () => {
         const { waterIntake, waterHistory } = get();
         const today = new Date().toISOString().split('T')[0];
-        
         set({
           waterIntake: 0,
           waterHistory: {
@@ -99,11 +121,9 @@ export const useUserStore = create<UserState>()(
           },
         });
       },
-      
       logWaterHistory: () => {
         const { waterIntake, waterHistory } = get();
         const today = new Date().toISOString().split('T')[0];
-        
         set({
           waterHistory: {
             ...waterHistory,
@@ -114,8 +134,7 @@ export const useUserStore = create<UserState>()(
     }),
     {
       name: 'mboa-zen-storage',
-      storage: createJSONStorage(() => AsyncStorage),
-      // ─── PERSIST WATER DATA ────────────────────────────────────────────
+      storage: createJSONStorage(() => isWeb ? webStorage : AsyncStorage),
       partialize: (state) => ({
         archetype: state.archetype,
         phone: state.phone,
@@ -123,7 +142,6 @@ export const useUserStore = create<UserState>()(
         checkInHistory: state.checkInHistory,
         harmonyScore: state.harmonyScore,
         lastCheckinDate: state.lastCheckinDate,
-        // Water data to persist
         waterIntake: state.waterIntake,
         waterGoal: state.waterGoal,
         waterHistory: state.waterHistory,
