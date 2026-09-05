@@ -19,3 +19,7 @@ path_instructions:
       30 workouts - 10 Runner 10 Warrior 10 Guardian.
       Each needs warmup cooldown proverb warning pidgin.
       Guardian must be low-impact no jump.
+    - path: "src/data/workoutDatabase.ts"
+    instructions: |
+      SAFETY - Same as workoutOptions. All Guardian exercises must be low-impact no jump.
+      Must keep allExercises and generateWeeklyPlan safe.
