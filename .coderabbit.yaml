@@ -1,13 +1,21 @@
 language: en
 tone: supportive
-early_access: true
+early_access: false
 reviews:
   profile: chill
+  request_changes_workflow: false
 
 path_instructions:
-    - path: src/data/quizLogic.ts
-    instructions: "SAFETY CRITICAL: If Q4 answer is pain/age 50+/pregnancy/belly, you MUST return Guardian. Scoring: Q1,Q2,Q3,Q5 votes, 3+ wins. Tie break Q1 > Guardian."
-    - path: src/data/mealOptions.ts
-    instructions: "70 Cameroonian dishes must have small/normal/big calories, protein/carbs/fat/fiber, pidgin, french, region, price FCFA. Eru=Southwest, Achu=Northwest, Mbongo=Center."
-    - path: src/data/workoutOptions.ts
-    instructions: "30 workouts: 10 Runner, 10 Warrior, 10 Guardian. Each must have warmup, cooldown, proverb, warning, pidgin. Guardian must be low-impact no jump."
+    - path: "src/data/quizLogic.ts"
+    instructions: |
+      SAFETY - Guardian must win if Q4 is pain, age 50 plus, pregnancy, or belly.
+      Scoring uses Q1 Q2 Q3 Q5, 3 votes wins. Tie break Q1 then Guardian.
+    - path: "src/data/mealOptions.ts"
+    instructions: |
+      70 Cameroonian dishes must have small normal big calories and macros.
+      Must include pidgin french region price FCFA.
+    - path: "src/data/workoutOptions.ts"
+    instructions: |
+      30 workouts - 10 Runner 10 Warrior 10 Guardian.
+      Each needs warmup cooldown proverb warning pidgin.
+      Guardian must be low-impact no jump.
