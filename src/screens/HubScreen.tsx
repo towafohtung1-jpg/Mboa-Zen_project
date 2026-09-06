@@ -16,6 +16,7 @@ import { useUserStore } from '../store/useUserStore';
 import proverbs from '../data/proverbs.json';
 import { FadeInView } from '../components/common/FadeInView';
 import { AnimatedButton } from '../components/common/AnimatedButton';
+import WaterDrop from '../components/common/WaterDrop';
 
 // ─── ARCHETYPE DATA ──────────────────────────────────────────────────────
 
@@ -457,6 +458,9 @@ const HubScreen = () => {
     logCheckInHistory,
     lastCheckinDate,
     setLastCheckinDate,
+    waterIntake,
+    waterGoal,
+    setWaterIntake,
   } = useUserStore();
 
   const [guidesExpanded, setGuidesExpanded] = useState(false);
@@ -617,6 +621,35 @@ const HubScreen = () => {
             <Text style={styles.author}>— {dailyProverb.origin}</Text>
             <View style={styles.divider} />
             <Text style={styles.lesson}>{dailyProverb.lesson}</Text>
+          </View>
+
+          {/* ─── WATER TRACKER ──────────────────────────────────────────── */}
+          <View style={styles.waterSection}>
+            <Text style={styles.waterTitle}>💧 Water Tracker</Text>
+            
+            <View style={styles.dropsContainer}>
+              {Array.from({ length: 8 }).map((_, index) => (
+                <WaterDrop
+                  key={index}
+                  filled={index < waterIntake}
+                  onPress={() => {
+                    if (index < waterIntake) {
+                      setWaterIntake(index);
+                    } else {
+                      setWaterIntake(index + 1);
+                    }
+                  }}
+                />
+              ))}
+            </View>
+
+            <Text style={styles.waterStatus}>
+              {waterIntake} / {waterGoal} glasses
+            </Text>
+
+            {waterIntake >= waterGoal && (
+              <Text style={styles.waterComplete}>🌊 Ocean full! Good job!</Text>
+            )}
           </View>
 
           {/* Previous month summary — first day of new month only */}
@@ -931,6 +964,40 @@ const styles = StyleSheet.create({
   shareSubtitle: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, textAlign: 'center', lineHeight: 20, marginBottom: 16 },
   shareButton: { backgroundColor: Colors.mboaGreen, paddingVertical: 14, paddingHorizontal: 32, borderRadius: 12, alignItems: 'center' },
   shareButtonText: { fontSize: 15, ...FONTS.bold, color: Colors.cleanWhite, letterSpacing: 0.5 },
+
+  // ─── WATER TRACKER STYLES ─────────────────────────────────────────────
+  waterSection: {
+    width: '100%',
+    backgroundColor: Colors.softBg,
+    borderRadius: 18,
+    padding: 20,
+    marginBottom: 20,
+  },
+  waterTitle: {
+    fontSize: 15,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    marginBottom: 14,
+  },
+  dropsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  waterStatus: {
+    fontSize: 14,
+    ...FONTS.medium,
+    color: Colors.textMuted,
+    textAlign: 'center',
+  },
+  waterComplete: {
+    fontSize: 14,
+    ...FONTS.bold,
+    color: Colors.mboaGreen,
+    textAlign: 'center',
+    marginTop: 8,
+  },
 });
 
 export default HubScreen;
