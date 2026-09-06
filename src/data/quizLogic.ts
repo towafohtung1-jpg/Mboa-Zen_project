@@ -1,4 +1,5 @@
 // src/data/quizLogic.ts
+
 export type ArchetypeType = 'runner' | 'warrior' | 'guardian' | null;
 
 type QuizOption = {
@@ -29,19 +30,18 @@ export const quizQuestions: QuizQuestion[] = [
     id: 'q2',
     question: 'What do you do every day?',
     options: [
-      { id: 'a', label: 'I walk a lot - school, market, farm', archetype: 'runner', icon: '🚶' },
-      { id: 'b', label: 'I carry heavy things, push, build', archetype: 'warrior', icon: '💪' },
-      { id: 'c', label: 'I sit at shop, office, or home', archetype: 'guardian', icon: '🪑' },
+      { id: 'a', label: 'I walk a lot - school, market, farm', archetype: 'runner', icon: 'walk_icon' },
+      { id: 'b', label: 'I carry heavy things, push, build', archetype: 'warrior', icon: 'carry_icon' },
+      { id: 'c', label: 'I sit at shop, office, or home', archetype: 'guardian', icon: 'sit_icon' },
     ],
   },
   {
     id: 'q3',
     question: 'After eating fufu, how do you feel?',
     options: [
-      { id: 'a', label: 'Hungry again quickly (fast burn)', archetype: 'runner', icon: '🍽️' },
-      { id: 'b', label: 'Strong for long work', archetype: 'warrior', icon: '💪' },
-      { id: 'c', label: 'Tired if I eat too much', archetype: 'guardian', icon: '😴' },
-    ],
+      { id: 'a', label: 'Hungry again quickly (fast burn)', archetype: 'runner', icon: 'hungry_icon' },
+      { id: 'b', label: 'Strong for long work', archetype: 'warrior', icon: 'strong_icon' },
+      { id: 'c', label: 'Tired if I eat too much', archetype: 'guardian', icon: 'tired_icon' },    ],
   },
   {
     id: 'q4',
@@ -55,10 +55,9 @@ export const quizQuestions: QuizQuestion[] = [
     id: 'q5',
     question: 'What is your goal?',
     options: [
-      { id: 'a', label: 'I want power for walking, no tiredness', archetype: 'runner', icon: '🏃' },
-      { id: 'b', label: 'I want muscle, strong hands', archetype: 'warrior', icon: '💪' },
-      { id: 'c', label: 'I want balance, to feel fine', archetype: 'guardian', icon: '⚖️' },
-    ],
+      { id: 'a', label: 'I want power for walking, no tiredness', archetype: 'runner', icon: 'power_icon' },
+      { id: 'b', label: 'I want muscle, strong hands', archetype: 'warrior', icon: 'muscle_icon' },
+      { id: 'c', label: 'I want balance, to feel fine', archetype: 'guardian', icon: 'balance_icon' },    ],
   },
 ];
 

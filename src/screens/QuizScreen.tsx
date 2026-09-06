@@ -21,7 +21,6 @@ type Props = {
 
 // ─── TREE IMAGES ────────────────────────────────────────────────────────
 
-// Use exact filenames from src/assets/Media/Trees/
 import plantainTree from '../../assets/Media/Trees/plantain_tree.jpg';
 import irokoTree from '../../assets/Media/Trees/iroko_tree.jpg';
 import mangoTree from '../../assets/Media/Trees/mango_tree.jpg';
@@ -31,6 +30,23 @@ const TREE_IMAGES = {
   warrior: irokoTree,
   guardian: mangoTree,
 };
+
+// ─── ICON IMAGES ────────────────────────────────────────────────────────
+
+import runnerIcon from '../../assets/Media/Icons/runner_icon.png';
+import warriorIcon from '../../assets/Media/Icons/warrior_icon.png';
+import guardianIcon from '../../assets/Media/Icons/guardian_icon.png';
+import walkIcon from '../../assets/Media/Icons/walk_icon.png';
+import carryIcon from '../../assets/Media/Icons/carry_icon.png';
+import sitIcon from '../../assets/Media/Icons/sit_icon.png';
+import hungryIcon from '../../assets/Media/Icons/hungry_icon.png';
+import strongIcon from '../../assets/Media/Icons/strong_icon.png';
+import tiredIcon from '../../assets/Media/Icons/tired_icon.png';
+import powerIcon from '../../assets/Media/Icons/power_icon.png';
+import muscleIcon from '../../assets/Media/Icons/muscle_icon.png';
+import balanceIcon from '../../assets/Media/Icons/balance_icon.png';
+
+
 
 // ─── OPTION CARD ────────────────────────────────────────────────────────
 
@@ -65,6 +81,29 @@ const OptionCard = ({
     }).start();
   };
 
+  // Direct mapping of icon names to images
+  const getIconSource = (iconName: string) => {
+  switch (iconName) {
+    case 'runner_icon': return runnerIcon;
+    case 'warrior_icon': return warriorIcon;
+    case 'guardian_icon': return guardianIcon;
+    case 'walk_icon': return walkIcon;
+    case 'carry_icon': return carryIcon;
+    case 'sit_icon': return sitIcon;
+    case 'hungry_icon': return hungryIcon;
+    case 'strong_icon': return strongIcon;
+    case 'tired_icon': return tiredIcon;
+    case 'power_icon': return powerIcon;
+    case 'muscle_icon': return muscleIcon;
+    case 'balance_icon': return balanceIcon;
+    default: return null;
+  }
+};
+
+  const imageSource = icon ? getIconSource(icon) : null;
+  const isImageIcon = imageSource !== null;
+  console.log('🔍 Q3 icon:', icon, 'imageSource:', imageSource ? 'FOUND' : 'NULL');
+
   return (
     <Animated.View style={{ transform: [{ scale }] }}>
       <TouchableOpacity
@@ -77,7 +116,11 @@ const OptionCard = ({
         <View style={[styles.radio, isSelected && styles.radioSelected]}>
           {isSelected && <View style={styles.radioInner} />}
         </View>
-        {icon && <Text style={styles.optionIcon}>{icon}</Text>}
+        {isImageIcon ? (
+          <Image source={imageSource} style={styles.optionIconImage} />
+        ) : (
+          icon && <Text style={styles.optionIcon}>{icon}</Text>
+        )}
         <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
           {label}
         </Text>
@@ -354,6 +397,12 @@ const styles = StyleSheet.create({
   optionIcon: {
     fontSize: 24,
     marginRight: 12,
+  },
+  optionIconImage: {
+    width: 30,
+    height: 30,
+    marginRight: 12,
+    resizeMode: 'contain',
   },
   optionLabel: {
     fontSize: 16,

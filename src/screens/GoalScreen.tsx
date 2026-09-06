@@ -7,10 +7,18 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from 'react-native';
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
+
+// ─── ICON IMAGES ────────────────────────────────────────────────────────
+
+import fireIcon from '../../assets/Media/Icons/fire_icon.png';
+import strongIcon from '../../assets/Media/Icons/strong_icon.png';
+import walkIcon from '../../assets/Media/Icons/walk_icon.png';
+import foodIcon from '../../assets/Media/Icons/food_icon.png';
 
 type Props = {
   onFinish: () => void;
@@ -18,10 +26,10 @@ type Props = {
 
 const GoalScreen = ({ onFinish }: Props) => {
   const goals = [
-    { id: 'lose_weight', icon: '🔥', label: 'Lose Weight', desc: 'Burn fat and slim down healthily' },
-    { id: 'build_strength', icon: '💪', label: 'Build Strength', desc: 'Gain muscle and get stronger' },
-    { id: 'stay_active', icon: '🚶', label: 'Stay Active', desc: 'Maintain good health and energy' },
-    { id: 'eat_better', icon: '🥗', label: 'Eat Better', desc: 'Make smarter everyday food choices' },
+    { id: 'lose_weight', icon: 'fire_icon', label: 'Lose Weight', desc: 'Burn fat and slim down healthily' },
+    { id: 'build_strength', icon: 'strong_icon', label: 'Build Strength', desc: 'Gain muscle and get stronger' },
+    { id: 'stay_active', icon: 'walk_icon', label: 'Stay Active', desc: 'Maintain good health and energy' },
+    { id: 'eat_better', icon: 'food_icon', label: 'Eat Better', desc: 'Make smarter everyday food choices' },
   ];
 
   const [selectedGoal, setSelectedGoal] = React.useState<string | null>(null);
@@ -51,7 +59,10 @@ const GoalScreen = ({ onFinish }: Props) => {
               onPress={() => setSelectedGoal(goal.id)}
               activeOpacity={0.8}
             >
-              <Text style={styles.goalIcon}>{goal.icon}</Text>
+              {goal.icon === 'fire_icon' && <Image source={fireIcon} style={styles.goalIconImage} />}
+              {goal.icon === 'strong_icon' && <Image source={strongIcon} style={styles.goalIconImage} />}
+              {goal.icon === 'walk_icon' && <Image source={walkIcon} style={styles.goalIconImage} />}
+              {goal.icon === 'food_icon' && <Image source={foodIcon} style={styles.goalIconImage} />}
               <View style={styles.goalContent}>
                 <Text style={styles.goalTitle}>{goal.label}</Text>
                 <Text style={styles.goalDescription}>
@@ -141,9 +152,11 @@ const styles = StyleSheet.create({
     borderColor: Colors.mboaGreen,
     backgroundColor: '#F1FAF3',
   },
-  goalIcon: {
-    fontSize: 28,
+  goalIconImage: {
+    width: 30,
+    height: 30,
     marginRight: 14,
+    resizeMode: 'contain',
   },
   goalContent: {
     flex: 1,
