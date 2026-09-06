@@ -5,8 +5,8 @@
   "scripts": {
     "start": "expo start",
     "web": "expo start --web",
-    "build": "echo 'Skipping build'",
-    "build:web": "echo 'Skipping build:web'",
+    "build": "npx expo export --platform web",
+    "build:web": "npx expo export --platform web",
     "export": "expo export --platform web"
   },
   "dependencies": {
