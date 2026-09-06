@@ -1,16 +1,38 @@
 // ─── src/screens/QuizScreen.tsx ─────────────────────────────────────────
 
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+  ScrollView,
+  Image,
+} from 'react-native';
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
-import { FadeInView } from '../components/common/FadeInView';
 import { quizQuestions, calculateQuizResult, ArchetypeType } from '../data/quizLogic';
 
 type Props = {
   onFinish: () => void;
 };
+
+// ─── TREE IMAGES ────────────────────────────────────────────────────────
+
+// Use exact filenames from src/assets/Media/Trees/
+import plantainTree from '../../assets/Media/Trees/plantain_tree.jpg';
+import irokoTree from '../../assets/Media/Trees/iroko_tree.jpg';
+import mangoTree from '../../assets/Media/Trees/mango_tree.jpg';
+
+const TREE_IMAGES = {
+  runner: plantainTree,
+  warrior: irokoTree,
+  guardian: mangoTree,
+};
+
+// ─── OPTION CARD ────────────────────────────────────────────────────────
 
 const OptionCard = ({
   label,
@@ -46,10 +68,7 @@ const OptionCard = ({
   return (
     <Animated.View style={{ transform: [{ scale }] }}>
       <TouchableOpacity
-        style={[
-          styles.option,
-          isSelected && styles.optionSelected,
-        ]}
+        style={[styles.option, isSelected && styles.optionSelected]}
         onPress={onPress}
         onPressIn={pressIn}
         onPressOut={pressOut}
@@ -67,6 +86,63 @@ const OptionCard = ({
   );
 };
 
+// ─── TREE OPTION CARD (with images) ────────────────────────────────────
+
+const TreeOptionCard = ({
+  label,
+  archetype,
+  onPress,
+  isSelected,
+}: {
+  label: string;
+  archetype: string;
+  onPress: () => void;
+  isSelected: boolean;
+}) => {
+  const scale = useState(new Animated.Value(1))[0];
+  const imageSource = TREE_IMAGES[archetype as keyof typeof TREE_IMAGES];
+
+  const pressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.97,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 8,
+    }).start();
+  };
+
+  const pressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 30,
+      bounciness: 8,
+    }).start();
+  };
+
+  return (
+    <Animated.View style={{ transform: [{ scale }] }}>
+      <TouchableOpacity
+        style={[styles.option, isSelected && styles.optionSelected]}
+        onPress={onPress}
+        onPressIn={pressIn}
+        onPressOut={pressOut}
+        activeOpacity={1}
+      >
+        <View style={[styles.radio, isSelected && styles.radioSelected]}>
+          {isSelected && <View style={styles.radioInner} />}
+        </View>
+        <Image source={imageSource} style={styles.treeImage} />
+        <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
+          {label}
+        </Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
+
+// ─── QUIZ SCREEN ────────────────────────────────────────────────────────
+
 const QuizScreen = ({ onFinish }: Props) => {
   const [answers, setAnswers] = useState<ArchetypeType[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -82,7 +158,7 @@ const QuizScreen = ({ onFinish }: Props) => {
   const handleOptionPress = (index: number) => {
     setSelectedOption(index);
     const selected = currentQ.options[index];
-    
+
     if (selected.forceGuardian) {
       setForceGuardian(true);
     }
@@ -102,13 +178,13 @@ const QuizScreen = ({ onFinish }: Props) => {
   };
 
   const finishQuiz = (finalAnswers: ArchetypeType[]) => {
-    let resultArchetype: ArchetypeType;
+    let resultArchetype: ArchetypeType = 'guardian';
 
     if (forceGuardian) {
       resultArchetype = 'guardian';
     } else {
       const result = calculateQuizResult(finalAnswers);
-      resultArchetype = result.archetype;
+      resultArchetype = result.archetype || 'guardian';
     }
 
     setArchetype(resultArchetype);
@@ -116,7 +192,7 @@ const QuizScreen = ({ onFinish }: Props) => {
   };
 
   return (
-    <FadeInView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.headerRow}>
@@ -135,27 +211,40 @@ const QuizScreen = ({ onFinish }: Props) => {
           <Text style={styles.question}>{currentQ.question}</Text>
 
           <View style={styles.optionsContainer}>
-            {currentQ.options.map((option: { id: string; label: string; archetype: ArchetypeType; icon?: string; image?: string; forceGuardian?: boolean }, index: number) => (
-              <OptionCard
-                key={option.id}
-                label={option.label}
-                icon={option.icon}
-                onPress={() => handleOptionPress(index)}
-                isSelected={selectedOption === index}
-              />
-            ))}
+            {currentQ.options.map((option: any, index: number) => {
+              if (currentQuestion === 0) {
+                return (
+                  <TreeOptionCard
+                    key={option.id}
+                    label={option.label}
+                    archetype={option.archetype}
+                    onPress={() => handleOptionPress(index)}
+                    isSelected={selectedOption === index}
+                  />
+                );
+              }
+              return (
+                <OptionCard
+                  key={option.id}
+                  label={option.label}
+                  icon={option.icon}
+                  onPress={() => handleOptionPress(index)}
+                  isSelected={selectedOption === index}
+                />
+              );
+            })}
           </View>
 
           {currentQuestion === 0 && (
             <View style={styles.imageHintContainer}>
-              <Text style={styles.imageHintText}>🌴 Plantain • 🌳 Iroko • 🌿 Mango</Text>
+              <Text style={styles.imageHintText}>🌴 Plantain • 🌳 Iroko • 🥭 Mango</Text>
             </View>
           )}
 
           {currentQuestion === 3 && (
             <View style={styles.safetyNote}>
               <Text style={styles.safetyNoteText}>
-                ⚠️ If you have any health conditions, we'll recommend the safest path for you.
+                ⚠ If you have any health conditions, we'll recommend the safest path for you.
               </Text>
             </View>
           )}
@@ -163,9 +252,11 @@ const QuizScreen = ({ onFinish }: Props) => {
           <View style={{ height: 20 }} />
         </ScrollView>
       </View>
-    </FadeInView>
+    </View>
   );
 };
+
+// ─── STYLES ─────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   container: {
@@ -272,6 +363,13 @@ const styles = StyleSheet.create({
   },
   optionLabelSelected: {
     color: Colors.mboaGreen,
+  },
+  treeImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 14,
+    resizeMode: 'cover',
   },
   imageHintContainer: {
     marginTop: 16,
