@@ -12,6 +12,7 @@ import { Colors } from '../../constants/colors';
 import { FONTS } from '../../constants/typography';
 import { useLanguageStore } from '../../i18n/useTranslation';
 import { LANGUAGES, Language } from '../../i18n/strings';
+import { track } from '../../utils/analytics';
 
 type Props = {
   visible: boolean;
@@ -23,6 +24,9 @@ export const LanguageSwitcher = ({ visible, onClose }: Props) => {
   const setLanguage = useLanguageStore((state) => state.setLanguage);
 
   const handleSelect = (code: Language) => {
+    if (code !== language) {
+      track('language_switched', { from: language, to: code });
+    }
     setLanguage(code);
     onClose();
   };

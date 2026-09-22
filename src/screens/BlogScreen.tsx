@@ -17,6 +17,7 @@ import { BLOG_POSTS, BlogPost, BlogCategory } from '../data/blogPosts';
 import { MboaButton } from '../components/common/MboaButton';
 import { useSwipeTabs } from '../hooks/useSwipeTabs';
 import { useTranslation } from '../i18n/useTranslation';
+import { track } from '../utils/analytics';
 
 const CATEGORIES: { key: BlogCategory | 'all'; label: string }[] = [
   { key: 'all', label: 'All' },
@@ -168,7 +169,7 @@ const BlogCard = ({
 // ─── MAIN BLOG SCREEN ───────────────────────────────────────────────────
 
 const BlogScreen = () => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<BlogCategory | 'all'>('all');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
@@ -193,7 +194,12 @@ const BlogScreen = () => {
       ? BLOG_POSTS
       : BLOG_POSTS.filter((post) => post.category === selectedCategory);
 
-  const openPost = (post: BlogPost) => {
+   const openPost = (post: BlogPost) => {
+    track('article_read', {
+      id: post.id,
+      category: post.category,
+      language,
+    });
     setSelectedPost(post);
     setModalVisible(true);
   };

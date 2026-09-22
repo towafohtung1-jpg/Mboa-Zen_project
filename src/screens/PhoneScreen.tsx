@@ -41,6 +41,7 @@ const PhoneScreen = ({ onFinish, onSkip }: Props) => {
     });
 
     track('phone_login');
+    track('onboarding_complete', { path: 'phone' });
     onFinish();
   };
 
@@ -55,6 +56,7 @@ const PhoneScreen = ({ onFinish, onSkip }: Props) => {
     });
 
     track('guest_login');
+    track('onboarding_complete', { path: 'guest' });
     onSkip();
   };
 
