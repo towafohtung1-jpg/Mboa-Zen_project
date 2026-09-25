@@ -1,6 +1,6 @@
 // ─── src/screens/NurtureScreen.tsx ──────────────────────────────────────
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  Modal,
 } from 'react-native';
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
@@ -16,12 +17,10 @@ import { useUserStore } from '../store/useUserStore';
 import { FadeInView } from '../components/common/FadeInView';
 import { getMealOptions, getBodyTypeFromArchetype } from '../data/mealOptions';
 import { MealOption, MealFoodItem } from '../types';
-
 import { offlineAgent } from '../database/offlineAgent';
 
 // ─── FOOD IMAGES ────────────────────────────────────────────────────────
 
-// High-res images
 import akara_break_pepper from '../../assets/Media/Meals/high-res/akara_break_pepper.png';
 import kumba_bread_akara_pap from '../../assets/Media/Meals/high-res/kumba_bread_akara_pap.png';
 import boiled_eggs_kumba_bread from '../../assets/Media/Meals/high-res/boiled_eggs_kumba_bread.png';
@@ -57,7 +56,6 @@ import soya_gizzard_plantain from '../../assets/Media/Meals/high-res/soya_gizzar
 import kwacoco_bible_kanda from '../../assets/Media/Meals/high-res/kwacoco_bible_kanda.png';
 import burning_fish from '../../assets/Media/Meals/high-res/burning_fish.png';
 
-// Mapping
 const FOOD_IMAGES: Record<string, any> = {
   'akara_break_pepper.png': akara_break_pepper,
   'kumba_bread_akara_pap.png': kumba_bread_akara_pap,
@@ -101,6 +99,8 @@ const MEAL_TIMES = [
   { key: 'supper' as const, label: '🍲 Supper', emoji: '🌙' },
 ];
 
+// ─── NUTRITION BAR ──────────────────────────────────────────────────────
+
 const NutritionBar = ({ label, value, max, color }: { label: string; value: number; max: number; color: string }) => {
   const percentage = Math.min((value / max) * 100, 100);
   return (
@@ -114,19 +114,168 @@ const NutritionBar = ({ label, value, max, color }: { label: string; value: numb
   );
 };
 
-const MealCard = ({ meal, onLogMeal }: { meal: MealOption; onLogMeal: (meal: MealOption) => void }) => {
+// ─── MEAL DETAIL MODAL ──────────────────────────────────────────────────
+
+const MealDetailModal = ({
+  meal,
+  visible,
+  onClose,
+  onLogMeal,
+}: {
+  meal: MealOption | null;
+  visible: boolean;
+  onClose: () => void;
+  onLogMeal: (meal: MealOption) => void;
+}) => {
+  if (!meal) return null;
+
+  const foodImage = meal.image ? FOOD_IMAGES[meal.image] : null;
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+          {/* Close Button */}
+          <TouchableOpacity
+            style={styles.modalCloseButton}
+            onPress={onClose}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.modalCloseText}>✕</Text>
+          </TouchableOpacity>
+
+          <ScrollView
+            style={styles.modalScroll}
+            contentContainerStyle={styles.modalScrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Full Image */}
+            {foodImage && (
+              <Image
+                source={foodImage}
+                style={styles.modalImage}
+                resizeMode="contain"
+              />
+            )}
+
+            {/* Header */}
+            <View style={styles.modalHeader}>
+              <View style={styles.optionBadge}>
+                <Text style={styles.optionBadgeText}>Option {meal.option_number}</Text>
+              </View>
+              <Text style={styles.modalMealName}>{meal.meal_name}</Text>
+              <Text style={styles.modalRegion}>{meal.region}</Text>
+            </View>
+
+            {/* Quick Nutrition */}
+            <View style={styles.quickNutrition}>
+              <View style={styles.quickNutritionItem}>
+                <Text style={styles.quickNutritionValue}>{meal.nutrition.calories}</Text>
+                <Text style={styles.quickNutritionLabel}>kcal</Text>
+              </View>
+              <View style={styles.quickNutritionDivider} />
+              <View style={styles.quickNutritionItem}>
+                <Text style={styles.quickNutritionValue}>{meal.nutrition.protein}g</Text>
+                <Text style={styles.quickNutritionLabel}>protein</Text>
+              </View>
+              <View style={styles.quickNutritionDivider} />
+              <View style={styles.quickNutritionItem}>
+                <Text style={styles.quickNutritionValue}>{meal.nutrition.carbohydrates}g</Text>
+                <Text style={styles.quickNutritionLabel}>carbs</Text>
+              </View>
+              <View style={styles.quickNutritionDivider} />
+              <View style={styles.quickNutritionItem}>
+                <Text style={styles.quickNutritionValue}>{meal.nutrition.fiber}g</Text>
+                <Text style={styles.quickNutritionLabel}>fiber</Text>
+              </View>
+            </View>
+
+            {/* Ingredients */}
+            <View style={styles.sectionDivider} />
+            <Text style={styles.bodyTitle}>What You Need</Text>
+            {meal.foods.map((food: MealFoodItem, index: number) => (
+              <View key={index} style={styles.foodRow}>
+                <View style={styles.foodDot} />
+                <View style={styles.foodInfo}>
+                  <Text style={styles.foodName}>{food.name}</Text>
+                  <Text style={styles.foodQty}>{food.quantity}</Text>
+                  {food.notes && <Text style={styles.foodNotes}>{food.notes}</Text>}
+                </View>
+              </View>
+            ))}
+
+            {/* Nutritional Breakdown */}
+            <View style={styles.sectionDivider} />
+            <Text style={styles.bodyTitle}>Nutritional Breakdown</Text>
+            <NutritionBar label="Calories" value={meal.nutrition.calories} max={800} color={Colors.zenGold} />
+            <NutritionBar label="Protein" value={meal.nutrition.protein} max={60} color={Colors.mboaGreen} />
+            <NutritionBar label="Carbs" value={meal.nutrition.carbohydrates} max={100} color="#FF9800" />
+            <NutritionBar label="Fat" value={meal.nutrition.fat} max={40} color="#9C27B0" />
+            <NutritionBar label="Fiber" value={meal.nutrition.fiber} max={20} color="#00BCD4" />
+
+            {/* Why This Is Good For You */}
+            <View style={styles.sectionDivider} />
+            <Text style={styles.bodyTitle}>Why This Is Good For You</Text>
+            <Text style={styles.whyGoodText}>{meal.why_good}</Text>
+
+            {/* Where to get it */}
+            <View style={styles.availableBox}>
+              <Text style={styles.availableLabel}>📍 Where to get it</Text>
+              <Text style={styles.availableText}>{meal.available_from}</Text>
+            </View>
+
+            {/* Log Meal Button */}
+            <TouchableOpacity
+              style={styles.logMealButton}
+              onPress={() => {
+                onLogMeal(meal);
+                onClose();
+              }}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.logMealButtonText}>✓ I Ate This</Text>
+            </TouchableOpacity>
+
+            <View style={{ height: 20 }} />
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+// ─── MEAL CARD ──────────────────────────────────────────────────────────
+
+const MealCard = ({
+  meal,
+  onLogMeal,
+  onOpenModal,
+}: {
+  meal: MealOption;
+  onLogMeal: (meal: MealOption) => void;
+  onOpenModal: (meal: MealOption) => void;
+}) => {
   const [expanded, setExpanded] = useState(false);
   const foodImage = meal.image ? FOOD_IMAGES[meal.image] : null;
 
   return (
     <View style={styles.mealCard}>
-      {foodImage && (
-        <Image
-          source={foodImage}
-          style={styles.mealCardImage}
-          resizeMode="contain"
-        />
-      )}
+      {/* Tappable Image */}
+      <TouchableOpacity onPress={() => onOpenModal(meal)} activeOpacity={0.9}>
+        {foodImage && (
+          <Image
+            source={foodImage}
+            style={styles.mealCardImage}
+            resizeMode="contain"
+          />
+        )}
+      </TouchableOpacity>
+
       <TouchableOpacity
         style={styles.mealCardHeader}
         onPress={() => setExpanded(!expanded)}
@@ -164,6 +313,14 @@ const MealCard = ({ meal, onLogMeal }: { meal: MealOption; onLogMeal: (meal: Mea
 
       {expanded && (
         <View style={styles.mealCardBody}>
+          <TouchableOpacity
+            style={styles.viewDetailsButton}
+            onPress={() => onOpenModal(meal)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.viewDetailsButtonText}>👁️ View Full Details</Text>
+          </TouchableOpacity>
+
           <View style={styles.sectionDivider} />
           <Text style={styles.bodyTitle}>What You Need</Text>
           {meal.foods.map((food: MealFoodItem, index: number) => (
@@ -203,14 +360,17 @@ const MealCard = ({ meal, onLogMeal }: { meal: MealOption; onLogMeal: (meal: Mea
   );
 };
 
+// ─── NURTURE SCREEN ─────────────────────────────────────────────────────
+
 const NurtureScreen = () => {
-  
   const { archetype } = useUserStore();
   const [selectedMealTime, setSelectedMealTime] = useState<'breakfast' | 'lunch' | 'supper'>('breakfast');
   const [todayCalories, setTodayCalories] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  
+  // Modal state
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedMeal, setSelectedMeal] = useState<MealOption | null>(null);
 
   const bodyType = getBodyTypeFromArchetype(archetype);
 
@@ -250,6 +410,16 @@ const NurtureScreen = () => {
     }
   };
 
+  const openModal = (meal: MealOption) => {
+    setSelectedMeal(meal);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedMeal(null);
+  };
+
   return (
     <FadeInView style={styles.container} key={refreshKey}>
       <View style={styles.headerArea}>
@@ -283,7 +453,7 @@ const NurtureScreen = () => {
           ))}
         </View>
         <Text style={styles.chooseText}>
-          Choose any meal below. All options suit your body profile.
+          Tap any meal to see full details and log it.
         </Text>
       </View>
 
@@ -302,7 +472,12 @@ const NurtureScreen = () => {
             </View>
           ) : (
             mealOptions.map((meal) => (
-              <MealCard key={meal.id} meal={meal} onLogMeal={handleLogMeal} />
+              <MealCard
+                key={meal.id}
+                meal={meal}
+                onLogMeal={handleLogMeal}
+                onOpenModal={openModal}
+              />
             ))
           )}
           <View style={styles.disclaimerBox}>
@@ -313,9 +488,19 @@ const NurtureScreen = () => {
           <View style={{ height: 20 }} />
         </View>
       </ScrollView>
+
+      {/* Meal Detail Modal */}
+      <MealDetailModal
+        meal={selectedMeal}
+        visible={modalVisible}
+        onClose={closeModal}
+        onLogMeal={handleLogMeal}
+      />
     </FadeInView>
   );
 };
+
+// ─── STYLES ─────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.softBg, alignItems: 'center' },
@@ -337,7 +522,8 @@ const styles = StyleSheet.create({
   scrollContent: { width: '100%', alignItems: 'center', paddingTop: 8 },
   section: { width: '100%', maxWidth: 480, paddingHorizontal: 20, paddingBottom: 20 },
   mealCard: { backgroundColor: Colors.cleanWhite, borderRadius: 18, marginBottom: 14, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 10, elevation: 2 },
-  mealCardImage: { width: '100%', height: 200, backgroundColor: '#F5F5F5' },  mealCardHeader: { padding: 18 },
+  mealCardImage: { width: '100%', height: 220, backgroundColor: '#F5F5F5' },
+  mealCardHeader: { padding: 18 },
   mealCardTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   optionBadge: { backgroundColor: '#F1FAF3', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, borderWidth: 1, borderColor: Colors.mboaGreen },
   optionBadgeText: { fontSize: 11, ...FONTS.bold, color: Colors.mboaGreen },
@@ -349,6 +535,8 @@ const styles = StyleSheet.create({
   quickNutritionLabel: { fontSize: 10, ...FONTS.regular, color: Colors.textMuted, marginTop: 2 },
   quickNutritionDivider: { width: 1, height: 28, backgroundColor: '#E0E0E0' },
   mealCardBody: { paddingHorizontal: 18, paddingBottom: 18 },
+  viewDetailsButton: { backgroundColor: Colors.softBg, borderRadius: 10, paddingVertical: 10, alignItems: 'center', marginBottom: 14 },
+  viewDetailsButtonText: { fontSize: 13, ...FONTS.bold, color: Colors.mboaGreen },
   sectionDivider: { height: 1, backgroundColor: '#F0F0F0', marginVertical: 14 },
   bodyTitle: { fontSize: 13, ...FONTS.bold, color: Colors.earthBlack, letterSpacing: 0.5, marginBottom: 12 },
   foodRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 },
@@ -373,7 +561,69 @@ const styles = StyleSheet.create({
   emptySubtitle: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, textAlign: 'center', lineHeight: 22, paddingHorizontal: 20 },
   disclaimerBox: { backgroundColor: '#FFF8E1', borderRadius: 12, padding: 14, marginTop: 8, borderLeftWidth: 3, borderLeftColor: Colors.zenGold },
   disclaimerText: { fontSize: 12, ...FONTS.regular, color: Colors.earthBlack, lineHeight: 18 },
+
+  // ─── MODAL STYLES ──────────────────────────────────────────────────────
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  modalContainer: {
+    backgroundColor: Colors.cleanWhite,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '90%',
+    minHeight: '50%',
+    paddingTop: 16,
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 12,
+    right: 16,
+    zIndex: 10,
+    backgroundColor: Colors.softBg,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalCloseText: {
+    fontSize: 18,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+  },
+  modalScroll: {
+    width: '100%',
+  },
+  modalScrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  modalImage: {
+    width: '100%',
+    height: 280,
+    borderRadius: 16,
+    backgroundColor: '#F5F5F5',
+    marginBottom: 16,
+  },
+  modalHeader: {
+    marginBottom: 16,
+  },
+  modalMealName: {
+    fontSize: 22,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    marginTop: 8,
+    marginBottom: 4,
+    lineHeight: 28,
+  },
+  modalRegion: {
+    fontSize: 13,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    fontStyle: 'italic',
+  },
 });
 
 export default NurtureScreen;
-
