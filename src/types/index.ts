@@ -22,12 +22,17 @@ export interface MealOption {
   meal_name: string;
   option_number: number;
   meal_time: 'breakfast' | 'lunch' | 'supper';
+  region: string;                    // NEW
+  type: 'street' | 'home' | 'both';  // NEW
   image?: string;
+  high_res_image?: string;           // NEW
   foods: MealFoodItem[];
   nutrition: MealNutrition;
   why_good: string;
   available_from: string;
+  verified: boolean;                 // NEW
 }
+
 
 // ─── WORKOUT TYPES ──────────────────────────────────────────────────────
 
@@ -61,4 +66,13 @@ export interface UserProfile {
   archetype: Archetype;
   createdAt: string;
   updatedAt: string;
+}
+
+// ─── PROVERB TYPES ──────────────────────────────────────────────────────
+
+export interface Proverb {
+  id: number;
+  proverb: string;
+  origin: string;
+  lesson: string;
 }

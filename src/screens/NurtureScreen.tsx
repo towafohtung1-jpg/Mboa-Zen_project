@@ -19,17 +19,80 @@ import { MealOption, MealFoodItem } from '../types';
 
 import { offlineAgent } from '../database/offlineAgent';
 
-// Food images mapping
+// ─── FOOD IMAGES ────────────────────────────────────────────────────────
+
+// High-res images
+import akara_break_pepper from '../../assets/Media/Meals/high-res/akara_break_pepper.png';
+import kumba_bread_akara_pap from '../../assets/Media/Meals/high-res/kumba_bread_akara_pap.png';
+import boiled_eggs_kumba_bread from '../../assets/Media/Meals/high-res/boiled_eggs_kumba_bread.png';
+import puff_puff_pap from '../../assets/Media/Meals/high-res/puff_puff_pap.png';
+import bread_egg_tea from '../../assets/Media/Meals/high-res/bread_egg_tea.png';
+import beignets_haricot_bouillie from '../../assets/Media/Meals/high-res/beignets_haricot_bouillie.png';
+import avocado_bread from '../../assets/Media/Meals/high-res/avocado_bread.png';
+import beans_bread from '../../assets/Media/Meals/high-res/beans_bread.png';
+import pap_milk_sugar from '../../assets/Media/Meals/high-res/pap_milk_sugar.png';
+import fried_eggs_bread_avocado_tea from '../../assets/Media/Meals/high-res/fried_eggs_bread_avocado_tea.png';
+import egusi_soup_fufu_garri from '../../assets/Media/Meals/high-res/egusi_soup_fufu_garri.png';
+import ndole_rice_plantains_beef from '../../assets/Media/Meals/high-res/ndole_rice_plantains_beef.png';
+import eru_water_fufu_gari from '../../assets/Media/Meals/high-res/eru_water_fufu_gari.png';
+import rice_egusi_chicken from '../../assets/Media/Meals/high-res/rice_egusi_chicken.png';
+import koki_plantain_cocoyams from '../../assets/Media/Meals/high-res/koki_plantain_cocoyams.png';
+import poulet_dg from '../../assets/Media/Meals/high-res/poulet_dg.png';
+import mbongo_tchobi from '../../assets/Media/Meals/high-res/mbongo_tchobi.png';
+import ekwang from '../../assets/Media/Meals/high-res/ekwang.png';
+import cornchaff from '../../assets/Media/Meals/high-res/cornchaff.png';
+import achu_yellow_soup from '../../assets/Media/Meals/high-res/achu_yellow_soup.png';
+import ogbono_soup_fufu from '../../assets/Media/Meals/high-res/ogbono_soup_fufu.png';
+import beans_dodo from '../../assets/Media/Meals/high-res/beans_dodo.png';
+import kwacoco_banga_soup from '../../assets/Media/Meals/high-res/kwacoco_banga_soup.png';
+import rice_groundnut_soup_beef from '../../assets/Media/Meals/high-res/rice_groundnut_soup_beef.png';
+import pepper_soup_meat_plantains from '../../assets/Media/Meals/high-res/pepper_soup_meat_plantains.png';
+import pepper_soup_goat_plantains from '../../assets/Media/Meals/high-res/pepper_soup_goat_plantains.png';
+import brochettes_plantains from '../../assets/Media/Meals/high-res/brochettes_plantains.png';
+import grilled_fish_sweet_potato_njama from '../../assets/Media/Meals/high-res/grilled_fish_sweet_potato_njama.png';
+import roasted_fish_miondo_bobolo from '../../assets/Media/Meals/high-res/roasted_fish_miondo_bobolo.png';
+import jollof_rice from '../../assets/Media/Meals/high-res/jollof_rice.png';
+import roasted_pork_plantains from '../../assets/Media/Meals/high-res/roasted_pork_plantains.png';
+import soya_gizzard_plantain from '../../assets/Media/Meals/high-res/soya_gizzard_plantain.png';
+import kwacoco_bible_kanda from '../../assets/Media/Meals/high-res/kwacoco_bible_kanda.png';
+import burning_fish from '../../assets/Media/Meals/high-res/burning_fish.png';
+
+// Mapping
 const FOOD_IMAGES: Record<string, any> = {
-  'runner_breakfast_puffpuff_pap.png': require('../../assets/Media/Culinary/runner_breakfast_puffpuff_pap.png'),
-  'runner_lunch_sweetpotato_rice_greens_meat.png': require('../../assets/Media/Culinary/runner_lunch_sweetpotato_rice_greens_meat.png'),
-  'runner_supper_grilledfish_miondo.png': require('../../assets/Media/Culinary/runner_supper_grilledfish_miondo.png'),
-  'warrior_breakfast_kumbabread_akara_pap.png': require('../../assets/Media/Culinary/warrior_breakfast_kumbabread_akara_pap.png'),
-  'warrior_lunch_waterfufu_eru.png': require('../../assets/Media/Culinary/warrior_lunch_waterfufu_eru.png'),
-  'warrior_supper_suya_plantain.png': require('../../assets/Media/Culinary/warrior_supper_suya_plantain.png'),
-  'guardian_breakfast_koki.png': require('../../assets/Media/Culinary/guardian_breakfast_koki.png'),
-  'guardian_lunch_yam_egusi.png': require('../../assets/Media/Culinary/guardian_lunch_yam_egusi.png'),
-  'guardian_supper_peppersoup_gardenegg.png': require('../../assets/Media/Culinary/guardian_supper_peppersoup_gardenegg.png'),
+  'akara_break_pepper.png': akara_break_pepper,
+  'kumba_bread_akara_pap.png': kumba_bread_akara_pap,
+  'boiled_eggs_kumba_bread.png': boiled_eggs_kumba_bread,
+  'puff_puff_pap.png': puff_puff_pap,
+  'bread_egg_tea.png': bread_egg_tea,
+  'beignets_haricot_bouillie.png': beignets_haricot_bouillie,
+  'avocado_bread.png': avocado_bread,
+  'beans_bread.png': beans_bread,
+  'pap_milk_sugar.png': pap_milk_sugar,
+  'fried_eggs_bread_avocado_tea.png': fried_eggs_bread_avocado_tea,
+  'egusi_soup_fufu_garri.png': egusi_soup_fufu_garri,
+  'ndole_rice_plantains_beef.png': ndole_rice_plantains_beef,
+  'eru_water_fufu_gari.png': eru_water_fufu_gari,
+  'rice_egusi_chicken.png': rice_egusi_chicken,
+  'koki_plantain_cocoyams.png': koki_plantain_cocoyams,
+  'poulet_dg.png': poulet_dg,
+  'mbongo_tchobi.png': mbongo_tchobi,
+  'ekwang.png': ekwang,
+  'cornchaff.png': cornchaff,
+  'achu_yellow_soup.png': achu_yellow_soup,
+  'ogbono_soup_fufu.png': ogbono_soup_fufu,
+  'beans_dodo.png': beans_dodo,
+  'kwacoco_banga_soup.png': kwacoco_banga_soup,
+  'rice_groundnut_soup_beef.png': rice_groundnut_soup_beef,
+  'pepper_soup_meat_plantains.png': pepper_soup_meat_plantains,
+  'pepper_soup_goat_plantains.png': pepper_soup_goat_plantains,
+  'brochettes_plantains.png': brochettes_plantains,
+  'grilled_fish_sweet_potato_njama.png': grilled_fish_sweet_potato_njama,
+  'roasted_fish_miondo_bobolo.png': roasted_fish_miondo_bobolo,
+  'jollof_rice.png': jollof_rice,
+  'roasted_pork_plantains.png': roasted_pork_plantains,
+  'soya_gizzard_plantain.png': soya_gizzard_plantain,
+  'kwacoco_bible_kanda.png': kwacoco_bible_kanda,
+  'burning_fish.png': burning_fish,
 };
 
 const MEAL_TIMES = [
@@ -61,7 +124,7 @@ const MealCard = ({ meal, onLogMeal }: { meal: MealOption; onLogMeal: (meal: Mea
         <Image
           source={foodImage}
           style={styles.mealCardImage}
-          resizeMode="cover"
+          resizeMode="contain"
         />
       )}
       <TouchableOpacity
@@ -274,8 +337,7 @@ const styles = StyleSheet.create({
   scrollContent: { width: '100%', alignItems: 'center', paddingTop: 8 },
   section: { width: '100%', maxWidth: 480, paddingHorizontal: 20, paddingBottom: 20 },
   mealCard: { backgroundColor: Colors.cleanWhite, borderRadius: 18, marginBottom: 14, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 10, elevation: 2 },
-  mealCardImage: { width: '100%', height: 150 },
-  mealCardHeader: { padding: 18 },
+  mealCardImage: { width: '100%', height: 200, backgroundColor: '#F5F5F5' },  mealCardHeader: { padding: 18 },
   mealCardTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   optionBadge: { backgroundColor: '#F1FAF3', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, borderWidth: 1, borderColor: Colors.mboaGreen },
   optionBadgeText: { fontSize: 11, ...FONTS.bold, color: Colors.mboaGreen },
