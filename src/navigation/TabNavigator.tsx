@@ -2,11 +2,10 @@ import React from 'react';
 import { Image } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import HubScreen from '../screens/HubScreen';
-import NurtureScreen from '../screens/NurtureScreen';
-import ScanScreen from '../screens/ScanScreen';
+import { HubStack } from './HubStack';import NurtureScreen from '../screens/NurtureScreen';
 import DojoScreen from '../screens/DojoScreen';
 import MarketScreen from '../screens/MarketScreen';
+import BlogScreen from '../screens/BlogScreen';
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 
@@ -15,9 +14,8 @@ const Tab = createBottomTabNavigator();
 const ICONS: Record<string, any> = {
   Hub: require('../../assets/Graphics/UI_vectors_icon_set/dashboard.png'),
   Meals: require('../../assets/Graphics/UI_vectors_icon_set/kitchen.png'),
-  Scan: require('../../assets/Graphics/UI_vectors_icon_set/scan.png'),
   Training: require('../../assets/Graphics/UI_vectors_icon_set/dojo.png'),
-  Market: require('../../assets/Graphics/UI_vectors_icon_set/market.png'),
+  Learn: require('../../assets/Graphics/UI_vectors_icon_set/Learn.png'),  Market: require('../../assets/Graphics/UI_vectors_icon_set/market.png'),
 };
 
 export const TabNavigator = () => {
@@ -53,10 +51,10 @@ export const TabNavigator = () => {
         ),
       })}
     >
-      <Tab.Screen name="Hub" component={HubScreen} />
+      <Tab.Screen name="Hub" component={HubStack} />     
       <Tab.Screen name="Meals" component={NurtureScreen} />
-      <Tab.Screen name="Scan" component={ScanScreen} />
       <Tab.Screen name="Training" component={DojoScreen} />
+      <Tab.Screen name="Learn" component={BlogScreen} />
       <Tab.Screen name="Market" component={MarketScreen} />
     </Tab.Navigator>
   );

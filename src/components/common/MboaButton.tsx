@@ -14,23 +14,20 @@ const COLORS = {
 interface MboaButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'gold';
+  variant?: 'primary' | 'secondary' | 'gold' | 'outline';
   loading?: boolean;
   disabled?: boolean;
-  style?: React.CSSProperties; // Configured for universal container styles
+  fullWidth?: boolean;
+  style?: React.CSSProperties;
 }
 
-/**
- * MboaButton Component
- * Designed to compile cleanly in both mobile bundling environments 
- * and web-based workspace previews.
- */
 export const MboaButton: React.FC<MboaButtonProps> = ({ 
   title, 
   onPress, 
   variant = 'primary', 
   loading = false, 
   disabled = false,
+  fullWidth = false,
   style
 }) => {
   
@@ -38,29 +35,41 @@ export const MboaButton: React.FC<MboaButtonProps> = ({
     if (disabled) return COLORS.borderDark;
     if (variant === 'gold') return COLORS.zenGold;
     if (variant === 'secondary') return 'transparent';
+    if (variant === 'outline') return 'transparent';
     return COLORS.mboaGreen;
   };
 
   const getTextColor = () => {
     if (disabled) return COLORS.textMuted;
     if (variant === 'gold') return COLORS.earthBlack;
+    if (variant === 'outline') return COLORS.mboaGreen;
+    if (variant === 'secondary') return COLORS.mboaGreen;
     return COLORS.textPrimary;
   };
 
+  const getBorderBottomColor = () => {
+    if (disabled) return 'transparent';
+    if (variant === 'gold') return COLORS.mboaGreen;
+    if (variant === 'secondary') return 'transparent';
+    if (variant === 'outline') return COLORS.zenGold;
+    return COLORS.zenGold;
+  };
+
   const buttonStyle: React.CSSProperties = {
-    paddingTop: '14px',
-    paddingBottom: '14px',
-    paddingLeft: '24px',
-    paddingRight: '24px',
-    borderRadius: '20px',
+    paddingTop: '16px',
+    paddingBottom: '16px',
+    paddingLeft: '32px',
+    paddingRight: '32px',
+    borderRadius: '50px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
+    width: fullWidth ? '100%' : 'auto',
     border: variant === 'secondary' && !disabled ? `1.5px solid ${COLORS.mboaGreen}` : 'none',
+    borderBottom: `3px solid ${getBorderBottomColor()}`,
     backgroundColor: getBgColor(),
     color: getTextColor(),
-    fontSize: '15px',
+    fontSize: '16px',
     fontWeight: '800',
     letterSpacing: '0.5px',
     cursor: disabled || loading ? 'not-allowed' : 'pointer',

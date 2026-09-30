@@ -12,6 +12,8 @@ import {
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
+import { MboaButton } from '../components/common/MboaButton';
+
 // ─── REMOVED: 
 // ─── REMOVED: import LanguageSwitcher from '../components/common/LanguageSwitcher';
 
@@ -53,13 +55,10 @@ const OnboardingScreen = ({ onFinish }: OnboardingScreenProps) => {
           Nutrition plans built around the foods you already know and trust.
         </Text>
 
-        <TouchableOpacity
-          style={styles.button}
+        <MboaButton
+          title="Start Journey"
           onPress={onFinish}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.buttonText}>Start Journey</Text>
-        </TouchableOpacity>
+        />
       </View>
 
       {/* ─── REMOVED: Language Modal ────────────────────────────────── */}
@@ -125,20 +124,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginBottom: 40,
   },
-  button: {
-    backgroundColor: Colors.mboaGreen,
-    borderRadius: 14,
-    paddingVertical: 16,
-    paddingHorizontal: 48,
-    width: '100%',
-    alignItems: 'center',
-  },
-  buttonText: {
-    fontSize: 16,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-    letterSpacing: 1,
-  },
+  
 });
 
 export default OnboardingScreen;

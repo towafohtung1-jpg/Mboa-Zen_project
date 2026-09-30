@@ -12,6 +12,7 @@ import {
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
+import { MboaButton } from '../components/common/MboaButton';
 
 // ─── ICON IMAGES ────────────────────────────────────────────────────────
 
@@ -77,25 +78,20 @@ const GoalScreen = ({ onFinish }: Props) => {
           ))}
         </View>
 
-        <TouchableOpacity
-          style={[
-            styles.continueButton,
-            !selectedGoal && styles.continueButtonDisabled,
-          ]}
-          onPress={onFinish}
-          disabled={!selectedGoal}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.continueButtonText}>Continue</Text>
-        </TouchableOpacity>
+                <View style={styles.buttonRow}>
+          <MboaButton
+            title="Continue"
+            onPress={onFinish}
+            disabled={!selectedGoal}
+          />
 
-        <TouchableOpacity
-          style={styles.skipButton}
-          onPress={onFinish}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.skipButtonText}>Skip</Text>
-        </TouchableOpacity>
+          <MboaButton
+            title="Skip"
+            onPress={onFinish}
+            variant="outline"
+          />
+        </View>
+
       </ScrollView>
     </FadeInView>
   );
@@ -185,31 +181,14 @@ const styles = StyleSheet.create({
     borderColor: Colors.mboaGreen,
     backgroundColor: Colors.mboaGreen,
   },
-  continueButton: {
-    backgroundColor: Colors.mboaGreen,
-    borderRadius: 14,
-    paddingVertical: 16,
+
+    buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
     alignItems: 'center',
-    marginBottom: 12,
+    justifyContent:'flex-end'
   },
-  continueButtonDisabled: {
-    opacity: 0.5,
-  },
-  continueButtonText: {
-    fontSize: 16,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-    letterSpacing: 0.5,
-  },
-  skipButton: {
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  skipButtonText: {
-    fontSize: 14,
-    ...FONTS.medium,
-    color: Colors.textMuted,
-  },
+  
 });
 
 export default GoalScreen;

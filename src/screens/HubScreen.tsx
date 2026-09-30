@@ -9,14 +9,16 @@ import {
   TouchableOpacity,
   Image,
   Share,
+  Modal,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
 import proverbs from '../data/proverbs.json';
 import { FadeInView } from '../components/common/FadeInView';
-import { AnimatedButton } from '../components/common/AnimatedButton';
 import WaterDrop from '../components/common/WaterDrop';
+import { MboaButton } from '../components/common/MboaButton';
 
 // ─── ARCHETYPE DATA ──────────────────────────────────────────────────────
 
@@ -187,9 +189,9 @@ const PrevMonthSummary = ({
   );
 
   const habitStats = [
-    { label: '💧 Hydration', days: hydrationDays },
-    { label: '🍽️ Nutrition', days: nutritionDays },
-    { label: '💪 Movement', days: trainingDays },
+    { label: 'Hydration', days: hydrationDays },
+    { label: 'Nutrition', days: nutritionDays },
+    { label: 'Movement', days: trainingDays },
   ];
   const strongest = [...habitStats].sort((a, b) => b.days - a.days)[0];
   const weakest = [...habitStats].sort((a, b) => a.days - b.days)[0];
@@ -197,7 +199,7 @@ const PrevMonthSummary = ({
   return (
     <View style={styles.prevMonthCard}>
       <Text style={styles.prevMonthTitle}>
-        🎉 {monthName} {prevYear} — Your Month Is Complete!
+        {monthName} {prevYear} — Your Month Is Complete!
       </Text>
       <Text style={styles.prevMonthSubtitle}>
         Here is how your health journey went last month.
@@ -229,13 +231,11 @@ const PrevMonthSummary = ({
         Needs attention: {weakest.label} ({weakest.days}/{daysInPrevMonth} days)
       </Text>
 
-      <TouchableOpacity
-        style={styles.prevMonthDismiss}
+      <MboaButton
+        title="Start New Month →"
         onPress={onDismiss}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.prevMonthDismissText}>Start New Month →</Text>
-      </TouchableOpacity>
+        variant="primary"
+      />
     </View>
   );
 };
@@ -274,9 +274,9 @@ const MonthlyReport = ({
     : 0;
 
   const habitStats = [
-    { label: '💧 Hydration', days: hydrationDays },
-    { label: '🍽️ Nutrition', days: nutritionDays },
-    { label: '💪 Movement', days: trainingDays },
+    { label: 'Hydration', days: hydrationDays },
+    { label: 'Nutrition', days: nutritionDays },
+    { label: 'Movement', days: trainingDays },
   ];
   const strongest = [...habitStats].sort((a, b) => b.days - a.days)[0];
   const weakest = [...habitStats].sort((a, b) => a.days - b.days)[0];
@@ -344,7 +344,7 @@ const MonthlyCalendar = ({
       <View style={styles.calendarTopRow}>
         <View>
           <Text style={styles.calendarMonth}>{monthName} {year}</Text>
-          <Text style={styles.streakText}>🔥 {streak} day streak</Text>
+          <Text style={styles.streakText}>{streak} day streak</Text>
         </View>
         <TouchableOpacity
           style={styles.reportButton}
@@ -448,6 +448,7 @@ type Answer = 'yes' | 'not_yet' | null;
 // ─── MAIN HUB SCREEN ──────────────────────────────────────────────────────
 
 const HubScreen = () => {
+  const navigation = useNavigation<any>();
   const {
     archetype,
     setArchetype,
@@ -465,6 +466,7 @@ const HubScreen = () => {
 
   const [guidesExpanded, setGuidesExpanded] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [showProgressModal, setShowProgressModal] = useState(false);
 
   // Date helpers
   const todayStr = new Date().toISOString().split('T')[0];
@@ -498,7 +500,10 @@ const HubScreen = () => {
     setAnswers(newAnswers);
     if (!checkIns[key]) toggleCheckIn(key);
     const allDone = Object.values(newAnswers).filter(a => a !== null).length === 3;
-    if (allDone) setLastCheckinDate(todayStr);
+    if (allDone) {
+      setLastCheckinDate(todayStr);
+      setTimeout(() => setShowProgressModal(true), 400);
+    }
   };
 
   const handleNotYet = (key: 'hydration' | 'nutrition' | 'training') => {
@@ -506,7 +511,10 @@ const HubScreen = () => {
     setAnswers(newAnswers);
     if (checkIns[key]) toggleCheckIn(key);
     const allDone = Object.values(newAnswers).filter(a => a !== null).length === 3;
-    if (allDone) setLastCheckinDate(todayStr);
+    if (allDone) {
+      setLastCheckinDate(todayStr);
+      setTimeout(() => setShowProgressModal(true), 400);
+    }
   };
 
   const dailyProverb: any = useMemo(() => {
@@ -557,12 +565,11 @@ const HubScreen = () => {
 
   const questions: {
     key: 'hydration' | 'nutrition' | 'training';
-    emoji: string;
     question: string;
   }[] = [
-    { key: 'hydration', emoji: '💧', question: 'Have you drunk at least 3 cups of water today?' },
-    { key: 'nutrition', emoji: '🍽️', question: 'Have you eaten a balanced local meal today?' },
-    { key: 'training', emoji: '💪', question: 'Have you moved or exercised today?' },
+    { key: 'hydration', question: 'Have you drunk at least 3 cups of water today?' },
+    { key: 'nutrition', question: 'Have you eaten a balanced local meal today?' },
+    { key: 'training', question: 'Have you moved or exercised today?' },
   ];
 
   // Archetype selection screen
@@ -575,15 +582,16 @@ const HubScreen = () => {
           <Text style={styles.subHeader}>
             Select your path to wellness
           </Text>
-          {options.map((option) => (
-            <AnimatedButton
-              key={option.id}
-              title={option.label}
-              onPress={() => setArchetype(option.id)}
-              variant="primary"
-              style={styles.archetypeButton}
-            />
-          ))}
+          <View style={styles.archetypeButtonRow}>
+            {options.map((option) => (
+              <MboaButton
+                key={option.id}
+                title={option.label}
+                onPress={() => setArchetype(option.id)}
+                variant="primary"
+              />
+            ))}
+          </View>
         </View>
       </FadeInView>
     );
@@ -626,7 +634,7 @@ const HubScreen = () => {
           {/* ─── WATER TRACKER ──────────────────────────────────────────── */}
           <View style={styles.waterSection}>
             <Text style={styles.waterTitle}>💧 Water Tracker</Text>
-            
+
             <View style={styles.dropsContainer}>
               {Array.from({ length: 8 }).map((_, index) => (
                 <WaterDrop
@@ -651,6 +659,21 @@ const HubScreen = () => {
               <Text style={styles.waterComplete}>🌊 Ocean full! Good job!</Text>
             )}
           </View>
+
+          {/* Body Snapshot Card */}
+          <TouchableOpacity
+            style={styles.scanCard}
+            onPress={() => navigation.navigate('Scan')}
+            activeOpacity={0.85}
+          >
+            <View style={styles.scanCardContent}>
+              <Text style={styles.scanCardTitle}>Body Snapshot</Text>
+              <Text style={styles.scanCardSubtitle}>
+                Check your BMI and body health indicators
+              </Text>
+            </View>
+            <Text style={styles.scanCardArrow}>→</Text>
+          </TouchableOpacity>
 
           {/* Previous month summary — first day of new month only */}
           {showPrevMonthSummary && (
@@ -720,7 +743,7 @@ const HubScreen = () => {
                 return (
                   <View key={item.key} style={styles.qaBlock}>
                     <Text style={styles.qaQuestion}>
-                      {item.emoji}  {item.question}
+                      {item.question}
                     </Text>
                     <View style={styles.qaButtons}>
                       <TouchableOpacity
@@ -761,42 +784,13 @@ const HubScreen = () => {
             </View>
           )}
 
-          {/* Harmony + Calendar */}
+          {/* View Monthly Progress Button */}
           {allAnswered && (
-            <>
-              <View style={styles.harmonyReveal}>
-                <Text style={styles.harmonyRevealLabel}>Today's Harmony Score</Text>
-                <Text style={[styles.harmonyRevealScore, { color: getHarmonyColor(harmonyScore) }]}>
-                  {harmonyScore}% — {getHarmonyLabel(harmonyScore)}
-                </Text>
-                <View style={styles.progressBarBgLarge}>
-                  <View
-                    style={[
-                      styles.progressBarFillLarge,
-                      {
-                        width: `${harmonyScore}%`,
-                        backgroundColor: getHarmonyColor(harmonyScore),
-                      },
-                    ]}
-                  />
-                </View>
-                <Text style={styles.harmonyMessage}>
-                  {harmonyScore === 100
-                    ? "Perfect! You're in complete harmony! 🌟"
-                    : harmonyScore >= 66
-                    ? 'Great effort! Keep going! 💪'
-                    : harmonyScore >= 33
-                    ? 'Every journey starts with one step! 🌱'
-                    : 'Tomorrow is a new chance to start! 🌅'}
-                </Text>
-              </View>
-
-              <Text style={styles.sectionLabel}>This Month's Progress</Text>
-              <MonthlyCalendar
-                checkInHistory={checkInHistory}
-                streak={streak}
-              />
-            </>
+            <MboaButton
+              title="View Monthly Progress"
+              onPress={() => setShowProgressModal(true)}
+              variant="primary"
+            />
           )}
 
           {/* Wellness Guides */}
@@ -819,18 +813,75 @@ const HubScreen = () => {
             <Text style={styles.shareSubtitle}>
               Help others discover wellness the Cameroon way
             </Text>
-            <TouchableOpacity
-              style={styles.shareButton}
+            <MboaButton
+              title="Share App"
               onPress={handleShare}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.shareButtonText}>📲  Share App</Text>
-            </TouchableOpacity>
+              variant="primary"
+            />
           </View>
 
           <View style={{ height: 20 }} />
         </View>
       </ScrollView>
+
+      {/* ─── MONTHLY PROGRESS MODAL ──────────────────────────────────── */}
+      <Modal
+        visible={showProgressModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowProgressModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setShowProgressModal(false)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.modalCloseText}>✕</Text>
+            </TouchableOpacity>
+
+            <ScrollView
+              style={styles.modalScroll}
+              contentContainerStyle={styles.modalScrollContent}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.harmonyReveal}>
+                <Text style={styles.harmonyRevealLabel}>Today's Harmony Score</Text>
+                <Text style={[styles.harmonyRevealScore, { color: getHarmonyColor(harmonyScore) }]}>
+                  {harmonyScore}% — {getHarmonyLabel(harmonyScore)}
+                </Text>
+                <View style={styles.progressBarBgLarge}>
+                  <View
+                    style={[
+                      styles.progressBarFillLarge,
+                      {
+                        width: `${harmonyScore}%`,
+                        backgroundColor: getHarmonyColor(harmonyScore),
+                      },
+                    ]}
+                  />
+                </View>
+                <Text style={styles.harmonyMessage}>
+                  {harmonyScore === 100
+                    ? "Perfect! You're in complete harmony!"
+                    : harmonyScore >= 66
+                    ? 'Great effort! Keep going!'
+                    : harmonyScore >= 33
+                    ? 'Every journey starts with one step!'
+                    : 'Tomorrow is a new chance to start!'}
+                </Text>
+              </View>
+
+              <Text style={styles.sectionLabel}>This Month's Progress</Text>
+              <MonthlyCalendar
+                checkInHistory={checkInHistory}
+                streak={streak}
+              />
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </FadeInView>
   );
 };
@@ -845,7 +896,10 @@ const styles = StyleSheet.create({
   eyebrow: { fontSize: 11, ...FONTS.bold, color: Colors.zenGold, letterSpacing: 3, marginBottom: 6 },
   header: { fontSize: 28, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 24 },
   subHeader: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, lineHeight: 22, marginBottom: 28 },
-  archetypeButton: { width: '100%', height: 56, borderRadius: 12, marginBottom: 12 },
+  archetypeButtonRow: {
+    alignItems: 'flex-end',
+    gap: 12,
+  },
 
   // ─── HERO STYLES ──────────────────────────────────────────────────────
   heroContainer: {
@@ -892,8 +946,6 @@ const styles = StyleSheet.create({
   prevMonthCard: { width: '100%', backgroundColor: '#F1FAF3', borderRadius: 18, padding: 20, marginBottom: 20, borderWidth: 2, borderColor: Colors.mboaGreen },
   prevMonthTitle: { fontSize: 16, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 6 },
   prevMonthSubtitle: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, marginBottom: 16 },
-  prevMonthDismiss: { backgroundColor: Colors.mboaGreen, paddingVertical: 14, borderRadius: 12, alignItems: 'center', marginTop: 16 },
-  prevMonthDismissText: { fontSize: 15, ...FONTS.bold, color: Colors.cleanWhite },
 
   alreadyDoneCard: { width: '100%', backgroundColor: Colors.softBg, borderRadius: 18, padding: 20, marginBottom: 20 },
   alreadyDoneTitle: { fontSize: 15, ...FONTS.bold, color: Colors.mboaGreen, marginBottom: 4 },
@@ -907,15 +959,38 @@ const styles = StyleSheet.create({
   questionsDivider: { height: 1, backgroundColor: '#E0E0E0', marginBottom: 16 },
   qaBlock: { marginBottom: 20 },
   qaQuestion: { fontSize: 15, ...FONTS.bold, color: Colors.earthBlack, lineHeight: 22, marginBottom: 12 },
-  qaButtons: { flexDirection: 'row' },
-  qaBtn: { flex: 1, paddingVertical: 13, borderRadius: 12, alignItems: 'center', borderWidth: 2, marginRight: 10 },
-  qaBtnYes: { borderColor: Colors.mboaGreen, backgroundColor: Colors.cleanWhite },
-  qaBtnYesActive: { borderColor: Colors.mboaGreen, backgroundColor: Colors.mboaGreen },
-  qaBtnNo: { borderColor: '#E0E0E0', backgroundColor: Colors.cleanWhite, marginRight: 0 },
-  qaBtnNoActive: { borderColor: '#FF9800', backgroundColor: '#FF9800', marginRight: 0 },
-  qaBtnText: { fontSize: 14, ...FONTS.bold, color: Colors.textMuted },
+  qaButtons: { flexDirection: 'row', gap: 12 },
+  qaBtn: {
+    flex: 1,
+    paddingVertical: 13,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderBottomWidth: 3,
+    backgroundColor: 'transparent',
+  },
+  qaBtnYes: {
+    borderColor: Colors.mboaGreen,
+    borderBottomColor: Colors.zenGold,
+  },
+  qaBtnYesActive: {
+    backgroundColor: Colors.mboaGreen,
+    borderColor: Colors.mboaGreen,
+    borderBottomColor: Colors.zenGold,
+  },
+  qaBtnNo: {
+    borderColor: Colors.mboaGreen,
+    borderBottomColor: Colors.zenGold,
+  },
+  qaBtnNoActive: {
+    backgroundColor: Colors.zenGold,
+    borderColor: Colors.zenGold,
+    borderBottomColor: Colors.mboaGreen,
+  },
+  qaBtnText: { fontSize: 14, ...FONTS.bold, color: Colors.mboaGreen },
   qaBtnTextWhite: { color: Colors.cleanWhite },
-  qaBtnNoTextActive: { color: Colors.cleanWhite },
+  qaBtnNoTextActive: { color: Colors.earthBlack },
 
   harmonyReveal: { width: '100%', backgroundColor: Colors.softBg, borderRadius: 18, padding: 20, marginBottom: 20 },
   harmonyRevealLabel: { fontSize: 11, ...FONTS.bold, color: Colors.textMuted, letterSpacing: 2, marginBottom: 8 },
@@ -962,8 +1037,6 @@ const styles = StyleSheet.create({
   shareCard: { width: '100%', backgroundColor: '#F1FAF3', borderRadius: 18, padding: 20, marginTop: 8, borderWidth: 1, borderColor: Colors.mboaGreen, alignItems: 'center' },
   shareTitle: { fontSize: 16, ...FONTS.bold, color: Colors.earthBlack, textAlign: 'center', marginBottom: 8 },
   shareSubtitle: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, textAlign: 'center', lineHeight: 20, marginBottom: 16 },
-  shareButton: { backgroundColor: Colors.mboaGreen, paddingVertical: 14, paddingHorizontal: 32, borderRadius: 12, alignItems: 'center' },
-  shareButtonText: { fontSize: 15, ...FONTS.bold, color: Colors.cleanWhite, letterSpacing: 0.5 },
 
   // ─── WATER TRACKER STYLES ─────────────────────────────────────────────
   waterSection: {
@@ -997,6 +1070,79 @@ const styles = StyleSheet.create({
     color: Colors.mboaGreen,
     textAlign: 'center',
     marginTop: 8,
+  },
+
+  // ─── BODY SNAPSHOT CARD ───────────────────────────────────────────────
+  scanCard: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.softBg,
+    borderRadius: 18,
+    padding: 20,
+    marginBottom: 20,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.zenGold,
+  },
+  scanCardContent: {
+    flex: 1,
+  },
+  scanCardTitle: {
+    fontSize: 16,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    marginBottom: 4,
+  },
+  scanCardSubtitle: {
+    fontSize: 13,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    lineHeight: 19,
+  },
+  scanCardArrow: {
+    fontSize: 22,
+    ...FONTS.bold,
+    color: Colors.mboaGreen,
+    marginLeft: 12,
+  },
+
+  // ─── PROGRESS MODAL STYLES ────────────────────────────────────────────
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  modalContainer: {
+    backgroundColor: Colors.cleanWhite,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '90%',
+    minHeight: '60%',
+    paddingTop: 16,
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 12,
+    right: 16,
+    zIndex: 10,
+    backgroundColor: Colors.softBg,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalCloseText: {
+    fontSize: 18,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+  },
+  modalScroll: {
+    width: '100%',
+  },
+  modalScrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 30,
   },
 });
 

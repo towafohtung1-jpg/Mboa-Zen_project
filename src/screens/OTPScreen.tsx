@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'reac
 import { Colors } from '../constants/colors';
 import { FONTS, SIZES } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
+import { MboaButton } from '../components/common/MboaButton';
 
 type Props = {
   phone: string;
@@ -83,11 +84,13 @@ const OTPScreen = ({ phone, onFinish, onBack }: Props) => {
           ))}
         </View>
 
-        <View style={styles.resendRow}>
+                <View style={styles.resendRow}>
           <Text style={styles.resendText}>Didn't get the code?</Text>
-          <TouchableOpacity onPress={handleResend}>
-            <Text style={styles.resendLink}>Resend</Text>
-          </TouchableOpacity>
+          <MboaButton
+            title="Resend"
+            onPress={handleResend}
+            variant="outline"
+          />
         </View>
 
         <TouchableOpacity onPress={onBack} style={styles.changeButton}>
@@ -170,18 +173,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 10,
+    gap: 10,
   },
   resendText: {
     fontSize: 14,
     ...FONTS.regular,
     color: Colors.textMuted,
-    marginRight: 6,
   },
-  resendLink: {
-    fontSize: 14,
-    color: Colors.mboaGreen,
-    ...FONTS.bold,
-  },
+ 
   changeButton: {
     marginTop: 30,
     padding: 10,

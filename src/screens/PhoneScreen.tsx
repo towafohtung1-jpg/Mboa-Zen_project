@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
 import { Colors } from '../constants/colors';
 import { FONTS, SIZES } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
 import { saveUserState } from '../utils/storage';
 import { FadeInView } from '../components/common/FadeInView';
-import { AnimatedButton } from '../components/common/AnimatedButton';
-
+import { MboaButton } from '../components/common/MboaButton';
 type Props = {
   onFinish: () => void;
   onSkip: () => void;
@@ -88,18 +87,21 @@ const PhoneScreen = ({ onFinish, onSkip }: Props) => {
         )}
       </View>
 
-      <View style={styles.footer}>
-        <AnimatedButton
-          title="Continue  →"
-          onPress={handleContinue}
-          variant="primary"
-          disabled={!isValid}
-          style={styles.button}
-        />
+            <View style={styles.footer}>
+        <View style={styles.buttonRow}>
+          <MboaButton
+            title="Continue  →"
+            onPress={handleContinue}
+            variant="primary"
+            disabled={!isValid}
+          />
 
-        <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
-          <Text style={styles.skipText}>Skip for now</Text>
-        </TouchableOpacity>
+          <MboaButton
+            title="Skip"
+            onPress={handleSkip}
+            variant="outline"
+          />
+        </View>
       </View>
     </FadeInView>
   );
@@ -191,19 +193,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 30,
   },
-  button: {
-    height: 56,
-    borderRadius: 12,
-  },
-  skipButton: {
+    buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
     alignItems: 'center',
-    marginTop: 18,
+    justifyContent: 'flex-end',
   },
-  skipText: {
-    fontSize: 13,
-    ...FONTS.regular,
-    color: Colors.textMuted,
-  },
+
 });
 
 export default PhoneScreen;

@@ -13,6 +13,7 @@ import { FONTS, SIZES } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
 import { AnimatedButton } from '../components/common/AnimatedButton';
 import { useUserStore } from '../store/useUserStore';
+import { useNavigation } from '@react-navigation/native';
 
 interface Results {
   bmi: number;
@@ -25,6 +26,7 @@ interface Results {
 
 const ScanScreen = () => {
   const isPremium = useUserStore((state) => state.isPremium);
+    const navigation = useNavigation<any>();
 
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
@@ -119,8 +121,15 @@ const ScanScreen = () => {
   };
 
   return (
-    <FadeInView style={styles.container}>
+       <FadeInView style={styles.container}>
       <View style={styles.headerArea}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.backButtonText}>← Back</Text>
+        </TouchableOpacity>
         <Text style={styles.eyebrow}>YOUR HEALTH</Text>
         <Text style={styles.header}>Body Snapshot</Text>
         <Text style={styles.subHeader}>
@@ -499,6 +508,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     ...FONTS.bold,
     color: Colors.zenGold,
+  },
+    backButton: {
+    alignSelf: 'flex-start',
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  backButtonText: {
+    fontSize: 14,
+    ...FONTS.bold,
+    color: Colors.mboaGreen,
   },
 });
 
