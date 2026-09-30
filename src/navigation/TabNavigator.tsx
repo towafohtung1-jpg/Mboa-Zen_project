@@ -15,7 +15,7 @@ const ICONS: Record<string, any> = {
   Hub: require('../../assets/Graphics/UI_vectors_icon_set/dashboard.png'),
   Meals: require('../../assets/Graphics/UI_vectors_icon_set/kitchen.png'),
   Training: require('../../assets/Graphics/UI_vectors_icon_set/dojo.png'),
-  Learn: require('../../assets/Graphics/UI_vectors_icon_set/Learn.png'),  Market: require('../../assets/Graphics/UI_vectors_icon_set/market.png'),
+  Learn: require('../../assets/Graphics/UI_vectors_icon_set/learn.png'),  Market: require('../../assets/Graphics/UI_vectors_icon_set/market.png'),
 };
 
 export const TabNavigator = () => {
