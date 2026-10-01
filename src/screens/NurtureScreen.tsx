@@ -18,6 +18,7 @@ import { FadeInView } from '../components/common/FadeInView';
 import { getMealOptions, getBodyTypeFromArchetype } from '../data/mealOptions';
 import { MealOption, MealFoodItem } from '../types';
 import { offlineAgent } from '../database/offlineAgent';
+import { MboaButton } from '../components/common/MboaButton';
 
 // ─── FOOD IMAGES ────────────────────────────────────────────────────────
 
@@ -94,9 +95,9 @@ const FOOD_IMAGES: Record<string, any> = {
 };
 
 const MEAL_TIMES = [
-  { key: 'breakfast' as const, label: '🍳 Breakfast', emoji: '🌅' },
-  { key: 'lunch' as const, label: '🥗 Lunch', emoji: '☀️' },
-  { key: 'supper' as const, label: '🍲 Supper', emoji: '🌙' },
+  { key: 'breakfast' as const, label: 'Breakfast' },
+  { key: 'lunch' as const, label: 'Lunch' },
+  { key: 'supper' as const, label: 'Supper' },
 ];
 
 // ─── NUTRITION BAR ──────────────────────────────────────────────────────
@@ -230,17 +231,17 @@ const MealDetailModal = ({
             </View>
 
             {/* Log Meal Button */}
-            <TouchableOpacity
-              style={styles.logMealButton}
-              onPress={() => {
-                onLogMeal(meal);
-                onClose();
-              }}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.logMealButtonText}>✓ I Ate This</Text>
-            </TouchableOpacity>
 
+                         <View style={{ marginTop: 14, alignItems: 'flex-end' }}>
+              <MboaButton
+                title="I Ate This"
+                onPress={() => {
+                  onLogMeal(meal);
+                  onClose();
+                }}
+                variant="primary"
+              />
+            </View>
             <View style={{ height: 20 }} />
           </ScrollView>
         </View>
@@ -313,13 +314,13 @@ const MealCard = ({
 
       {expanded && (
         <View style={styles.mealCardBody}>
-          <TouchableOpacity
-            style={styles.viewDetailsButton}
-            onPress={() => onOpenModal(meal)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.viewDetailsButtonText}>👁️ View Full Details</Text>
-          </TouchableOpacity>
+                    <View style={{ marginBottom: 14 }}>
+            <MboaButton
+              title="View Full Details"
+              onPress={() => onOpenModal(meal)}
+              variant="outline"
+            />
+          </View>
 
           <View style={styles.sectionDivider} />
           <Text style={styles.bodyTitle}>What You Need</Text>
@@ -347,13 +348,13 @@ const MealCard = ({
             <Text style={styles.availableLabel}>📍 Where to get it</Text>
             <Text style={styles.availableText}>{meal.available_from}</Text>
           </View>
-          <TouchableOpacity
-            style={styles.logMealButton}
-            onPress={() => onLogMeal(meal)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.logMealButtonText}>✓ I Ate This</Text>
-          </TouchableOpacity>
+          <View style={{ marginTop: 14, alignItems: 'flex-end' }}>
+            <MboaButton
+              title="I Ate This"
+              onPress={() => onLogMeal(meal)}
+              variant="primary"
+            />
+          </View>
         </View>
       )}
     </View>
@@ -437,7 +438,7 @@ const NurtureScreen = () => {
           <Text style={styles.calorieBannerLabel}>Today's Calories</Text>
           <Text style={styles.calorieBannerValue}>{todayCalories} kcal</Text>
         </View>
-        <View style={styles.tabRow}>
+              <View style={styles.tabRow}>
           {MEAL_TIMES.map((tab) => (
             <TouchableOpacity
               key={tab.key}
@@ -445,7 +446,6 @@ const NurtureScreen = () => {
               onPress={() => setSelectedMealTime(tab.key)}
               activeOpacity={0.8}
             >
-              <Text style={styles.tabEmoji}>{tab.emoji}</Text>
               <Text style={[styles.tabLabel, selectedMealTime === tab.key && styles.tabLabelActive]}>
                 {tab.label}
               </Text>
@@ -512,13 +512,26 @@ const styles = StyleSheet.create({
   calorieBanner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F1FAF3', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 10, marginBottom: 16, borderWidth: 1, borderColor: Colors.mboaGreen },
   calorieBannerLabel: { fontSize: 13, ...FONTS.bold, color: Colors.earthBlack },
   calorieBannerValue: { fontSize: 18, ...FONTS.bold, color: Colors.mboaGreen },
-  tabRow: { flexDirection: 'row', backgroundColor: Colors.cleanWhite, borderRadius: 14, padding: 4 },
-  tab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 10, borderRadius: 10 },
-  tabActive: { backgroundColor: Colors.mboaGreen },
-  tabEmoji: { fontSize: 14, marginRight: 6 },
-  tabLabel: { fontSize: 13, ...FONTS.bold, color: Colors.textMuted },
-  tabLabelActive: { color: Colors.cleanWhite },
-  chooseText: { fontSize: 12, ...FONTS.regular, color: Colors.textMuted, fontStyle: 'italic', marginTop: 12, marginBottom: 8 },
+  tabRow: { flexDirection: 'row', gap: 10, marginBottom: 4 },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderBottomWidth: 3,
+    borderColor: Colors.mboaGreen,
+    borderBottomColor: Colors.zenGold,
+    backgroundColor: 'transparent',
+  },
+  tabActive: {
+    backgroundColor: Colors.mboaGreen,
+    borderColor: Colors.mboaGreen,
+    borderBottomColor: Colors.zenGold,
+  },
+  tabLabel: { fontSize: 13, ...FONTS.bold, color: Colors.mboaGreen },
+  tabLabelActive: { color: Colors.cleanWhite },  chooseText: { fontSize: 12, ...FONTS.regular, color: Colors.textMuted, fontStyle: 'italic', marginTop: 12, marginBottom: 8 },
   scrollContent: { width: '100%', alignItems: 'center', paddingTop: 8 },
   section: { width: '100%', maxWidth: 480, paddingHorizontal: 20, paddingBottom: 20 },
   mealCard: { backgroundColor: Colors.cleanWhite, borderRadius: 18, marginBottom: 14, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 10, elevation: 2 },
@@ -535,7 +548,6 @@ const styles = StyleSheet.create({
   quickNutritionLabel: { fontSize: 10, ...FONTS.regular, color: Colors.textMuted, marginTop: 2 },
   quickNutritionDivider: { width: 1, height: 28, backgroundColor: '#E0E0E0' },
   mealCardBody: { paddingHorizontal: 18, paddingBottom: 18 },
-  viewDetailsButton: { backgroundColor: Colors.softBg, borderRadius: 10, paddingVertical: 10, alignItems: 'center', marginBottom: 14 },
   viewDetailsButtonText: { fontSize: 13, ...FONTS.bold, color: Colors.mboaGreen },
   sectionDivider: { height: 1, backgroundColor: '#F0F0F0', marginVertical: 14 },
   bodyTitle: { fontSize: 13, ...FONTS.bold, color: Colors.earthBlack, letterSpacing: 0.5, marginBottom: 12 },
