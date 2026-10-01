@@ -10,11 +10,30 @@ import {
   Alert,
   Platform,
   Linking,
+  Image,
 } from 'react-native';
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
 import { FadeInView } from '../components/common/FadeInView';
+import { MboaButton } from '../components/common/MboaButton';
+
+// ─── ICONS ──────────────────────────────────────────────────────────────
+
+const ICONS = {
+  analytics: require('../../assets/Graphics/UI_vectors_icon_set/analytics.png'),
+  check: require('../../assets/Graphics/UI_vectors_icon_set/check.png'),
+  coaches: require('../../assets/Graphics/UI_vectors_icon_set/coaches.png'),
+  lock: require('../../assets/Graphics/UI_vectors_icon_set/lock.png'),
+  location_pin: require('../../assets/Graphics/UI_vectors_icon_set/location_pin.png'),
+  payment: require('../../assets/Graphics/UI_vectors_icon_set/payment.png'),
+  star: require('../../assets/Graphics/UI_vectors_icon_set/star.png'),
+  dojo: require('../../assets/Graphics/UI_vectors_icon_set/dojo.png'),
+  kitchen: require('../../assets/Graphics/UI_vectors_icon_set/kitchen.png'),
+  coach_marie: require('../../assets/Graphics/UI_vectors_icon_set/coach_marie.png'),
+  coach_jean: require('../../assets/Graphics/UI_vectors_icon_set/coach_jean.png'),
+  coach_sarah: require('../../assets/Graphics/UI_vectors_icon_set/coach_sarah.png'),
+};
 
 // ─── COACHES DATA ──────────────────────────────────────────────────────
 const COACHES = [
@@ -25,7 +44,7 @@ const COACHES = [
     location: 'Yaoundé',
     rating: 4.9,
     price: 'FCFA 5,000/session',
-    image: '👩‍🍳',
+    avatar: 'coach_marie',
     available: true,
   },
   {
@@ -35,7 +54,7 @@ const COACHES = [
     location: 'Douala',
     rating: 4.8,
     price: 'FCFA 4,500/session',
-    image: '🏋️',
+    avatar: 'coach_jean',
     available: true,
   },
   {
@@ -45,7 +64,7 @@ const COACHES = [
     location: 'Buea',
     rating: 4.7,
     price: 'FCFA 4,000/session',
-    image: '🧘',
+    avatar: 'coach_sarah',
     available: true,
   },
 ];
@@ -65,10 +84,8 @@ const MarketScreen = () => {
     setIsProcessing(true);
 
     try {
-      // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Successful payment
       setIsPremium(true);
       Alert.alert(
         '🎉 Premium Activated!',
@@ -106,11 +123,10 @@ const MarketScreen = () => {
       `${coach.specialty}\n${coach.location}\n${coach.price}\n\n⭐ ${coach.rating} rating\n\nWould you like to book a session?`,
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Book Session', 
+        {
+          text: 'Book Session',
           onPress: () => {
-            // In a real app, this would send a booking request
-            Alert.alert('✅ Booking Requested!', 
+            Alert.alert('✅ Booking Requested!',
               `You have requested a session with ${coach.name}.\nThey will contact you shortly.`
             );
           }
@@ -131,16 +147,17 @@ const MarketScreen = () => {
           <Text style={styles.eyebrow}>THE MARKET</Text>
           <Text style={styles.header}>Premium Features</Text>
           <Text style={styles.subHeader}>
-            {isPremium ? '🎉 You have full access!' : 'Upgrade to unlock everything'}
+            {isPremium ? 'You have full access!' : 'Upgrade to unlock everything'}
           </Text>
         </View>
 
         {/* ─── PREMIUM STATUS CARD ──────────────────────────────────────── */}
         <View style={[styles.premiumCard, isPremium && styles.premiumCardActive]}>
           <View style={styles.premiumHeader}>
-            <Text style={styles.premiumBadge}>
-              {isPremium ? '✅ PREMIUM' : '⭐ PREMIUM'}
-            </Text>
+            <View style={styles.premiumBadgeRow}>
+              <Image source={ICONS.check} style={styles.premiumBadgeIcon} />
+              <Text style={styles.premiumBadge}>PREMIUM</Text>
+            </View>
             {isPremium && (
               <View style={styles.activeBadge}>
                 <Text style={styles.activeBadgeText}>ACTIVE</Text>
@@ -151,7 +168,7 @@ const MarketScreen = () => {
             {isPremium ? 'You have full access' : 'FCFA 2,500 / month'}
           </Text>
           <Text style={styles.premiumDescription}>
-            {isPremium 
+            {isPremium
               ? 'Enjoy all premium features including exclusive workouts and meal plans.'
               : 'Unlock premium content and features to get the most out of Mboa-Zen.'}
           </Text>
@@ -160,73 +177,69 @@ const MarketScreen = () => {
         {/* ─── FEATURES LIST ────────────────────────────────────────────── */}
         <View style={styles.featuresContainer}>
           <Text style={styles.sectionTitle}>What You Get</Text>
-          
+
           <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>🏋️</Text>
+            <Image source={ICONS.dojo} style={styles.featureIconImage} />
             <View style={styles.featureContent}>
               <Text style={styles.featureName}>Exclusive Workouts</Text>
               <Text style={styles.featureDescription}>
-                {isPremium 
-                  ? 'All premium workouts unlocked' 
+                {isPremium
+                  ? 'All premium workouts unlocked'
                   : 'Advanced workouts and progress tracking'}
               </Text>
             </View>
-            {isPremium ? (
-              <Text style={styles.featureStatus}>✅</Text>
-            ) : (
-              <Text style={styles.featureLock}>🔒</Text>
-            )}
+            <Image
+              source={isPremium ? ICONS.check : ICONS.lock}
+              style={styles.featureStatusImage}
+            />
           </View>
 
           <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>🍽️</Text>
+            <Image source={ICONS.kitchen} style={styles.featureIconImage} />
             <View style={styles.featureContent}>
               <Text style={styles.featureName}>Personalized Meal Plans</Text>
               <Text style={styles.featureDescription}>
-                {isPremium 
-                  ? 'All meal plans unlocked' 
+                {isPremium
+                  ? 'All meal plans unlocked'
                   : 'Custom meal plans based on your goals'}
               </Text>
             </View>
-            {isPremium ? (
-              <Text style={styles.featureStatus}>✅</Text>
-            ) : (
-              <Text style={styles.featureLock}>🔒</Text>
-            )}
+            <Image
+              source={isPremium ? ICONS.check : ICONS.lock}
+              style={styles.featureStatusImage}
+            />
           </View>
 
           <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>👨‍🏫</Text>
+            <Image source={ICONS.coaches} style={styles.featureIconImage} />
             <View style={styles.featureContent}>
               <Text style={styles.featureName}>Coach Booking</Text>
               <Text style={styles.featureDescription}>
-                {isPremium 
-                  ? 'Book any coach anytime' 
+                {isPremium
+                  ? 'Book any coach anytime'
                   : '1-on-1 sessions with certified coaches'}
               </Text>
             </View>
-            {isPremium ? (
-              <Text style={styles.featureStatus}>✅</Text>
-            ) : (
-              <Text style={styles.featureLock}>🔒</Text>
-            )}
+            <Image
+              source={isPremium ? ICONS.check : ICONS.lock}
+              style={styles.featureStatusImage}
+            />
           </View>
 
           <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>📊</Text>
+            <Image source={ICONS.analytics} style={styles.featureIconImage} />
             <View style={styles.featureContent}>
               <Text style={styles.featureName}>Advanced Analytics</Text>
               <Text style={styles.featureDescription}>
-                {isPremium 
-                  ? 'Full analytics dashboard' 
+                {isPremium
+                  ? 'Full analytics dashboard'
                   : 'Track your progress with detailed insights'}
               </Text>
             </View>
-            {isPremium ? (
-              <Text style={styles.featureStatus}>✅</Text>
-            ) : (
-              <Text style={styles.featureLock}>🔒</Text>
-            )}
+            <Image
+              source={isPremium ? ICONS.check : ICONS.lock}
+              style={styles.featureStatusImage}
+            />
           </View>
         </View>
 
@@ -244,7 +257,7 @@ const MarketScreen = () => {
               activeOpacity={0.8}
             >
               <View style={styles.paymentLeft}>
-                <Text style={styles.paymentIcon}>📱</Text>
+                <Image source={ICONS.payment} style={styles.paymentIconImage} />
                 <View>
                   <Text style={styles.paymentName}>MTN MoMo</Text>
                   <Text style={styles.paymentSubtext}>Mobile Money</Text>
@@ -266,7 +279,7 @@ const MarketScreen = () => {
               activeOpacity={0.8}
             >
               <View style={styles.paymentLeft}>
-                <Text style={styles.paymentIcon}>📱</Text>
+                <Image source={ICONS.payment} style={styles.paymentIconImage} />
                 <View>
                   <Text style={styles.paymentName}>Orange Money</Text>
                   <Text style={styles.paymentSubtext}>Mobile Money</Text>
@@ -279,19 +292,12 @@ const MarketScreen = () => {
               )}
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[
-                styles.upgradeButton,
-                isProcessing && styles.upgradeButtonDisabled,
-              ]}
+            <MboaButton
+              title={isProcessing ? 'Processing...' : 'Upgrade Now'}
               onPress={handleUpgrade}
+              variant="primary"
               disabled={isProcessing}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.upgradeButtonText}>
-                {isProcessing ? 'Processing...' : '🔓 Upgrade Now'}
-              </Text>
-            </TouchableOpacity>
+            />
 
             <Text style={styles.paymentNote}>
               Secure payment via MTN MoMo or Orange Money
@@ -301,9 +307,12 @@ const MarketScreen = () => {
 
         {/* ─── COACHES SECTION ──────────────────────────────────────────── */}
         <View style={styles.coachesContainer}>
-          <Text style={styles.sectionTitle}>
-            {isPremium ? '👨‍🏫 Book a Coach' : '👨‍🏫 Available Coaches'}
-          </Text>
+          <View style={styles.sectionTitleRow}>
+            <Image source={ICONS.coaches} style={styles.sectionTitleIcon} />
+            <Text style={styles.sectionTitle}>
+              {isPremium ? 'Book a Coach' : 'Available Coaches'}
+            </Text>
+          </View>
           {!isPremium && (
             <Text style={styles.coachesSubtext}>
               Upgrade to premium to book a session
@@ -321,25 +330,36 @@ const MarketScreen = () => {
               activeOpacity={0.8}
             >
               <View style={styles.coachHeader}>
-                <Text style={styles.coachAvatar}>{coach.image}</Text>
+                <Image
+                  source={ICONS[coach.avatar as keyof typeof ICONS]}
+                  style={styles.coachAvatarImage}
+                />
                 <View style={styles.coachInfo}>
                   <Text style={styles.coachName}>{coach.name}</Text>
                   <Text style={styles.coachSpecialty}>{coach.specialty}</Text>
                   <View style={styles.coachMeta}>
-                    <Text style={styles.coachLocation}>📍 {coach.location}</Text>
-                    <Text style={styles.coachRating}>⭐ {coach.rating}</Text>
+                    <View style={styles.coachMetaItem}>
+                      <Image source={ICONS.location_pin} style={styles.coachMetaIcon} />
+                      <Text style={styles.coachLocation}>{coach.location}</Text>
+                    </View>
+                    <View style={styles.coachMetaItem}>
+                      <Image source={ICONS.star} style={styles.coachMetaIcon} />
+                      <Text style={styles.coachRating}>{coach.rating}</Text>
+                    </View>
                   </View>
                 </View>
                 {isPremium && (
-                  <View style={styles.coachBookButton}>
-                    <Text style={styles.coachBookText}>Book</Text>
-                  </View>
+                  <MboaButton
+                    title="Book"
+                    onPress={() => handleBookCoach(coach)}
+                    variant="primary"
+                  />
                 )}
               </View>
               <Text style={styles.coachPrice}>{coach.price}</Text>
               {!isPremium && (
                 <View style={styles.coachLockOverlay}>
-                  <Text style={styles.coachLockText}>🔒</Text>
+                  <Image source={ICONS.lock} style={styles.coachLockIcon} />
                 </View>
               )}
             </TouchableOpacity>
@@ -388,6 +408,7 @@ const styles = StyleSheet.create({
     ...FONTS.regular,
     color: Colors.textMuted,
   },
+
   // ─── PREMIUM CARD ──────────────────────────────────────────────────────
   premiumCard: {
     width: '100%',
@@ -413,6 +434,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
+  },
+  premiumBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  premiumBadgeIcon: {
+    width: 14,
+    height: 14,
+    resizeMode: 'contain',
   },
   premiumBadge: {
     fontSize: 12,
@@ -443,6 +474,7 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     lineHeight: 20,
   },
+
   // ─── FEATURES ──────────────────────────────────────────────────────────
   featuresContainer: {
     width: '100%',
@@ -457,7 +489,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     ...FONTS.bold,
     color: Colors.earthBlack,
+  },
+  sectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     marginBottom: 12,
+  },
+  sectionTitleIcon: {
+    width: 20,
+    height: 20,
+    resizeMode: 'contain',
   },
   featureItem: {
     flexDirection: 'row',
@@ -466,9 +508,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },
-  featureIcon: {
-    fontSize: 24,
+  featureIconImage: {
+    width: 24,
+    height: 24,
     marginRight: 12,
+    resizeMode: 'contain',
   },
   featureContent: {
     flex: 1,
@@ -483,13 +527,12 @@ const styles = StyleSheet.create({
     ...FONTS.regular,
     color: Colors.textMuted,
   },
-  featureStatus: {
-    fontSize: 18,
+  featureStatusImage: {
+    width: 20,
+    height: 20,
+    resizeMode: 'contain',
   },
-  featureLock: {
-    fontSize: 18,
-    color: Colors.textMuted,
-  },
+
   // ─── PAYMENT ──────────────────────────────────────────────────────────
   paymentContainer: {
     width: '100%',
@@ -519,9 +562,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  paymentIcon: {
-    fontSize: 24,
+  paymentIconImage: {
+    width: 24,
+    height: 24,
     marginRight: 12,
+    resizeMode: 'contain',
   },
   paymentName: {
     fontSize: 15,
@@ -545,21 +590,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.cleanWhite,
   },
-  upgradeButton: {
-    backgroundColor: Colors.mboaGreen,
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  upgradeButtonDisabled: {
-    opacity: 0.6,
-  },
-  upgradeButtonText: {
-    fontSize: 16,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-  },
   paymentNote: {
     fontSize: 12,
     ...FONTS.regular,
@@ -567,6 +597,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
+
   // ─── COACHES ──────────────────────────────────────────────────────────
   coachesContainer: {
     width: '100%',
@@ -596,9 +627,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  coachAvatar: {
-    fontSize: 32,
+  coachAvatarImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     marginRight: 12,
+    resizeMode: 'cover',
   },
   coachInfo: {
     flex: 1,
@@ -618,6 +652,16 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 2,
   },
+  coachMetaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  coachMetaIcon: {
+    width: 12,
+    height: 12,
+    resizeMode: 'contain',
+  },
   coachLocation: {
     fontSize: 11,
     ...FONTS.regular,
@@ -634,17 +678,6 @@ const styles = StyleSheet.create({
     color: Colors.mboaGreen,
     marginTop: 4,
   },
-  coachBookButton: {
-    backgroundColor: Colors.mboaGreen,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  coachBookText: {
-    fontSize: 12,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-  },
   coachLockOverlay: {
     position: 'absolute',
     top: 0,
@@ -656,10 +689,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.7)',
     borderRadius: 12,
   },
-  coachLockText: {
-    fontSize: 32,
+  coachLockIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
   },
 });
 
 export default MarketScreen;
-
