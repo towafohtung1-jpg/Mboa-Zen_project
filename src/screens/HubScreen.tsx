@@ -462,11 +462,14 @@ const HubScreen = () => {
     waterIntake,
     waterGoal,
     setWaterIntake,
+    waterHistory,
+    getWaterStreak,
   } = useUserStore();
 
-  const [guidesExpanded, setGuidesExpanded] = useState(false);
+    const [guidesExpanded, setGuidesExpanded] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [showProgressModal, setShowProgressModal] = useState(false);
+  const [showGoodJobModal, setShowGoodJobModal] = useState(false);
 
   // Date helpers
   const todayStr = new Date().toISOString().split('T')[0];
@@ -637,27 +640,69 @@ const HubScreen = () => {
 
             <View style={styles.dropsContainer}>
               {Array.from({ length: 8 }).map((_, index) => (
-                <WaterDrop
+                                <WaterDrop
                   key={index}
                   filled={index < waterIntake}
                   onPress={() => {
                     if (index < waterIntake) {
                       setWaterIntake(index);
                     } else {
-                      setWaterIntake(index + 1);
+                      const nextAmount = index + 1;
+                      const wasBelowGoal = waterIntake < waterGoal;
+                      const willHitGoal = nextAmount >= waterGoal;
+
+                      setWaterIntake(nextAmount);
+
+                      // Show "Good Job" modal only when crossing from <8 to 8
+                      if (wasBelowGoal && willHitGoal) {
+                        setTimeout(() => setShowGoodJobModal(true), 300);
+                      }
                     }
                   }}
                 />
               ))}
             </View>
 
-            <Text style={styles.waterStatus}>
+                        <Text style={styles.waterStatus}>
               {waterIntake} / {waterGoal} glasses
             </Text>
 
             {waterIntake >= waterGoal && (
               <Text style={styles.waterComplete}>🌊 Ocean full! Good job!</Text>
             )}
+
+            {/* ─── WATER STREAK ROW ────────────────────────────────── */}
+            <View style={styles.streakDivider} />
+            <View style={styles.streakRow}>
+              {Array.from({ length: 7 }).map((_, i) => {
+                const offset = 6 - i; // oldest first
+                const d = new Date();
+                d.setDate(d.getDate() - offset);
+                const dateStr = d.toISOString().split('T')[0];
+                const glasses = waterHistory[dateStr] ?? 0;
+                const isFilled = glasses >= waterGoal;
+                const isToday = offset === 0;
+                const letter = ['S', 'M', 'T', 'W', 'T', 'F', 'S'][d.getDay()];
+
+                return (
+                  <View key={i} style={styles.streakDayCol}>
+                    <View
+                      style={[
+                        styles.streakDrop,
+                        isFilled && styles.streakDropFilled,
+                        isToday && styles.streakDropToday,
+                      ]}
+                    />
+                    <Text style={styles.streakDayLabel}>{letter}</Text>
+                  </View>
+                );
+              })}
+            </View>
+                        <Text style={styles.waterStreakText}>
+              {getWaterStreak() > 0
+                ? `${getWaterStreak()} day${getWaterStreak() > 1 ? 's' : ''} strong`
+                : 'Start your streak today'}
+            </Text>
           </View>
 
           {/* Body Snapshot Card */}
@@ -881,6 +926,54 @@ const HubScreen = () => {
             </ScrollView>
           </View>
         </View>
+            </Modal>
+
+      {/* ─── GOOD JOB MODAL ──────────────────────────────────────────── */}
+      <Modal
+        visible={showGoodJobModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowGoodJobModal(false)}
+      >
+        <View style={styles.goodJobOverlay}>
+          <View style={styles.goodJobContainer}>
+            <Text style={styles.goodJobEmoji}>🌊</Text>
+            <Text style={styles.goodJobTitle}>Good Job!</Text>
+            <Text style={styles.goodJobSubtitle}>
+              You drank {waterGoal} glasses today.
+            </Text>
+
+            <View style={styles.goodJobStreakBadge}>
+              <Text style={styles.goodJobStreakText}>
+                {getWaterStreak()} day{getWaterStreak() > 1 ? 's' : ''} strong
+              </Text>
+            </View>
+
+            <Text style={styles.goodJobMessage}>
+              {getWaterStreak() <= 1
+                ? "You started. That's the hardest part."
+                : getWaterStreak() <= 3
+                ? "You're building something."
+                : getWaterStreak() <= 6
+                ? "You're getting strong."
+                : getWaterStreak() === 7
+                ? "One full week! Na real water discipline."
+                : getWaterStreak() <= 13
+                ? "You're a water champion."
+                : getWaterStreak() <= 29
+                ? "Two weeks. That's a real habit."
+                : "A month of water. You're a different person."}
+            </Text>
+
+            <View style={styles.goodJobButtonRow}>
+              <MboaButton
+                title="Done"
+                onPress={() => setShowGoodJobModal(false)}
+                variant="primary"
+              />
+            </View>
+          </View>
+        </View>
       </Modal>
     </FadeInView>
   );
@@ -1000,9 +1093,9 @@ const styles = StyleSheet.create({
   harmonyMessage: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, lineHeight: 22, fontStyle: 'italic' },
 
   calendarCard: { width: '100%', backgroundColor: Colors.softBg, borderRadius: 18, padding: 20, marginBottom: 20 },
+  streakText: { fontSize: 12, ...FONTS.bold, color: '#FF6D00' },
   calendarTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
   calendarMonth: { fontSize: 15, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 4 },
-  streakText: { fontSize: 12, ...FONTS.bold, color: '#FF6D00' },
   reportButton: { backgroundColor: Colors.mboaGreen, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 },
   reportButtonText: { fontSize: 11, ...FONTS.bold, color: Colors.cleanWhite },
   calendarDayLabels: { flexDirection: 'row', marginBottom: 6 },
@@ -1070,6 +1163,49 @@ const styles = StyleSheet.create({
     color: Colors.mboaGreen,
     textAlign: 'center',
     marginTop: 8,
+  },
+
+    streakDivider: {
+    height: 1,
+    backgroundColor: '#E0E0E0',
+    marginTop: 16,
+    marginBottom: 12,
+  },
+  streakRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  streakDayCol: {
+    alignItems: 'center',
+  },
+  streakDrop: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: '#D0D0D0',
+    marginBottom: 6,
+  },
+  streakDropFilled: {
+    backgroundColor: '#2F80ED',
+    borderColor: '#2F80ED',
+  },
+  streakDropToday: {
+    borderColor: Colors.mboaGreen,
+  },
+  streakDayLabel: {
+    fontSize: 10,
+    ...FONTS.medium,
+    color: Colors.textMuted,
+  },
+   waterStreakText: {
+    fontSize: 13,
+    ...FONTS.bold,
+    color: Colors.mboaGreen,
+    textAlign: 'center',
   },
 
   // ─── BODY SNAPSHOT CARD ───────────────────────────────────────────────
@@ -1140,9 +1276,71 @@ const styles = StyleSheet.create({
   modalScroll: {
     width: '100%',
   },
-  modalScrollContent: {
+    modalScrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 30,
+  },
+
+  // ─── GOOD JOB MODAL STYLES ────────────────────────────────────────────
+  goodJobOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  goodJobContainer: {
+    width: '100%',
+    maxWidth: 380,
+    backgroundColor: Colors.cleanWhite,
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    borderTopWidth: 6,
+    borderTopColor: Colors.zenGold,
+  },
+  goodJobEmoji: {
+    fontSize: 56,
+    marginBottom: 12,
+  },
+  goodJobTitle: {
+    fontSize: 28,
+    ...FONTS.bold,
+    color: Colors.mboaGreen,
+    marginBottom: 8,
+  },
+  goodJobSubtitle: {
+    fontSize: 15,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  goodJobStreakBadge: {
+    backgroundColor: '#F1FAF3',
+    borderRadius: 50,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: Colors.mboaGreen,
+  },
+  goodJobStreakText: {
+    fontSize: 15,
+    ...FONTS.bold,
+    color: Colors.mboaGreen,
+  },
+  goodJobMessage: {
+    fontSize: 15,
+    ...FONTS.regular,
+    color: Colors.earthBlack,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 28,
+    fontStyle: 'italic',
+  },
+  goodJobButtonRow: {
+    alignItems: 'center',
   },
 });
 

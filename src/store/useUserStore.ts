@@ -30,8 +30,17 @@ const webStorage = {
   },
 };
 
+// ─── HELPER: Get today's date as YYYY-MM-DD ────────────────────────────
+const getTodayStr = () => new Date().toISOString().split('T')[0];
+
+// ─── HELPER: Get a date string N days ago ──────────────────────────────
+const getDateStrOffset = (offsetDays: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() - offsetDays);
+  return d.toISOString().split('T')[0];
+};
+
 interface UserState {
-  // ... your existing state
   archetype: string | null;
   phone: string | null;
   isPremium: boolean;
@@ -50,6 +59,7 @@ interface UserState {
   lastCheckinDate: string | null;
   setLastCheckinDate: (date: string) => void;
   resetCheckIns: () => void;
+
   // Water tracking
   waterIntake: number;
   waterGoal: number;
@@ -57,12 +67,14 @@ interface UserState {
   setWaterIntake: (amount: number) => void;
   resetWater: () => void;
   logWaterHistory: () => void;
+
+  // ─── NEW: Water streak helper ────────────────────────────────────────
+  getWaterStreak: () => number;
 }
 
 export const useUserStore = create<UserState>()(
   persist(
     (set, get) => ({
-      // ... your existing state
       archetype: null,
       phone: null,
       isPremium: false,
@@ -85,7 +97,7 @@ export const useUserStore = create<UserState>()(
       checkInHistory: {},
       logCheckInHistory: () => {
         const { checkIns, checkInHistory } = get();
-        const today = new Date().toISOString().split('T')[0];
+        const today = getTodayStr();
         const completed = Object.values(checkIns).filter(Boolean).length;
         const score = Math.round((completed / 3) * 100);
         set({
@@ -102,17 +114,28 @@ export const useUserStore = create<UserState>()(
         set({
           checkIns: { hydration: false, nutrition: false, training: false },
         }),
+
       waterIntake: 0,
       waterGoal: 8,
       waterHistory: {},
+
+      // ─── UPDATED: Auto-saves water history on every change ────────────
       setWaterIntake: (amount) => {
-        const goal = get().waterGoal;
-        const capped = Math.min(amount, goal);
-        set({ waterIntake: capped });
+        const { waterGoal, waterHistory } = get();
+        const capped = Math.min(Math.max(amount, 0), waterGoal);
+        const today = getTodayStr();
+        set({
+          waterIntake: capped,
+          waterHistory: {
+            ...waterHistory,
+            [today]: capped,
+          },
+        });
       },
+
       resetWater: () => {
         const { waterIntake, waterHistory } = get();
-        const today = new Date().toISOString().split('T')[0];
+        const today = getTodayStr();
         set({
           waterIntake: 0,
           waterHistory: {
@@ -121,15 +144,41 @@ export const useUserStore = create<UserState>()(
           },
         });
       },
+
       logWaterHistory: () => {
         const { waterIntake, waterHistory } = get();
-        const today = new Date().toISOString().split('T')[0];
+        const today = getTodayStr();
         set({
           waterHistory: {
             ...waterHistory,
             [today]: waterIntake,
           },
         });
+      },
+
+      // ─── NEW: Compute water streak ────────────────────────────────────
+      // A "streak day" = waterHistory[date] === waterGoal (8/8)
+      // Streak counts backwards from today until a missed day.
+      getWaterStreak: () => {
+        const { waterHistory, waterGoal } = get();
+        let count = 0;
+
+        // Start from today, walk backwards
+        for (let i = 0; i < 365; i++) {
+          const dateStr = getDateStrOffset(i);
+          const glasses = waterHistory[dateStr] ?? 0;
+
+          if (glasses >= waterGoal) {
+            count++;
+          } else {
+            // If today is incomplete, allow the streak to start yesterday
+            // (so an in-progress day doesn't show 0)
+            if (i === 0) continue;
+            break;
+          }
+        }
+
+        return count;
       },
     }),
     {
