@@ -149,6 +149,123 @@ const getHarmonyColor = (score: number): string => {
   if (score >= 33) return '#FF9800';
   return Colors.textMuted;
 };
+// ─── WATER NEAR-MISS / HEALTH MESSAGE ───────────────────────────────────
+
+const getWaterMessage = ({
+  waterIntake,
+  waterGoal,
+  currentStreak,
+  personalBest,
+}: {
+  waterIntake: number;
+  waterGoal: number;
+  currentStreak: number;
+  personalBest: number;
+}): { text: string; color: string } | null => {
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+  // Priority 1: Streak broken — find how many days since last 8/8
+  // If waterIntake is 0 today and yesterday had no 8/8, streak is broken
+  const twoDaysAgo = new Date(now);
+  twoDaysAgo.setDate(now.getDate() - 2);
+  const twoDaysAgoStr = twoDaysAgo.toISOString().split('T')[0];
+
+  // We need waterHistory to compute this — passed in from the store
+  // (Handled in the call site)
+
+  // Priority 2: Today incomplete but streak intact
+  if (currentStreak > 0 && waterIntake < waterGoal) {
+    const remaining = waterGoal - waterIntake;
+    if (remaining >= 3) {
+      return {
+        text: `You're at ${waterIntake}/${waterGoal} today. Your kidneys are waiting. Drink ${remaining} more before you sleep.`,
+        color: Colors.mboaGreen,
+      };
+    } else if (remaining > 0) {
+      return {
+        text: `Almost there. ${remaining} glass${remaining > 1 ? 'es' : ''} to go. Your kidneys thank you.`,
+        color: Colors.mboaGreen,
+      };
+    }
+  }
+
+  // Priority 3: Near personal best
+  if (
+    personalBest > 0 &&
+    currentStreak < personalBest &&
+    personalBest - currentStreak <= 3
+  ) {
+    const diff = personalBest - currentStreak;
+    return {
+      text: `${diff} day${diff > 1 ? 's' : ''} to beat your record (${personalBest} days). Your body is already proud.`,
+      color: Colors.zenGold,
+    };
+  }
+
+  // Priority 4: Near next milestone
+  const milestones = [
+    { days: 3, label: 'Getting Started' },
+    { days: 7, label: 'One Week Strong' },
+    { days: 14, label: 'Two Weeks' },
+    { days: 30, label: 'One Month' },
+    { days: 60, label: 'Two Months' },
+    { days: 100, label: 'Century' },
+    { days: 365, label: 'One Year Ocean' },
+  ];
+  const nextMilestone = milestones.find((m) => m.days > currentStreak);
+  if (nextMilestone) {
+    const diff = nextMilestone.days - currentStreak;
+    if (diff <= 3 && diff > 0) {
+      return {
+        text: `${diff} day${diff > 1 ? 's' : ''} to "${nextMilestone.label}". Keep going.`,
+        color: Colors.zenGold,
+      };
+    }
+  }
+
+  // Priority 5: Just hit goal today
+  if (waterIntake >= waterGoal) {
+    return {
+      text: `Your kidneys thank you. ${waterGoal}/${waterGoal} today.`,
+      color: Colors.mboaGreen,
+    };
+  }
+
+  return null;
+};
+
+// ─── BROKEN-STREAK ORGAN MESSAGE ────────────────────────────────────────
+
+const getBrokenStreakMessage = (daysSinceLastGoal: number): { text: string; color: string } | null => {
+  if (daysSinceLastGoal <= 0) return null;
+
+  if (daysSinceLastGoal === 1) {
+    return {
+      text: `You missed your water goal yesterday. Your kidneys filter your blood all day. Give them water. One glass now.`,
+      color: '#FF9800',
+    };
+  }
+  if (daysSinceLastGoal <= 3) {
+    return {
+      text: `${daysSinceLastGoal} days without your water goal. Your liver is working harder to clean your blood. Help it. One glass now.`,
+      color: '#FF9800',
+    };
+  }
+  if (daysSinceLastGoal <= 6) {
+    return {
+      text: `${daysSinceLastGoal} days dry. Your brain needs water to think clearly. Foggy mind? Drink. One glass now.`,
+      color: Colors.errorRed,
+    };
+  }
+  return {
+    text: `A full week without your goal. Your whole body is asking for water. Start with one glass.`,
+    color: Colors.errorRed,
+  };
+};
 
 // ─── PREVIOUS MONTH SUMMARY ───────────────────────────────────────────────
 
@@ -449,7 +566,7 @@ type Answer = 'yes' | 'not_yet' | null;
 
 const HubScreen = () => {
   const navigation = useNavigation<any>();
-  const {
+    const {
     archetype,
     setArchetype,
     checkIns,
@@ -464,6 +581,9 @@ const HubScreen = () => {
     setWaterIntake,
     waterHistory,
     getWaterStreak,
+    syncWaterForToday,
+    getPersonalBest,
+    getDaysSinceLastGoal,
   } = useUserStore();
 
     const [guidesExpanded, setGuidesExpanded] = useState(false);
@@ -546,6 +666,11 @@ const HubScreen = () => {
   useEffect(() => {
     logCheckInHistory();
   }, [checkIns]);
+  
+    // Sync water tracker to today's date on mount
+  useEffect(() => {
+    syncWaterForToday();
+  }, []);
 
   const handleShare = async () => {
     try {
@@ -698,11 +823,45 @@ const HubScreen = () => {
                 );
               })}
             </View>
-                        <Text style={styles.waterStreakText}>
+            <Text style={styles.waterStreakText}>
               {getWaterStreak() > 0
                 ? `${getWaterStreak()} day${getWaterStreak() > 1 ? 's' : ''} strong`
                 : 'Start your streak today'}
             </Text>
+
+            {/* ─── NEAR-MISS / HEALTH MESSAGE ──────────────────── */}
+            {(() => {
+              const daysSinceLastGoal = getDaysSinceLastGoal();
+              const brokenStreakMsg = getBrokenStreakMessage(daysSinceLastGoal);
+              if (brokenStreakMsg) {
+                return (
+                  <View style={styles.waterMessageBox}>
+                    <Text style={[styles.waterMessageText, { color: brokenStreakMsg.color }]}>
+                      {brokenStreakMsg.text}
+                    </Text>
+                  </View>
+                );
+              }
+
+              const nearMissMsg = getWaterMessage({
+                waterIntake,
+                waterGoal,
+                currentStreak: getWaterStreak(),
+                personalBest: getPersonalBest(),
+              });
+
+              if (nearMissMsg) {
+                return (
+                  <View style={styles.waterMessageBox}>
+                    <Text style={[styles.waterMessageText, { color: nearMissMsg.color }]}>
+                      {nearMissMsg.text}
+                    </Text>
+                  </View>
+                );
+              }
+
+              return null;
+            })()}
           </View>
 
           {/* Body Snapshot Card */}
@@ -1205,6 +1364,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     ...FONTS.bold,
     color: Colors.mboaGreen,
+    textAlign: 'center',
+  },
+
+    waterMessageBox: {
+    marginTop: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: '#FFF8E1',
+    borderRadius: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.zenGold,
+  },
+  waterMessageText: {
+    fontSize: 13,
+    ...FONTS.medium,
+    lineHeight: 20,
     textAlign: 'center',
   },
 

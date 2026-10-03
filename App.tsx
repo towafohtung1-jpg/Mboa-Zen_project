@@ -1,6 +1,11 @@
 // ─── App.tsx ─────────────────────────────────────────────────────────────
-
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useUserStore } from './src/store/useUserStore';
+import {
+  requestNotificationPermission,
+  scheduleArchetypeReminders,
+  cancelAllReminders,
+} from './src/utils/notifications';
 import { View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import RootNavigator from './src/navigation/RootNavigator';
@@ -11,7 +16,6 @@ import PhoneScreen from './src/screens/PhoneScreen';
 import OTPScreen from './src/screens/OTPScreen';
 import { Colors } from './src/constants/colors';
 import { loadUserState } from './src/utils/storage';
-import { useUserStore } from './src/store/useUserStore';
 import { useFonts } from './src/utils/useFonts';
 import { AnimatedLogo } from './src/components/common/AnimatedLogo';
 
@@ -22,9 +26,32 @@ export default function App() {
   >('onboarding');
 
   const fontsLoaded = useFonts();
-  const setArchetype = useUserStore((state) => state.setArchetype);
+    const setArchetype = useUserStore((state) => state.setArchetype);
   const setPhone = useUserStore((state) => state.setPhone);
   const userPhone = useUserStore((state) => state.phone);
+  const archetype = useUserStore((state) => state.archetype);
+
+  // ─── NOTIFICATION SETUP ─────────────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+
+    const setup = async () => {
+      const granted = await requestNotificationPermission();
+      if (!granted || cancelled) return;
+
+      if (archetype) {
+        await scheduleArchetypeReminders(archetype as any);
+      } else {
+        await cancelAllReminders();
+      }
+    };
+
+    setup();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [archetype]);
 
   useEffect(() => {
     const init = async () => {

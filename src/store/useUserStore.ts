@@ -64,12 +64,16 @@ interface UserState {
   waterIntake: number;
   waterGoal: number;
   waterHistory: Record<string, number>;
+  lastWaterLogDate: string | null;
   setWaterIntake: (amount: number) => void;
   resetWater: () => void;
   logWaterHistory: () => void;
+  syncWaterForToday: () => void;
 
-  // ─── NEW: Water streak helper ────────────────────────────────────────
+  // ─── Water streak helpers ─────────────────────────────────────────────
   getWaterStreak: () => number;
+  getPersonalBest: () => number;
+  getDaysSinceLastGoal: () => number;
 }
 
 export const useUserStore = create<UserState>()(
@@ -118,18 +122,32 @@ export const useUserStore = create<UserState>()(
       waterIntake: 0,
       waterGoal: 8,
       waterHistory: {},
+      lastWaterLogDate: null,
 
-      // ─── UPDATED: Auto-saves water history on every change ────────────
       setWaterIntake: (amount) => {
         const { waterGoal, waterHistory } = get();
         const capped = Math.min(Math.max(amount, 0), waterGoal);
         const today = getTodayStr();
         set({
           waterIntake: capped,
+          lastWaterLogDate: today,
           waterHistory: {
             ...waterHistory,
             [today]: capped,
           },
+        });
+      },
+
+      syncWaterForToday: () => {
+        const { lastWaterLogDate, waterHistory } = get();
+        const today = getTodayStr();
+
+        if (lastWaterLogDate === today) return;
+
+        const todayAmount = waterHistory[today] ?? 0;
+        set({
+          waterIntake: todayAmount,
+          lastWaterLogDate: today,
         });
       },
 
@@ -156,14 +174,11 @@ export const useUserStore = create<UserState>()(
         });
       },
 
-      // ─── NEW: Compute water streak ────────────────────────────────────
-      // A "streak day" = waterHistory[date] === waterGoal (8/8)
-      // Streak counts backwards from today until a missed day.
+      // ─── WATER STREAK ──────────────────────────────────────────────────
       getWaterStreak: () => {
         const { waterHistory, waterGoal } = get();
         let count = 0;
 
-        // Start from today, walk backwards
         for (let i = 0; i < 365; i++) {
           const dateStr = getDateStrOffset(i);
           const glasses = waterHistory[dateStr] ?? 0;
@@ -171,8 +186,6 @@ export const useUserStore = create<UserState>()(
           if (glasses >= waterGoal) {
             count++;
           } else {
-            // If today is incomplete, allow the streak to start yesterday
-            // (so an in-progress day doesn't show 0)
             if (i === 0) continue;
             break;
           }
@@ -180,10 +193,75 @@ export const useUserStore = create<UserState>()(
 
         return count;
       },
+
+      // ─── PERSONAL BEST STREAK ──────────────────────────────────────────
+      getPersonalBest: () => {
+        const { waterHistory, waterGoal } = get();
+        const dates = Object.keys(waterHistory).sort();
+        if (dates.length === 0) return 0;
+
+        let best = 0;
+        let current = 0;
+        let prevDate: Date | null = null;
+
+        for (const dateStr of dates) {
+          const glasses = waterHistory[dateStr] ?? 0;
+          const thisDate = new Date(dateStr);
+
+          if (glasses >= waterGoal) {
+            if (prevDate) {
+              const diffDays = Math.round(
+                (thisDate.getTime() - prevDate.getTime()) / 86400000
+              );
+              if (diffDays === 1) {
+                current++;
+              } else {
+                current = 1;
+              }
+            } else {
+              current = 1;
+            }
+            best = Math.max(best, current);
+            prevDate = thisDate;
+          } else {
+            current = 0;
+            prevDate = null;
+          }
+        }
+        return best;
+      },
+
+      // ─── DAYS SINCE LAST FULL GOAL ─────────────────────────────────────
+ getDaysSinceLastGoal: () => {
+  const { waterHistory, waterGoal } = get();
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+
+  // Yesterday's date
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+  // If today OR yesterday hit the goal, the streak is NOT broken
+  if ((waterHistory[todayStr] ?? 0) >= waterGoal) return 0;
+  if ((waterHistory[yesterdayStr] ?? 0) >= waterGoal) return 0;
+
+  // Otherwise, count backwards from 2 days ago
+  for (let i = 2; i <= 30; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+    const glasses = waterHistory[dateStr] ?? 0;
+    if (glasses >= waterGoal) {
+      return i - 1; // days since last full goal day
+    }
+  }
+  return 999;
+},
     }),
     {
       name: 'mboa-zen-storage',
-      storage: createJSONStorage(() => isWeb ? webStorage : AsyncStorage),
+      storage: createJSONStorage(() => (isWeb ? webStorage : AsyncStorage)),
       partialize: (state) => ({
         archetype: state.archetype,
         phone: state.phone,
@@ -194,7 +272,13 @@ export const useUserStore = create<UserState>()(
         waterIntake: state.waterIntake,
         waterGoal: state.waterGoal,
         waterHistory: state.waterHistory,
+        lastWaterLogDate: state.lastWaterLogDate,
       }),
     }
   )
 );
+
+// DEV ONLY — expose store for debugging
+if (typeof window !== 'undefined') {
+  (window as any).__store = useUserStore;
+}
