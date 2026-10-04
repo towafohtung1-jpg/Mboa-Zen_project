@@ -70,10 +70,11 @@ interface UserState {
   logWaterHistory: () => void;
   syncWaterForToday: () => void;
 
-  // ─── Water streak helpers ─────────────────────────────────────────────
+    // ─── Water streak helpers ─────────────────────────────────────────────
   getWaterStreak: () => number;
   getPersonalBest: () => number;
   getDaysSinceLastGoal: () => number;
+  getDaysActive: () => number;
 }
 
 export const useUserStore = create<UserState>()(
@@ -256,8 +257,29 @@ export const useUserStore = create<UserState>()(
       return i - 1; // days since last full goal day
     }
   }
-  return 999;
-},
+          return 999;
+      },
+
+      // ─── LIFETIME ACTIVE DAYS ──────────────────────────────────────────
+      getDaysActive: () => {
+        const { checkInHistory, waterHistory } = get();
+        const activeDates = new Set<string>();
+
+        Object.entries(checkInHistory).forEach(([date, log]: [string, any]) => {
+          if (log && typeof log === 'object') {
+            const hasAny = log.hydration || log.nutrition || log.training;
+            if (hasAny) activeDates.add(date);
+          }
+        });
+
+        Object.entries(waterHistory).forEach(([date, glasses]) => {
+          if (typeof glasses === 'number' && glasses > 0) {
+            activeDates.add(date);
+          }
+        });
+
+        return activeDates.size;
+      },
     }),
     {
       name: 'mboa-zen-storage',

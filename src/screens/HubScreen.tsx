@@ -149,6 +149,7 @@ const getHarmonyColor = (score: number): string => {
   if (score >= 33) return '#FF9800';
   return Colors.textMuted;
 };
+
 // ─── WATER NEAR-MISS / HEALTH MESSAGE ───────────────────────────────────
 
 const getWaterMessage = ({
@@ -162,22 +163,7 @@ const getWaterMessage = ({
   currentStreak: number;
   personalBest: number;
 }): { text: string; color: string } | null => {
-  const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
-  const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().split('T')[0];
-
-  // Priority 1: Streak broken — find how many days since last 8/8
-  // If waterIntake is 0 today and yesterday had no 8/8, streak is broken
-  const twoDaysAgo = new Date(now);
-  twoDaysAgo.setDate(now.getDate() - 2);
-  const twoDaysAgoStr = twoDaysAgo.toISOString().split('T')[0];
-
-  // We need waterHistory to compute this — passed in from the store
-  // (Handled in the call site)
-
-  // Priority 2: Today incomplete but streak intact
+  // Priority 1: Today incomplete but streak intact
   if (currentStreak > 0 && waterIntake < waterGoal) {
     const remaining = waterGoal - waterIntake;
     if (remaining >= 3) {
@@ -193,7 +179,7 @@ const getWaterMessage = ({
     }
   }
 
-  // Priority 3: Near personal best
+  // Priority 2: Near personal best
   if (
     personalBest > 0 &&
     currentStreak < personalBest &&
@@ -206,7 +192,7 @@ const getWaterMessage = ({
     };
   }
 
-  // Priority 4: Near next milestone
+  // Priority 3: Near next milestone
   const milestones = [
     { days: 3, label: 'Getting Started' },
     { days: 7, label: 'One Week Strong' },
@@ -227,7 +213,7 @@ const getWaterMessage = ({
     }
   }
 
-  // Priority 5: Just hit goal today
+  // Priority 4: Just hit goal today
   if (waterIntake >= waterGoal) {
     return {
       text: `Your kidneys thank you. ${waterGoal}/${waterGoal} today.`,
@@ -243,6 +229,12 @@ const getWaterMessage = ({
 const getBrokenStreakMessage = (daysSinceLastGoal: number): { text: string; color: string } | null => {
   if (daysSinceLastGoal <= 0) return null;
 
+  if (daysSinceLastGoal >= 999) {
+    return {
+      text: `You haven't started your water goal yet. One glass now. That's how it begins.`,
+      color: Colors.mboaGreen,
+    };
+  }
   if (daysSinceLastGoal === 1) {
     return {
       text: `You missed your water goal yesterday. Your kidneys filter your blood all day. Give them water. One glass now.`,
@@ -566,7 +558,7 @@ type Answer = 'yes' | 'not_yet' | null;
 
 const HubScreen = () => {
   const navigation = useNavigation<any>();
-    const {
+  const {
     archetype,
     setArchetype,
     checkIns,
@@ -584,9 +576,10 @@ const HubScreen = () => {
     syncWaterForToday,
     getPersonalBest,
     getDaysSinceLastGoal,
+    getDaysActive,
   } = useUserStore();
 
-    const [guidesExpanded, setGuidesExpanded] = useState(false);
+  const [guidesExpanded, setGuidesExpanded] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [showGoodJobModal, setShowGoodJobModal] = useState(false);
@@ -666,8 +659,8 @@ const HubScreen = () => {
   useEffect(() => {
     logCheckInHistory();
   }, [checkIns]);
-  
-    // Sync water tracker to today's date on mount
+
+  // Sync water tracker to today's date on mount
   useEffect(() => {
     syncWaterForToday();
   }, []);
@@ -765,7 +758,7 @@ const HubScreen = () => {
 
             <View style={styles.dropsContainer}>
               {Array.from({ length: 8 }).map((_, index) => (
-                                <WaterDrop
+                <WaterDrop
                   key={index}
                   filled={index < waterIntake}
                   onPress={() => {
@@ -788,7 +781,7 @@ const HubScreen = () => {
               ))}
             </View>
 
-                        <Text style={styles.waterStatus}>
+            <Text style={styles.waterStatus}>
               {waterIntake} / {waterGoal} glasses
             </Text>
 
@@ -862,6 +855,14 @@ const HubScreen = () => {
 
               return null;
             })()}
+
+            {/* ─── LIFETIME ACTIVE DAYS ──────────────────────────── */}
+            <View style={styles.daysActiveBox}>
+              <Text style={styles.daysActiveNumber}>{getDaysActive()}</Text>
+              <Text style={styles.daysActiveLabel}>
+                {getDaysActive() === 1 ? 'day active' : 'days active'}
+              </Text>
+            </View>
           </View>
 
           {/* Body Snapshot Card */}
@@ -1085,7 +1086,7 @@ const HubScreen = () => {
             </ScrollView>
           </View>
         </View>
-            </Modal>
+      </Modal>
 
       {/* ─── GOOD JOB MODAL ──────────────────────────────────────────── */}
       <Modal
@@ -1324,7 +1325,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 
-    streakDivider: {
+  streakDivider: {
     height: 1,
     backgroundColor: '#E0E0E0',
     marginTop: 16,
@@ -1360,14 +1361,14 @@ const styles = StyleSheet.create({
     ...FONTS.medium,
     color: Colors.textMuted,
   },
-   waterStreakText: {
+  waterStreakText: {
     fontSize: 13,
     ...FONTS.bold,
     color: Colors.mboaGreen,
     textAlign: 'center',
   },
 
-    waterMessageBox: {
+  waterMessageBox: {
     marginTop: 14,
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -1381,6 +1382,27 @@ const styles = StyleSheet.create({
     ...FONTS.medium,
     lineHeight: 20,
     textAlign: 'center',
+  },
+
+  daysActiveBox: {
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  daysActiveNumber: {
+    fontSize: 20,
+    ...FONTS.bold,
+    color: Colors.zenGold,
+  },
+  daysActiveLabel: {
+    fontSize: 13,
+    ...FONTS.medium,
+    color: Colors.textMuted,
   },
 
   // ─── BODY SNAPSHOT CARD ───────────────────────────────────────────────
@@ -1451,7 +1473,7 @@ const styles = StyleSheet.create({
   modalScroll: {
     width: '100%',
   },
-    modalScrollContent: {
+  modalScrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 30,
   },
