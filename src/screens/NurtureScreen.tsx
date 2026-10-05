@@ -674,8 +674,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chopSwapIcon: {
-    width: 22,
-    height: 22,
+    width: 40,
+    height: 40,
     resizeMode: 'contain',
   },
   chopSwapTitle: {
