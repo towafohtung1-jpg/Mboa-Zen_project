@@ -75,6 +75,10 @@ interface UserState {
   getPersonalBest: () => number;
   getDaysSinceLastGoal: () => number;
   getDaysActive: () => number;
+
+  // ─── Milestones ──────────────────────────────────────────────────────
+  celebratedMilestones: string[];
+  markMilestoneCelebrated: (key: string) => void;
 }
 
 export const useUserStore = create<UserState>()(
@@ -280,7 +284,17 @@ export const useUserStore = create<UserState>()(
 
         return activeDates.size;
       },
+
+      // ─── MILESTONES ────────────────────────────────────────────────────
+      celebratedMilestones: [],
+
+      markMilestoneCelebrated: (key) => {
+        const { celebratedMilestones } = get();
+        if (celebratedMilestones.includes(key)) return;
+        set({ celebratedMilestones: [...celebratedMilestones, key] });
+      },
     }),
+
     {
       name: 'mboa-zen-storage',
       storage: createJSONStorage(() => (isWeb ? webStorage : AsyncStorage)),
@@ -295,6 +309,7 @@ export const useUserStore = create<UserState>()(
         waterGoal: state.waterGoal,
         waterHistory: state.waterHistory,
         lastWaterLogDate: state.lastWaterLogDate,
+        celebratedMilestones: state.celebratedMilestones,
       }),
     }
   )

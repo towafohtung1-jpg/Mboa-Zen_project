@@ -1,6 +1,6 @@
 // ─── src/screens/HubScreen.tsx ─────────────────────────────────────────
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -163,7 +163,6 @@ const getWaterMessage = ({
   currentStreak: number;
   personalBest: number;
 }): { text: string; color: string } | null => {
-  // Priority 1: Today incomplete but streak intact
   if (currentStreak > 0 && waterIntake < waterGoal) {
     const remaining = waterGoal - waterIntake;
     if (remaining >= 3) {
@@ -179,7 +178,6 @@ const getWaterMessage = ({
     }
   }
 
-  // Priority 2: Near personal best
   if (
     personalBest > 0 &&
     currentStreak < personalBest &&
@@ -192,7 +190,6 @@ const getWaterMessage = ({
     };
   }
 
-  // Priority 3: Near next milestone
   const milestones = [
     { days: 3, label: 'Getting Started' },
     { days: 7, label: 'One Week Strong' },
@@ -213,12 +210,62 @@ const getWaterMessage = ({
     }
   }
 
-  // Priority 4: Just hit goal today
   if (waterIntake >= waterGoal) {
     return {
       text: `Your kidneys thank you. ${waterGoal}/${waterGoal} today.`,
       color: Colors.mboaGreen,
     };
+  }
+
+  return null;
+};
+
+// ─── MILESTONE DEFINITIONS ──────────────────────────────────────────────
+
+const MILESTONES: Record<number, { title: string; message: string }> = {
+  7: {
+    title: 'One Week Strong',
+    message: "You've shown up for 7 days straight. That's not small.",
+  },
+  14: {
+    title: 'Two Weeks',
+    message: '14 days. A real habit is forming.',
+  },
+  30: {
+    title: 'One Month',
+    message: "30 days. You're a different person now.",
+  },
+  60: {
+    title: 'Two Months',
+    message: '60 days. Na real discipline.',
+  },
+  100: {
+    title: 'Century',
+    message: '100 days. Legend status.',
+  },
+  365: {
+    title: 'One Year Ocean',
+    message: '365 days. You built a whole ocean.',
+  },
+};
+
+const getNewMilestone = (
+  waterStreak: number,
+  checkInStreak: number,
+  celebrated: string[]
+): { days: number; title: string; message: string; key: string } | null => {
+  if (MILESTONES[waterStreak]) {
+    const key = `water-${waterStreak}`;
+    if (!celebrated.includes(key)) {
+      return { days: waterStreak, key, ...MILESTONES[waterStreak] };
+    }
+  }
+
+  if (MILESTONES[checkInStreak]) {
+    const key = `checkin-${checkInStreak}`;
+    if (!celebrated.includes(key)) {
+      return { days: checkInStreak, key, ...MILESTONES[checkInStreak] };
+    }
   }
 
   return null;
@@ -577,12 +624,23 @@ const HubScreen = () => {
     getPersonalBest,
     getDaysSinceLastGoal,
     getDaysActive,
+    celebratedMilestones,
+    markMilestoneCelebrated,
   } = useUserStore();
 
   const [guidesExpanded, setGuidesExpanded] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [showGoodJobModal, setShowGoodJobModal] = useState(false);
+  const [milestoneData, setMilestoneData] = useState<{
+    days: number;
+    title: string;
+    message: string;
+    key: string;
+  } | null>(null);
+
+  // Ref to ensure the milestone check runs only once per mount
+  const milestoneCheckedRef = useRef(false);
 
   // Date helpers
   const todayStr = new Date().toISOString().split('T')[0];
@@ -663,6 +721,30 @@ const HubScreen = () => {
   // Sync water tracker to today's date on mount
   useEffect(() => {
     syncWaterForToday();
+  }, []);
+
+  // Check for milestone celebrations on mount (once per session)
+  useEffect(() => {
+    if (milestoneCheckedRef.current) return;
+    milestoneCheckedRef.current = true;
+
+    const timer = setTimeout(() => {
+      const waterStreak = getWaterStreak();
+      const checkInStreak = streak;
+
+      const milestone = getNewMilestone(
+        waterStreak,
+        checkInStreak,
+        celebratedMilestones
+      );
+
+      if (milestone) {
+        setMilestoneData(milestone);
+        markMilestoneCelebrated(milestone.key);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const handleShare = async () => {
@@ -793,7 +875,7 @@ const HubScreen = () => {
             <View style={styles.streakDivider} />
             <View style={styles.streakRow}>
               {Array.from({ length: 7 }).map((_, i) => {
-                const offset = 6 - i; // oldest first
+                const offset = 6 - i;
                 const d = new Date();
                 d.setDate(d.getDate() - offset);
                 const dateStr = d.toISOString().split('T')[0];
@@ -1129,6 +1211,34 @@ const HubScreen = () => {
               <MboaButton
                 title="Done"
                 onPress={() => setShowGoodJobModal(false)}
+                variant="primary"
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* ─── MILESTONE CELEBRATION MODAL ──────────────────────────────── */}
+      <Modal
+        visible={!!milestoneData}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setMilestoneData(null)}
+      >
+        <View style={styles.milestoneOverlay}>
+          <View style={styles.milestoneContainer}>
+            <Text style={styles.milestoneStar}>⭐</Text>
+            <Text style={styles.milestoneDays}>{milestoneData?.days}</Text>
+            <Text style={styles.milestoneDaysLabel}>
+              {milestoneData?.days === 1 ? 'day' : 'days'}
+            </Text>
+            <Text style={styles.milestoneTitle}>{milestoneData?.title}</Text>
+            <Text style={styles.milestoneMessage}>{milestoneData?.message}</Text>
+
+            <View style={styles.milestoneButtonRow}>
+              <MboaButton
+                title="Keep Going"
+                onPress={() => setMilestoneData(null)}
                 variant="primary"
               />
             </View>
@@ -1537,6 +1647,63 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   goodJobButtonRow: {
+    alignItems: 'center',
+  },
+
+  // ─── MILESTONE MODAL STYLES ───────────────────────────────────────────
+  milestoneOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.75)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  milestoneContainer: {
+    width: '100%',
+    maxWidth: 380,
+    backgroundColor: Colors.cleanWhite,
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    borderTopWidth: 6,
+    borderTopColor: Colors.zenGold,
+    borderBottomWidth: 6,
+    borderBottomColor: Colors.mboaGreen,
+  },
+  milestoneStar: {
+    fontSize: 72,
+    marginBottom: 8,
+  },
+  milestoneDays: {
+    fontSize: 64,
+    ...FONTS.bold,
+    color: Colors.mboaGreen,
+    lineHeight: 70,
+  },
+  milestoneDaysLabel: {
+    fontSize: 16,
+    ...FONTS.medium,
+    color: Colors.textMuted,
+    letterSpacing: 2,
+    marginBottom: 20,
+  },
+  milestoneTitle: {
+    fontSize: 24,
+    ...FONTS.bold,
+    color: Colors.zenGold,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  milestoneMessage: {
+    fontSize: 15,
+    ...FONTS.regular,
+    color: Colors.earthBlack,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 28,
+    fontStyle: 'italic',
+  },
+  milestoneButtonRow: {
     alignItems: 'center',
   },
 });
