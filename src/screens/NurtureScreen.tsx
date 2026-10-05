@@ -19,6 +19,8 @@ import { getMealOptions, getBodyTypeFromArchetype } from '../data/mealOptions';
 import { MealOption, MealFoodItem } from '../types';
 import { offlineAgent } from '../database/offlineAgent';
 import { MboaButton } from '../components/common/MboaButton';
+import { getTodaySwap } from '../data/chopSwaps';
+import chopSwapIcon from '../../assets/Graphics/UI_vectors_icon_set/chop_swap.png';
 
 // ─── FOOD IMAGES ────────────────────────────────────────────────────────
 
@@ -374,6 +376,9 @@ const NurtureScreen = () => {
   const [selectedMeal, setSelectedMeal] = useState<MealOption | null>(null);
 
   const bodyType = getBodyTypeFromArchetype(archetype);
+    const todaySwap = getTodaySwap(
+    archetype as 'runner' | 'warrior' | 'guardian' | null
+  );
 
   const profileLabels: Record<string, { main: string; sub: string }> = {
     slim: { main: 'The Runner', sub: 'Slim Body' },
@@ -434,11 +439,27 @@ const NurtureScreen = () => {
         {bodyType && (
           <Text style={styles.subHeader}>{profileDescriptions[bodyType]}</Text>
         )}
-        <View style={styles.calorieBanner}>
+                <View style={styles.calorieBanner}>
           <Text style={styles.calorieBannerLabel}>Today's Calories</Text>
           <Text style={styles.calorieBannerValue}>{todayCalories} kcal</Text>
         </View>
-              <View style={styles.tabRow}>
+
+        {todaySwap && (
+          <View style={styles.chopSwapCard}>
+            <View style={styles.chopSwapHeader}>
+              <Image source={chopSwapIcon} style={styles.chopSwapIcon} />
+              <Text style={styles.chopSwapTitle}>Today's Chop Swap</Text>
+            </View>
+            <Text style={styles.chopSwapFrom}>
+              Instead of: {todaySwap.from}
+            </Text>
+            <Text style={styles.chopSwapTo}>Try: {todaySwap.to}</Text>
+            <Text style={styles.chopSwapReason}>{todaySwap.reason}</Text>
+          </View>
+        )}
+
+        <View style={styles.tabRow}>
+
           {MEAL_TIMES.map((tab) => (
             <TouchableOpacity
               key={tab.key}
@@ -634,6 +655,51 @@ const styles = StyleSheet.create({
     fontSize: 13,
     ...FONTS.regular,
     color: Colors.textMuted,
+    fontStyle: 'italic',
+  },
+
+    chopSwapCard: {
+    width: '100%',
+    backgroundColor: '#FFF8E1',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.zenGold,
+  },
+  chopSwapHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    gap: 8,
+  },
+  chopSwapIcon: {
+    width: 22,
+    height: 22,
+    resizeMode: 'contain',
+  },
+  chopSwapTitle: {
+    fontSize: 13,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    letterSpacing: 0.5,
+  },
+  chopSwapFrom: {
+    fontSize: 14,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    marginBottom: 4,
+  },
+  chopSwapTo: {
+    fontSize: 16,
+    ...FONTS.bold,
+    color: Colors.mboaGreen,
+    marginBottom: 8,
+  },
+  chopSwapReason: {
+    fontSize: 13,
+    ...FONTS.medium,
+    color: '#FF9800',
     fontStyle: 'italic',
   },
 });
