@@ -79,6 +79,14 @@ interface UserState {
   // ─── Milestones ──────────────────────────────────────────────────────
   celebratedMilestones: string[];
   markMilestoneCelebrated: (key: string) => void;
+
+  // ─── Njangi ──────────────────────────────────────────────────────────
+  njangiHistory: Record<string, string[]>;  // date → ['water', 'food', 'move']
+  njangiSavings: number;
+  addNjangiItem: (item: 'water' | 'food' | 'move') => void;
+  saveNjangiMoney: (amount: number) => void;
+  getNjangiStreak: () => number;
+  getTodayNjangi: () => string[];
 }
 
 export const useUserStore = create<UserState>()(
@@ -293,6 +301,50 @@ export const useUserStore = create<UserState>()(
         if (celebratedMilestones.includes(key)) return;
         set({ celebratedMilestones: [...celebratedMilestones, key] });
       },
+
+      // ─── NJANGI ────────────────────────────────────────────────────────
+      njangiHistory: {},
+      njangiSavings: 0,
+
+      addNjangiItem: (item) => {
+        const { njangiHistory } = get();
+        const today = getTodayStr();
+        const todayItems = njangiHistory[today] ?? [];
+        if (todayItems.includes(item)) return;
+        set({
+          njangiHistory: {
+            ...njangiHistory,
+            [today]: [...todayItems, item],
+          },
+        });
+      },
+
+      saveNjangiMoney: (amount) => {
+        const { njangiSavings } = get();
+        set({ njangiSavings: njangiSavings + amount });
+      },
+
+      getTodayNjangi: () => {
+        const { njangiHistory } = get();
+        const today = getTodayStr();
+        return njangiHistory[today] ?? [];
+      },
+
+      getNjangiStreak: () => {
+        const { njangiHistory } = get();
+        let count = 0;
+        for (let i = 0; i < 365; i++) {
+          const dateStr = getDateStrOffset(i);
+          const items = njangiHistory[dateStr] ?? [];
+          if (items.length >= 2) {
+            count++;
+          } else {
+            if (i === 0) continue;
+            break;
+          }
+        }
+        return count;
+      },
     }),
 
     {
@@ -310,6 +362,8 @@ export const useUserStore = create<UserState>()(
         waterHistory: state.waterHistory,
         lastWaterLogDate: state.lastWaterLogDate,
         celebratedMilestones: state.celebratedMilestones,
+        njangiHistory: state.njangiHistory,
+        njangiSavings: state.njangiSavings,
       }),
     }
   )

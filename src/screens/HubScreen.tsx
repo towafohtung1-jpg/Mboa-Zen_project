@@ -626,6 +626,7 @@ const HubScreen = () => {
     getDaysActive,
     celebratedMilestones,
     markMilestoneCelebrated,
+    addNjangiItem,
   } = useUserStore();
 
   const [guidesExpanded, setGuidesExpanded] = useState(false);
@@ -673,6 +674,11 @@ const HubScreen = () => {
     const newAnswers = { ...answers, [key]: 'yes' as Answer };
     setAnswers(newAnswers);
     if (!checkIns[key]) toggleCheckIn(key);
+
+    // Auto-complete Njangi items
+    if (key === 'nutrition') addNjangiItem('food');
+    if (key === 'training') addNjangiItem('move');
+
     const allDone = Object.values(newAnswers).filter(a => a !== null).length === 3;
     if (allDone) {
       setLastCheckinDate(todayStr);
@@ -856,6 +862,8 @@ const HubScreen = () => {
                       // Show "Good Job" modal only when crossing from <8 to 8
                       if (wasBelowGoal && willHitGoal) {
                         setTimeout(() => setShowGoodJobModal(true), 300);
+                        // Auto-complete Njangi water item
+                        addNjangiItem('water');
                       }
                     }
                   }}

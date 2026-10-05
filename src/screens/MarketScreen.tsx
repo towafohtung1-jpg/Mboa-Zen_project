@@ -30,6 +30,7 @@ const ICONS = {
   star: require('../../assets/Graphics/UI_vectors_icon_set/star.png'),
   dojo: require('../../assets/Graphics/UI_vectors_icon_set/dojo.png'),
   kitchen: require('../../assets/Graphics/UI_vectors_icon_set/kitchen.png'),
+  njangi: require('../../assets/Graphics/UI_vectors_icon_set/njangi.png'),
   coach_marie: require('../../assets/Graphics/UI_vectors_icon_set/coach_marie.png'),
   coach_jean: require('../../assets/Graphics/UI_vectors_icon_set/coach_jean.png'),
   coach_sarah: require('../../assets/Graphics/UI_vectors_icon_set/coach_sarah.png'),
@@ -70,7 +71,24 @@ const COACHES = [
 ];
 
 const MarketScreen = () => {
-  const { archetype, isPremium, setIsPremium } = useUserStore();
+  const {
+    archetype,
+    isPremium,
+    setIsPremium,
+    njangiHistory,
+    njangiSavings,
+    saveNjangiMoney,
+    getNjangiStreak,
+    getTodayNjangi,
+  } = useUserStore();
+
+  const todayNjangi = getTodayNjangi();
+  const njangiStreak = getNjangiStreak();
+  const njangiItems = [
+    { key: 'water' as const, label: 'Drink 8 glasses' },
+    { key: 'food' as const, label: 'Eat healthy' },
+    { key: 'move' as const, label: 'Move 10 minutes' },
+  ];
   const [selectedPayment, setSelectedPayment] = useState<'momo' | 'orange' | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -88,12 +106,12 @@ const MarketScreen = () => {
 
       setIsPremium(true);
       Alert.alert(
-        '🎉 Premium Activated!',
+        'Premium Activated!',
         'You now have access to all premium features.\n\n' +
-        '✅ Exclusive workouts\n' +
-        '✅ Personalized meal plans\n' +
-        '✅ Coach booking\n' +
-        '✅ Advanced analytics',
+        'Exclusive workouts\n' +
+        'Personalized meal plans\n' +
+        'Coach booking\n' +
+        'Advanced analytics',
         [{ text: 'Great!' }]
       );
     } catch (error) {
@@ -120,18 +138,28 @@ const MarketScreen = () => {
 
     Alert.alert(
       `Book ${coach.name}`,
-      `${coach.specialty}\n${coach.location}\n${coach.price}\n\n⭐ ${coach.rating} rating\n\nWould you like to book a session?`,
+      `${coach.specialty}\n${coach.location}\n${coach.price}\n\n${coach.rating} rating\n\nWould you like to book a session?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Book Session',
           onPress: () => {
-            Alert.alert('✅ Booking Requested!',
+            Alert.alert('Booking Requested!',
               `You have requested a session with ${coach.name}.\nThey will contact you shortly.`
             );
           }
         }
       ]
+    );
+  };
+
+  // ─── HANDLE NJANGI SAVE ──────────────────────────────────────────────
+  const handleSaveNjangi = () => {
+    saveNjangiMoney(100);
+    Alert.alert(
+      'Saved!',
+      '100 FCFA added to your Njangi Box.\n\nKeep going. Little drop = Ocean.',
+      [{ text: 'OK' }]
     );
   };
 
@@ -241,6 +269,72 @@ const MarketScreen = () => {
               style={styles.featureStatusImage}
             />
           </View>
+        </View>
+
+        {/* ─── NJANGI BOX ───────────────────────────────────────────────── */}
+        <View style={styles.njangiContainer}>
+          <View style={styles.njangiHeader}>
+            <Image source={ICONS.njangi} style={styles.njangiIcon} />
+            <Text style={styles.njangiTitle}>Njangi Box</Text>
+          </View>
+          <Text style={styles.njangiSubtitle}>
+            Save small. Grow big. The Mboa-Zen way.
+          </Text>
+
+          <View style={styles.njangiItemsList}>
+            {njangiItems.map((item) => {
+              const isDone = todayNjangi.includes(item.key);
+              return (
+                <View key={item.key} style={styles.njangiItemRow}>
+                  <View
+                    style={[
+                      styles.njangiItemDot,
+                      isDone && styles.njangiItemDotDone,
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.njangiItem,
+                      isDone && styles.njangiItemDone,
+                    ]}
+                  >
+                    {item.label}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+
+          <View style={styles.njangiProgressRow}>
+            <View style={styles.njangiProgressBar}>
+              <View
+                style={[
+                  styles.njangiProgressFill,
+                  { width: `${(todayNjangi.length / 3) * 100}%` },
+                ]}
+              />
+            </View>
+            <Text style={styles.njangiProgressText}>
+              {todayNjangi.length}/3 today
+            </Text>
+          </View>
+
+          <Text style={styles.njangiStreak}>
+            {njangiStreak} day{njangiStreak !== 1 ? 's' : ''} njangi streak
+          </Text>
+
+          <View style={styles.njangiSavingsRow}>
+            <Text style={styles.njangiSavingsLabel}>Total saved:</Text>
+            <Text style={styles.njangiSavingsValue}>
+              {njangiSavings.toLocaleString()} FCFA
+            </Text>
+          </View>
+
+          <MboaButton
+            title="Save 100 FCFA Today"
+            onPress={handleSaveNjangi}
+            variant="primary"
+          />
         </View>
 
         {/* ─── PAYMENT SECTION ──────────────────────────────────────────── */}
@@ -531,6 +625,121 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     resizeMode: 'contain',
+  },
+
+  // ─── NJANGI BOX ───────────────────────────────────────────────────────
+  njangiContainer: {
+    width: '100%',
+    maxWidth: 480,
+    backgroundColor: '#F1FAF3',
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 20,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: Colors.mboaGreen,
+  },
+  njangiHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 6,
+  },
+  njangiIcon: {
+    width: 28,
+    height: 28,
+    resizeMode: 'contain',
+  },
+  njangiTitle: {
+    fontSize: 18,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+  },
+  njangiSubtitle: {
+    fontSize: 13,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    marginBottom: 16,
+    fontStyle: 'italic',
+  },
+  njangiItemsList: {
+    marginBottom: 14,
+  },
+  njangiItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  njangiItemDot: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: '#D0D0D0',
+    backgroundColor: 'transparent',
+  },
+  njangiItemDotDone: {
+    backgroundColor: Colors.mboaGreen,
+    borderColor: Colors.mboaGreen,
+  },
+  njangiItem: {
+    fontSize: 14,
+    ...FONTS.medium,
+    color: Colors.textMuted,
+  },
+  njangiItemDone: {
+    color: Colors.mboaGreen,
+    ...FONTS.bold,
+  },
+  njangiProgressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 10,
+  },
+  njangiProgressBar: {
+    flex: 1,
+    height: 8,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  njangiProgressFill: {
+    height: 8,
+    backgroundColor: Colors.mboaGreen,
+    borderRadius: 4,
+  },
+  njangiProgressText: {
+    fontSize: 12,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+  },
+  njangiStreak: {
+    fontSize: 13,
+    ...FONTS.bold,
+    color: Colors.zenGold,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  njangiSavingsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#D9D9D9',
+  },
+  njangiSavingsLabel: {
+    fontSize: 13,
+    ...FONTS.medium,
+    color: Colors.textMuted,
+  },
+  njangiSavingsValue: {
+    fontSize: 18,
+    ...FONTS.bold,
+    color: Colors.mboaGreen,
   },
 
   // ─── PAYMENT ──────────────────────────────────────────────────────────
