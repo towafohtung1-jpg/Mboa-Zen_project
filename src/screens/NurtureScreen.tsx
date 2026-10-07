@@ -1,16 +1,7 @@
 // ─── src/screens/NurtureScreen.tsx ──────────────────────────────────────
 
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Alert,
-  Modal,
-} from 'react-native';
+import React, { useState, useRef } from 'react';
+import {View,Text,StyleSheet,ScrollView,TouchableOpacity,Image,Alert,Modal,} from 'react-native';
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
@@ -143,7 +134,6 @@ const MealDetailModal = ({
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
-          {/* Close Button */}
           <TouchableOpacity
             style={styles.modalCloseButton}
             onPress={onClose}
@@ -157,7 +147,6 @@ const MealDetailModal = ({
             contentContainerStyle={styles.modalScrollContent}
             showsVerticalScrollIndicator={false}
           >
-            {/* Full Image */}
             {foodImage && (
               <Image
                 source={foodImage}
@@ -166,7 +155,6 @@ const MealDetailModal = ({
               />
             )}
 
-            {/* Header */}
             <View style={styles.modalHeader}>
               <View style={styles.optionBadge}>
                 <Text style={styles.optionBadgeText}>Option {meal.option_number}</Text>
@@ -175,7 +163,6 @@ const MealDetailModal = ({
               <Text style={styles.modalRegion}>{meal.region}</Text>
             </View>
 
-            {/* Quick Nutrition */}
             <View style={styles.quickNutrition}>
               <View style={styles.quickNutritionItem}>
                 <Text style={styles.quickNutritionValue}>{meal.nutrition.calories}</Text>
@@ -198,7 +185,6 @@ const MealDetailModal = ({
               </View>
             </View>
 
-            {/* Ingredients */}
             <View style={styles.sectionDivider} />
             <Text style={styles.bodyTitle}>What You Need</Text>
             {meal.foods.map((food: MealFoodItem, index: number) => (
@@ -212,7 +198,6 @@ const MealDetailModal = ({
               </View>
             ))}
 
-            {/* Nutritional Breakdown */}
             <View style={styles.sectionDivider} />
             <Text style={styles.bodyTitle}>Nutritional Breakdown</Text>
             <NutritionBar label="Calories" value={meal.nutrition.calories} max={800} color={Colors.zenGold} />
@@ -221,20 +206,16 @@ const MealDetailModal = ({
             <NutritionBar label="Fat" value={meal.nutrition.fat} max={40} color="#9C27B0" />
             <NutritionBar label="Fiber" value={meal.nutrition.fiber} max={20} color="#00BCD4" />
 
-            {/* Why This Is Good For You */}
             <View style={styles.sectionDivider} />
             <Text style={styles.bodyTitle}>Why This Is Good For You</Text>
             <Text style={styles.whyGoodText}>{meal.why_good}</Text>
 
-            {/* Where to get it */}
             <View style={styles.availableBox}>
               <Text style={styles.availableLabel}>📍 Where to get it</Text>
               <Text style={styles.availableText}>{meal.available_from}</Text>
             </View>
 
-            {/* Log Meal Button */}
-
-                         <View style={{ marginTop: 14, alignItems: 'flex-end' }}>
+            <View style={{ marginTop: 14, alignItems: 'flex-end' }}>
               <MboaButton
                 title="I Ate This"
                 onPress={() => {
@@ -268,7 +249,6 @@ const MealCard = ({
 
   return (
     <View style={styles.mealCard}>
-      {/* Tappable Image */}
       <TouchableOpacity onPress={() => onOpenModal(meal)} activeOpacity={0.9}>
         {foodImage && (
           <Image
@@ -316,7 +296,7 @@ const MealCard = ({
 
       {expanded && (
         <View style={styles.mealCardBody}>
-                    <View style={{ marginBottom: 14 }}>
+          <View style={{ marginBottom: 14 }}>
             <MboaButton
               title="View Full Details"
               onPress={() => onOpenModal(meal)}
@@ -371,12 +351,24 @@ const NurtureScreen = () => {
   const [todayCalories, setTodayCalories] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Modal state
+  // Scroll-to-top
+  const scrollRef = useRef<any>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  const handleScroll = (event: any) => {
+    const y = event.nativeEvent.contentOffset.y;
+    setShowScrollTop(y > 400);
+  };
+
+  const scrollToTop = () => {
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  };
+
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<MealOption | null>(null);
 
   const bodyType = getBodyTypeFromArchetype(archetype);
-    const todaySwap = getTodaySwap(
+  const todaySwap = getTodaySwap(
     archetype as 'runner' | 'warrior' | 'guardian' | null
   );
 
@@ -429,6 +421,9 @@ const NurtureScreen = () => {
   return (
     <FadeInView style={styles.container} key={refreshKey}>
       <ScrollView
+        ref={scrollRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         style={{ width: '100%' }}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -516,6 +511,17 @@ const NurtureScreen = () => {
         onClose={closeModal}
         onLogMeal={handleLogMeal}
       />
+
+      {/* ─── SCROLL TO TOP BUTTON ────────────────────────────────────── */}
+      {showScrollTop && (
+        <TouchableOpacity
+          style={styles.scrollTopButton}
+          onPress={scrollToTop}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.scrollTopArrow}>↑</Text>
+        </TouchableOpacity>
+      )}
     </FadeInView>
   );
 };
@@ -551,7 +557,8 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.zenGold,
   },
   tabLabel: { fontSize: 13, ...FONTS.bold, color: Colors.mboaGreen },
-  tabLabelActive: { color: Colors.cleanWhite },  chooseText: { fontSize: 12, ...FONTS.regular, color: Colors.textMuted, fontStyle: 'italic', marginTop: 12, marginBottom: 8 },
+  tabLabelActive: { color: Colors.cleanWhite },
+  chooseText: { fontSize: 12, ...FONTS.regular, color: Colors.textMuted, fontStyle: 'italic', marginTop: 12, marginBottom: 8 },
   scrollContent: { width: '100%', alignItems: 'center', paddingTop: 8 },
   section: { width: '100%', maxWidth: 480, paddingHorizontal: 20, paddingBottom: 20 },
   mealCard: { backgroundColor: Colors.cleanWhite, borderRadius: 18, marginBottom: 14, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 10, elevation: 2 },
@@ -657,7 +664,8 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
-    chopSwapCard: {
+  // ─── CHOP SWAP ─────────────────────────────────────────────────────────
+  chopSwapCard: {
     width: '100%',
     backgroundColor: '#FFF8E1',
     borderRadius: 14,
@@ -700,6 +708,32 @@ const styles = StyleSheet.create({
     ...FONTS.medium,
     color: '#FF9800',
     fontStyle: 'italic',
+  },
+
+  // ─── SCROLL TO TOP ─────────────────────────────────────────────────────
+  scrollTopButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 24,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.mboaGreen,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 3,
+    borderBottomColor: Colors.zenGold,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 999,
+  },
+  scrollTopArrow: {
+    fontSize: 24,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
   },
 });
 

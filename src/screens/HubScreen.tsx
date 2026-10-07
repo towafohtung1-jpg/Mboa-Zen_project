@@ -20,6 +20,21 @@ import { FadeInView } from '../components/common/FadeInView';
 import WaterDrop from '../components/common/WaterDrop';
 import { MboaButton } from '../components/common/MboaButton';
 
+
+
+
+  const scrollRef = useRef<any>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  const handleScroll = (event: any) => {
+    const y = event.nativeEvent.contentOffset.y;
+    setShowScrollTop(y > 400);
+  };
+
+  const scrollToTop = () => {
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  };
+
 // ─── ARCHETYPE DATA ──────────────────────────────────────────────────────
 
 const ARCHETYPE_DATA: Record<
@@ -643,6 +658,19 @@ const HubScreen = () => {
   // Ref to ensure the milestone check runs only once per mount
   const milestoneCheckedRef = useRef(false);
 
+    // Scroll-to-top
+  const scrollRef = useRef<any>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  const handleScroll = (event: any) => {
+    const y = event.nativeEvent.contentOffset.y;
+    setShowScrollTop(y > 400);
+  };
+
+  const scrollToTop = () => {
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  };
+
   // Date helpers
   const todayStr = new Date().toISOString().split('T')[0];
   const today = new Date();
@@ -802,6 +830,15 @@ const HubScreen = () => {
             ))}
           </View>
         </View>
+              {showScrollTop && (
+        <TouchableOpacity
+          style={styles.scrollTopButton}
+          onPress={scrollToTop}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.scrollTopArrow}>↑</Text>
+        </TouchableOpacity>
+      )}
       </FadeInView>
     );
   }
@@ -812,6 +849,9 @@ const HubScreen = () => {
   return (
     <FadeInView style={styles.container} key={refreshKey}>
       <ScrollView
+        ref={scrollRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         style={{ width: '100%' }}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -1253,9 +1293,21 @@ const HubScreen = () => {
           </View>
         </View>
       </Modal>
+
+      {/* ─── SCROLL TO TOP BUTTON ────────────────────────────────────── */}
+      {showScrollTop && (
+        <TouchableOpacity
+          style={styles.scrollTopButton}
+          onPress={scrollToTop}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.scrollTopArrow}>↑</Text>
+        </TouchableOpacity>
+      )}
     </FadeInView>
   );
 };
+    
 
 // ─── STYLES ───────────────────────────────────────────────────────────────
 
@@ -1714,6 +1766,31 @@ const styles = StyleSheet.create({
   milestoneButtonRow: {
     alignItems: 'center',
   },
+    scrollTopButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 24,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.mboaGreen,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 3,
+    borderBottomColor: Colors.zenGold,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 999,
+  },
+  scrollTopArrow: {
+    fontSize: 24,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+  },
 });
+
 
 export default HubScreen;

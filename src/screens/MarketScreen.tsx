@@ -1,6 +1,6 @@
 // ─── src/screens/MarketScreen.tsx ──────────────────────────────────────
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -92,6 +92,19 @@ const MarketScreen = () => {
   const [selectedPayment, setSelectedPayment] = useState<'momo' | 'orange' | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Scroll-to-top
+  const scrollRef = useRef<any>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  const handleScroll = (event: any) => {
+    const y = event.nativeEvent.contentOffset.y;
+    setShowScrollTop(y > 400);
+  };
+
+  const scrollToTop = () => {
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  };
+
   // ─── HANDLE PREMIUM UPGRADE ──────────────────────────────────────────
   const handleUpgrade = async () => {
     if (!selectedPayment) {
@@ -166,6 +179,9 @@ const MarketScreen = () => {
   return (
     <FadeInView style={styles.container}>
       <ScrollView
+        ref={scrollRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         style={{ width: '100%' }}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -462,6 +478,17 @@ const MarketScreen = () => {
 
         <View style={{ height: 30 }} />
       </ScrollView>
+
+      {/* ─── SCROLL TO TOP BUTTON ────────────────────────────────────── */}
+      {showScrollTop && (
+        <TouchableOpacity
+          style={styles.scrollTopButton}
+          onPress={scrollToTop}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.scrollTopArrow}>↑</Text>
+        </TouchableOpacity>
+      )}
     </FadeInView>
   );
 };
@@ -902,6 +929,32 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     resizeMode: 'contain',
+  },
+
+  // ─── SCROLL TO TOP ─────────────────────────────────────────────────────
+  scrollTopButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 24,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.mboaGreen,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 3,
+    borderBottomColor: Colors.zenGold,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 999,
+  },
+  scrollTopArrow: {
+    fontSize: 24,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
   },
 });
 

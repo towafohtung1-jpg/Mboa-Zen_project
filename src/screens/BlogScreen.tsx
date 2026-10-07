@@ -1,6 +1,6 @@
 // ─── src/screens/BlogScreen.tsx ─────────────────────────────────────────
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -150,6 +150,19 @@ const BlogScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
+  // Scroll-to-top
+  const scrollRef = useRef<any>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  const handleScroll = (event: any) => {
+    const y = event.nativeEvent.contentOffset.y;
+    setShowScrollTop(y > 400);
+  };
+
+  const scrollToTop = () => {
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  };
+
   const filteredPosts =
     selectedCategory === 'all'
       ? BLOG_POSTS
@@ -167,36 +180,39 @@ const BlogScreen = () => {
 
   return (
     <FadeInView style={styles.container}>
-      <View style={styles.headerArea}>
-        <Text style={styles.eyebrow}>LEARN</Text>
-        <Text style={styles.header}>Mboa-Zen Blog</Text>
-        <Text style={styles.subHeader}>
-          Practical health, food, and workout advice for real Cameroonian life.
-        </Text>
-
-                {/* Category Tabs */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoryRow}
-        >
-          {CATEGORIES.map((cat) => (
-            <MboaButton
-              key={cat.key}
-              title={cat.label}
-              onPress={() => setSelectedCategory(cat.key)}
-              variant={selectedCategory === cat.key ? 'primary' : 'outline'}
-              style={{ marginRight: 8 }}
-            />
-          ))}
-        </ScrollView>
-      </View>
-
       <ScrollView
+        ref={scrollRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         style={{ width: '100%' }}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        <View style={styles.headerArea}>
+          <Text style={styles.eyebrow}>LEARN</Text>
+          <Text style={styles.header}>Mboa-Zen Blog</Text>
+          <Text style={styles.subHeader}>
+            Practical health, food, and workout advice for real Cameroonian life.
+          </Text>
+
+          {/* Category Tabs */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoryRow}
+          >
+            {CATEGORIES.map((cat) => (
+              <MboaButton
+                key={cat.key}
+                title={cat.label}
+                onPress={() => setSelectedCategory(cat.key)}
+                variant={selectedCategory === cat.key ? 'primary' : 'outline'}
+                style={{ marginRight: 8 }}
+              />
+            ))}
+          </ScrollView>
+        </View>
+
         <View style={styles.section}>
           {filteredPosts.length === 0 ? (
             <View style={styles.emptyState}>
@@ -213,7 +229,7 @@ const BlogScreen = () => {
 
           <View style={styles.disclaimerBox}>
             <Text style={styles.disclaimerText}>
-              ⚠️ These articles are for general wellness education only. Consult a
+              These articles are for general wellness education only. Consult a
               qualified health professional for personal medical advice.
             </Text>
           </View>
@@ -227,6 +243,17 @@ const BlogScreen = () => {
         visible={modalVisible}
         onClose={closePost}
       />
+
+      {/* ─── SCROLL TO TOP BUTTON ────────────────────────────────────── */}
+      {showScrollTop && (
+        <TouchableOpacity
+          style={styles.scrollTopButton}
+          onPress={scrollToTop}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.scrollTopArrow}>↑</Text>
+        </TouchableOpacity>
+      )}
     </FadeInView>
   );
 };
@@ -264,7 +291,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   categoryRow: { paddingBottom: 8, gap: 8 },
- 
 
   scrollContent: { width: '100%', alignItems: 'center', paddingTop: 8 },
   section: {
@@ -433,7 +459,7 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
 
-      blogReadMoreBadge: {
+  blogReadMoreBadge: {
     backgroundColor: Colors.mboaGreen,
     paddingHorizontal: 14,
     paddingVertical: 6,
@@ -442,9 +468,35 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.zenGold,
     alignSelf: 'flex-end',
   },
-  
+
   blogReadMoreText: {
     fontSize: 12,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
+  },
+
+  // ─── SCROLL TO TOP ─────────────────────────────────────────────────────
+  scrollTopButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 24,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.mboaGreen,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 3,
+    borderBottomColor: Colors.zenGold,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 999,
+  },
+  scrollTopArrow: {
+    fontSize: 24,
     ...FONTS.bold,
     color: Colors.cleanWhite,
   },

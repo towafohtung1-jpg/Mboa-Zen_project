@@ -60,11 +60,26 @@ const DojoScreen = () => {
     stepGoal,
     getStepStreak,
     getStepPersonalBest,
-  } = useUserStore();  const [currentIndex, setCurrentIndex] = useState(0);
+  } = useUserStore();
+
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
   const [isWorkoutComplete, setIsWorkoutComplete] = useState(false);
   const [showNextPrompt, setShowNextPrompt] = useState(false);
+
+  // Scroll-to-top
+  const scrollRef = useRef<any>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  const handleScroll = (event: any) => {
+    const y = event.nativeEvent.contentOffset.y;
+    setShowScrollTop(y > 400);
+  };
+
+  const scrollToTop = () => {
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  };
 
   const isWeb = Platform.OS === 'web';
 
@@ -233,6 +248,9 @@ const DojoScreen = () => {
       </View>
 
       <ScrollView
+        ref={scrollRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         style={{ width: '100%' }}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -315,7 +333,7 @@ const DojoScreen = () => {
           </View>
         )}
 
-                {/* NAVIGATION CONTROLS */}
+        {/* NAVIGATION CONTROLS */}
         {!showNextPrompt && (
           <View style={styles.controlsContainer}>
             <View style={styles.controlButtonWrapper}>
@@ -392,6 +410,17 @@ const DojoScreen = () => {
           )}
         </View>
       </ScrollView>
+
+      {/* ─── SCROLL TO TOP BUTTON ────────────────────────────────────── */}
+      {showScrollTop && (
+        <TouchableOpacity
+          style={styles.scrollTopButton}
+          onPress={scrollToTop}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.scrollTopArrow}>↑</Text>
+        </TouchableOpacity>
+      )}
     </FadeInView>
   );
 };
@@ -707,7 +736,8 @@ const styles = StyleSheet.create({
     height: 40,
     backgroundColor: '#D9D9D9',
   },
-    // ─── STEPS CARD ─────────────────────────────────────────────────────
+
+  // ─── STEPS CARD ─────────────────────────────────────────────────────
   stepsCard: {
     width: '100%',
     maxWidth: 480,
@@ -798,6 +828,32 @@ const styles = StyleSheet.create({
     fontSize: 12,
     ...FONTS.medium,
     color: Colors.textMuted,
+  },
+
+  // ─── SCROLL TO TOP ─────────────────────────────────────────────────────
+  scrollTopButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 24,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.mboaGreen,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 3,
+    borderBottomColor: Colors.zenGold,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 999,
+  },
+  scrollTopArrow: {
+    fontSize: 24,
+    ...FONTS.bold,
+    color: Colors.cleanWhite,
   },
 });
 
