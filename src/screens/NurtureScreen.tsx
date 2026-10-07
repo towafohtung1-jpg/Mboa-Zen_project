@@ -428,61 +428,60 @@ const NurtureScreen = () => {
 
   return (
     <FadeInView style={styles.container} key={refreshKey}>
-      <View style={styles.headerArea}>
-        <Text style={styles.eyebrow}>YOUR MEALS</Text>
-        <Text style={styles.header}>
-          {bodyType ? profileLabels[bodyType].main : 'Nurture Your Body'}
-        </Text>
-        {bodyType && (
-          <Text style={styles.profileSub}>{profileLabels[bodyType].sub}</Text>
-        )}
-        {bodyType && (
-          <Text style={styles.subHeader}>{profileDescriptions[bodyType]}</Text>
-        )}
-                <View style={styles.calorieBanner}>
-          <Text style={styles.calorieBannerLabel}>Today's Calories</Text>
-          <Text style={styles.calorieBannerValue}>{todayCalories} kcal</Text>
-        </View>
-
-        {todaySwap && (
-          <View style={styles.chopSwapCard}>
-            <View style={styles.chopSwapHeader}>
-              <Image source={chopSwapIcon} style={styles.chopSwapIcon} />
-              <Text style={styles.chopSwapTitle}>Today's Chop Swap</Text>
-            </View>
-            <Text style={styles.chopSwapFrom}>
-              Instead of: {todaySwap.from}
-            </Text>
-            <Text style={styles.chopSwapTo}>Try: {todaySwap.to}</Text>
-            <Text style={styles.chopSwapReason}>{todaySwap.reason}</Text>
-          </View>
-        )}
-
-        <View style={styles.tabRow}>
-
-          {MEAL_TIMES.map((tab) => (
-            <TouchableOpacity
-              key={tab.key}
-              style={[styles.tab, selectedMealTime === tab.key && styles.tabActive]}
-              onPress={() => setSelectedMealTime(tab.key)}
-              activeOpacity={0.8}
-            >
-              <Text style={[styles.tabLabel, selectedMealTime === tab.key && styles.tabLabelActive]}>
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <Text style={styles.chooseText}>
-          Tap any meal to see full details and log it.
-        </Text>
-      </View>
-
       <ScrollView
         style={{ width: '100%' }}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        <View style={styles.headerArea}>
+          <Text style={styles.eyebrow}>YOUR MEALS</Text>
+          <Text style={styles.header}>
+            {bodyType ? profileLabels[bodyType].main : 'Nurture Your Body'}
+          </Text>
+          {bodyType && (
+            <Text style={styles.profileSub}>{profileLabels[bodyType].sub}</Text>
+          )}
+          {bodyType && (
+            <Text style={styles.subHeader}>{profileDescriptions[bodyType]}</Text>
+          )}
+          <View style={styles.calorieBanner}>
+            <Text style={styles.calorieBannerLabel}>Today's Calories</Text>
+            <Text style={styles.calorieBannerValue}>{todayCalories} kcal</Text>
+          </View>
+
+          {todaySwap && (
+            <View style={styles.chopSwapCard}>
+              <View style={styles.chopSwapHeader}>
+                <Image source={chopSwapIcon} style={styles.chopSwapIcon} />
+                <Text style={styles.chopSwapTitle}>Today's Chop Swap</Text>
+              </View>
+              <Text style={styles.chopSwapFrom}>
+                Instead of: {todaySwap.from}
+              </Text>
+              <Text style={styles.chopSwapTo}>Try: {todaySwap.to}</Text>
+              <Text style={styles.chopSwapReason}>{todaySwap.reason}</Text>
+            </View>
+          )}
+
+          <View style={styles.tabRow}>
+            {MEAL_TIMES.map((tab) => (
+              <TouchableOpacity
+                key={tab.key}
+                style={[styles.tab, selectedMealTime === tab.key && styles.tabActive]}
+                onPress={() => setSelectedMealTime(tab.key)}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.tabLabel, selectedMealTime === tab.key && styles.tabLabelActive]}>
+                  {tab.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Text style={styles.chooseText}>
+            Tap any meal to see full details and log it.
+          </Text>
+        </View>
+
         <View style={styles.section}>
           {mealOptions.length === 0 ? (
             <View style={styles.emptyState}>
@@ -503,7 +502,7 @@ const NurtureScreen = () => {
           )}
           <View style={styles.disclaimerBox}>
             <Text style={styles.disclaimerText}>
-              ⚠️ These meal suggestions are general wellness guidance only. Nutritional values are approximate. Consult a qualified nutritionist for personalized dietary advice.
+              These meal suggestions are general wellness guidance only. Nutritional values are approximate. Consult a qualified nutritionist for personalized dietary advice.
             </Text>
           </View>
           <View style={{ height: 20 }} />
