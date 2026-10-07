@@ -81,12 +81,20 @@ interface UserState {
   markMilestoneCelebrated: (key: string) => void;
 
   // ─── Njangi ──────────────────────────────────────────────────────────
-  njangiHistory: Record<string, string[]>;  // date → ['water', 'food', 'move']
+  njangiHistory: Record<string, string[]>;
   njangiSavings: number;
   addNjangiItem: (item: 'water' | 'food' | 'move') => void;
   saveNjangiMoney: (amount: number) => void;
   getNjangiStreak: () => number;
   getTodayNjangi: () => string[];
+
+  // ─── Steps ───────────────────────────────────────────────────────────
+  todaySteps: number;
+  stepsHistory: Record<string, number>;
+  stepGoal: number;
+  setTodaySteps: (steps: number) => void;
+  getStepStreak: () => number;
+  getStepPersonalBest: () => number;
 }
 
 export const useUserStore = create<UserState>()(
@@ -330,7 +338,7 @@ export const useUserStore = create<UserState>()(
         return njangiHistory[today] ?? [];
       },
 
-      getNjangiStreak: () => {
+            getNjangiStreak: () => {
         const { njangiHistory } = get();
         let count = 0;
         for (let i = 0; i < 365; i++) {
@@ -344,6 +352,46 @@ export const useUserStore = create<UserState>()(
           }
         }
         return count;
+      },
+
+      // ─── STEPS ─────────────────────────────────────────────────────────
+      todaySteps: 0,
+      stepsHistory: {},
+      stepGoal: 10000,
+
+      setTodaySteps: (steps) => {
+        const { stepsHistory } = get();
+        const today = getTodayStr();
+        const capped = Math.max(0, Math.floor(steps));
+        set({
+          todaySteps: capped,
+          stepsHistory: {
+            ...stepsHistory,
+            [today]: capped,
+          },
+        });
+      },
+
+      getStepStreak: () => {
+        const { stepsHistory, stepGoal } = get();
+        let count = 0;
+        for (let i = 0; i < 365; i++) {
+          const dateStr = getDateStrOffset(i);
+          const steps = stepsHistory[dateStr] ?? 0;
+          if (steps >= stepGoal) {
+            count++;
+          } else {
+            if (i === 0) continue;
+            break;
+          }
+        }
+        return count;
+      },
+
+      getStepPersonalBest: () => {
+        const { stepsHistory } = get();
+        const values = Object.values(stepsHistory);
+        return values.length > 0 ? Math.max(...values) : 0;
       },
     }),
 
@@ -364,6 +412,9 @@ export const useUserStore = create<UserState>()(
         celebratedMilestones: state.celebratedMilestones,
         njangiHistory: state.njangiHistory,
         njangiSavings: state.njangiSavings,
+        todaySteps: state.todaySteps,
+        stepsHistory: state.stepsHistory,
+        stepGoal: state.stepGoal,
       }),
     }
   )

@@ -53,8 +53,14 @@ const WebVideo = ({ videoUrl, isPlaying }: { videoUrl: string; isPlaying: boolea
 
 // ─── MAIN COMPONENT ─────────────────────────────────────────────────────
 const DojoScreen = () => {
-  const { archetype } = useUserStore();
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const {
+    archetype,
+    todaySteps,
+    stepsHistory,
+    stepGoal,
+    getStepStreak,
+    getStepPersonalBest,
+  } = useUserStore();  const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
   const [isWorkoutComplete, setIsWorkoutComplete] = useState(false);
@@ -309,7 +315,7 @@ const DojoScreen = () => {
           </View>
         )}
 
-        {/* NAVIGATION CONTROLS */}
+                {/* NAVIGATION CONTROLS */}
         {!showNextPrompt && (
           <View style={styles.controlsContainer}>
             <View style={styles.controlButtonWrapper}>
@@ -338,6 +344,53 @@ const DojoScreen = () => {
             </View>
           </View>
         )}
+
+        {/* ─── STEPS CARD ─────────────────────────────────────────── */}
+        <View style={styles.stepsCard}>
+          <Text style={styles.stepsEyebrow}>TODAY'S STEPS</Text>
+
+          {isWeb ? (
+            <View>
+              <Text style={styles.stepsPlaceholderTitle}>
+                Step tracking works on mobile.
+              </Text>
+              <Text style={styles.stepsPlaceholderText}>
+                Install Mboa-Zen on your phone to track your daily steps.
+              </Text>
+              <Text style={styles.stepsPlaceholderNote}>
+                Coming soon: Step streaks and town leaderboards.
+              </Text>
+            </View>
+          ) : (
+            <View>
+              <View style={styles.stepsValueRow}>
+                <Text style={styles.stepsValue}>{todaySteps.toLocaleString()}</Text>
+                <Text style={styles.stepsValueLabel}>steps</Text>
+              </View>
+
+              <View style={styles.stepsProgressBg}>
+                <View
+                  style={[
+                    styles.stepsProgressFill,
+                    { width: `${Math.min((todaySteps / stepGoal) * 100, 100)}%` },
+                  ]}
+                />
+              </View>
+              <Text style={styles.stepsProgressText}>
+                Goal: {stepGoal.toLocaleString()} steps
+              </Text>
+
+              <View style={styles.stepsStreakRow}>
+                <Text style={styles.stepsStreak}>
+                  {getStepStreak()} day{getStepStreak() !== 1 ? 's' : ''} streak
+                </Text>
+                <Text style={styles.stepsBest}>
+                  Best: {getStepPersonalBest().toLocaleString()}
+                </Text>
+              </View>
+            </View>
+          )}
+        </View>
       </ScrollView>
     </FadeInView>
   );
@@ -653,6 +706,98 @@ const styles = StyleSheet.create({
     width: 1,
     height: 40,
     backgroundColor: '#D9D9D9',
+  },
+    // ─── STEPS CARD ─────────────────────────────────────────────────────
+  stepsCard: {
+    width: '100%',
+    maxWidth: 480,
+    backgroundColor: '#F1FAF3',
+    borderRadius: 14,
+    padding: 18,
+    marginTop: 8,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: Colors.mboaGreen,
+  },
+  stepsEyebrow: {
+    fontSize: 10,
+    ...FONTS.bold,
+    color: Colors.zenGold,
+    letterSpacing: 2,
+    marginBottom: 10,
+  },
+  stepsPlaceholderTitle: {
+    fontSize: 15,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    marginBottom: 6,
+  },
+  stepsPlaceholderText: {
+    fontSize: 13,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    lineHeight: 19,
+    marginBottom: 10,
+  },
+  stepsPlaceholderNote: {
+    fontSize: 12,
+    ...FONTS.medium,
+    color: Colors.mboaGreen,
+    fontStyle: 'italic',
+    lineHeight: 18,
+  },
+  stepsValueRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 6,
+    marginBottom: 14,
+  },
+  stepsValue: {
+    fontSize: 36,
+    ...FONTS.bold,
+    color: Colors.mboaGreen,
+    lineHeight: 40,
+  },
+  stepsValueLabel: {
+    fontSize: 14,
+    ...FONTS.medium,
+    color: Colors.textMuted,
+  },
+  stepsProgressBg: {
+    height: 8,
+    backgroundColor: '#D9E9DD',
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  stepsProgressFill: {
+    height: 8,
+    backgroundColor: Colors.mboaGreen,
+    borderRadius: 4,
+  },
+  stepsProgressText: {
+    fontSize: 12,
+    ...FONTS.medium,
+    color: Colors.textMuted,
+    marginBottom: 14,
+  },
+  stepsStreakRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#D9D9D9',
+  },
+  stepsStreak: {
+    fontSize: 13,
+    ...FONTS.bold,
+    color: Colors.mboaGreen,
+  },
+  stepsBest: {
+    fontSize: 12,
+    ...FONTS.medium,
+    color: Colors.textMuted,
   },
 });
 
