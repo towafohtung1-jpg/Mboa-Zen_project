@@ -23,18 +23,7 @@ import { MboaButton } from '../components/common/MboaButton';
 
 
 
-  const scrollRef = useRef<any>(null);
-  const [showScrollTop, setShowScrollTop] = useState(false);
-
-  const handleScroll = (event: any) => {
-    const y = event.nativeEvent.contentOffset.y;
-    setShowScrollTop(y > 400);
-  };
-
-  const scrollToTop = () => {
-    scrollRef.current?.scrollTo({ y: 0, animated: true });
-  };
-
+  
 // ─── ARCHETYPE DATA ──────────────────────────────────────────────────────
 
 const ARCHETYPE_DATA: Record<
