@@ -646,8 +646,8 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   njangiIcon: {
-    width: 28,
-    height: 28,
+    width: 56,
+    height: 56,
     resizeMode: 'contain',
   },
   njangiTitle: {
