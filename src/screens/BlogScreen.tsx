@@ -15,6 +15,7 @@ import { FONTS } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
 import { BLOG_POSTS, BlogPost, BlogCategory } from '../data/blogPosts';
 import { MboaButton } from '../components/common/MboaButton';
+import { useSwipeTabs } from '../hooks/useSwipeTabs';
 
 const CATEGORIES: { key: BlogCategory | 'all'; label: string }[] = [
   { key: 'all', label: 'All' },
@@ -150,6 +151,8 @@ const BlogScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
+  const panHandlers = useSwipeTabs();
+
   // Scroll-to-top
   const scrollRef = useRef<any>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -179,7 +182,7 @@ const BlogScreen = () => {
   };
 
   return (
-    <FadeInView style={styles.container}>
+    <FadeInView style={styles.container} {...panHandlers}>
       <ScrollView
         ref={scrollRef}
         onScroll={handleScroll}
@@ -503,3 +506,4 @@ const styles = StyleSheet.create({
 });
 
 export default BlogScreen;
+

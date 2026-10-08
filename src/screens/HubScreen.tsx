@@ -19,6 +19,7 @@ import proverbs from '../data/proverbs.json';
 import { FadeInView } from '../components/common/FadeInView';
 import WaterDrop from '../components/common/WaterDrop';
 import { MboaButton } from '../components/common/MboaButton';
+import { useSwipeTabs } from '../hooks/useSwipeTabs';
 
 
 
@@ -647,6 +648,8 @@ const HubScreen = () => {
   // Ref to ensure the milestone check runs only once per mount
   const milestoneCheckedRef = useRef(false);
 
+  const panHandlers = useSwipeTabs();
+
     // Scroll-to-top
   const scrollRef = useRef<any>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -836,7 +839,7 @@ const HubScreen = () => {
   const archetypeData = ARCHETYPE_DATA[archetype];
 
   return (
-    <FadeInView style={styles.container} key={refreshKey}>
+    <FadeInView style={styles.container} key={refreshKey} {...panHandlers}>
       <ScrollView
         ref={scrollRef}
         onScroll={handleScroll}

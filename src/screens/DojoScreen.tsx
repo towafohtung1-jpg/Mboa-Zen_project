@@ -16,6 +16,7 @@ import { useUserStore } from '../store/useUserStore';
 import { FadeInView } from '../components/common/FadeInView';
 import { MboaButton } from '../components/common/MboaButton';
 import { getExercisesForArchetype } from '../data/workoutOptions';
+import { useSwipeTabs } from '../hooks/useSwipeTabs';
 
 // ─── DAY NAMES ──────────────────────────────────────────────────────────
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -67,6 +68,8 @@ const DojoScreen = () => {
   const [timeLeft, setTimeLeft] = useState(30);
   const [isWorkoutComplete, setIsWorkoutComplete] = useState(false);
   const [showNextPrompt, setShowNextPrompt] = useState(false);
+
+  const panHandlers = useSwipeTabs();
 
   // Scroll-to-top
   const scrollRef = useRef<any>(null);
@@ -159,7 +162,7 @@ const DojoScreen = () => {
   // ─── EMPTY STATES ─────────────────────────────────────────────────────
   if (!archetype) {
     return (
-      <FadeInView style={styles.container}>
+      <FadeInView style={styles.container} {...panHandlers}>
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>Select Your Archetype</Text>
           <Text style={styles.emptySubtitle}>
@@ -172,7 +175,7 @@ const DojoScreen = () => {
 
   if (exercises.length === 0) {
     return (
-      <FadeInView style={styles.container}>
+      <FadeInView style={styles.container} {...panHandlers}>
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>No Exercises Found</Text>
           <Text style={styles.emptySubtitle}>
@@ -186,7 +189,7 @@ const DojoScreen = () => {
   // ─── WORKOUT COMPLETE ─────────────────────────────────────────────────
   if (isWorkoutComplete) {
     return (
-      <FadeInView style={styles.container}>
+      <FadeInView style={styles.container} {...panHandlers}>
         <View style={styles.completeContainer}>
           <Text style={styles.completeLabel}>WORKOUT COMPLETE</Text>
           <Text style={styles.completeTitle}>Good Job</Text>
@@ -227,7 +230,7 @@ const DojoScreen = () => {
   const videoUrl = currentExercise?.video || '';
 
   return (
-    <FadeInView style={styles.container}>
+    <FadeInView style={styles.container} {...panHandlers}>
       {/* HEADER */}
       <View style={styles.headerArea}>
         <Text style={styles.eyebrow}>THE DOJO</Text>
@@ -858,3 +861,4 @@ const styles = StyleSheet.create({
 });
 
 export default DojoScreen;
+

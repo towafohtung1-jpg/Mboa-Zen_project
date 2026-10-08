@@ -12,6 +12,7 @@ import { offlineAgent } from '../database/offlineAgent';
 import { MboaButton } from '../components/common/MboaButton';
 import { getTodaySwap } from '../data/chopSwaps';
 import chopSwapIcon from '../../assets/Graphics/UI_vectors_icon_set/chop_swap.png';
+import { useSwipeTabs } from '../hooks/useSwipeTabs';
 
 // ─── FOOD IMAGES ────────────────────────────────────────────────────────
 
@@ -366,6 +367,7 @@ const NurtureScreen = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<MealOption | null>(null);
+  const panHandlers = useSwipeTabs();
 
   const bodyType = getBodyTypeFromArchetype(archetype);
   const todaySwap = getTodaySwap(
@@ -419,7 +421,7 @@ const NurtureScreen = () => {
   };
 
   return (
-    <FadeInView style={styles.container} key={refreshKey}>
+    <FadeInView style={styles.container} key={refreshKey} {...panHandlers}>
       <ScrollView
         ref={scrollRef}
         onScroll={handleScroll}

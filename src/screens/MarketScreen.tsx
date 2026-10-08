@@ -17,6 +17,7 @@ import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
 import { FadeInView } from '../components/common/FadeInView';
 import { MboaButton } from '../components/common/MboaButton';
+import { useSwipeTabs } from '../hooks/useSwipeTabs';
 
 // ─── ICONS ──────────────────────────────────────────────────────────────
 
@@ -91,6 +92,8 @@ const MarketScreen = () => {
   ];
   const [selectedPayment, setSelectedPayment] = useState<'momo' | 'orange' | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const panHandlers = useSwipeTabs();
 
   // Scroll-to-top
   const scrollRef = useRef<any>(null);
@@ -177,7 +180,7 @@ const MarketScreen = () => {
   };
 
   return (
-    <FadeInView style={styles.container}>
+    <FadeInView style={styles.container} {...panHandlers}>
       <ScrollView
         ref={scrollRef}
         onScroll={handleScroll}
@@ -959,3 +962,4 @@ const styles = StyleSheet.create({
 });
 
 export default MarketScreen;
+
