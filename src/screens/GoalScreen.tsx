@@ -13,6 +13,7 @@ import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
 import { MboaButton } from '../components/common/MboaButton';
+import { useTranslation } from '../i18n/useTranslation';
 
 // ─── ICON IMAGES ────────────────────────────────────────────────────────
 
@@ -26,11 +27,12 @@ type Props = {
 };
 
 const GoalScreen = ({ onFinish }: Props) => {
+  const { t } = useTranslation();
   const goals = [
-    { id: 'lose_weight', icon: 'fire_icon', label: 'Lose Weight', desc: 'Burn fat and slim down healthily' },
-    { id: 'build_strength', icon: 'strong_icon', label: 'Build Strength', desc: 'Gain muscle and get stronger' },
-    { id: 'stay_active', icon: 'walk_icon', label: 'Stay Active', desc: 'Maintain good health and energy' },
-    { id: 'eat_better', icon: 'food_icon', label: 'Eat Better', desc: 'Make smarter everyday food choices' },
+    { id: 'lose_weight', icon: 'fire_icon', label: t('goal.loseWeight'), desc: t('goal.loseWeightDesc') },
+    { id: 'build_strength', icon: 'strong_icon', label: t('goal.buildStrength'), desc: t('goal.buildStrengthDesc') },
+    { id: 'stay_active', icon: 'walk_icon', label: t('goal.stayActive'), desc: t('goal.stayActiveDesc') },
+    { id: 'eat_better', icon: 'food_icon', label: t('goal.eatBetter'), desc: t('goal.eatBetterDesc') },
   ];
 
   const [selectedGoal, setSelectedGoal] = React.useState<string | null>(null);
@@ -42,8 +44,8 @@ const GoalScreen = ({ onFinish }: Props) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headerArea}>
-          <Text style={styles.eyebrow}>YOUR JOURNEY</Text>
-          <Text style={styles.title}>What is your main health goal?</Text>
+          <Text style={styles.eyebrow}>{t('goal.eyebrow')}</Text>
+          <Text style={styles.title}>{t('goal.title')}</Text>
           <Text style={styles.subtitle}>
             Choose one main focus. You can always adjust later.
           </Text>
@@ -80,13 +82,13 @@ const GoalScreen = ({ onFinish }: Props) => {
 
                 <View style={styles.buttonRow}>
           <MboaButton
-            title="Continue"
+            title={t('goal.continue')}
             onPress={onFinish}
             disabled={!selectedGoal}
           />
 
           <MboaButton
-            title="Skip"
+            title={t('goal.skip')}
             onPress={onFinish}
             variant="outline"
           />
@@ -192,3 +194,7 @@ const styles = StyleSheet.create({
 });
 
 export default GoalScreen;
+
+
+
+

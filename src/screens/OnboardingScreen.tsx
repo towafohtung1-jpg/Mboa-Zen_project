@@ -1,4 +1,4 @@
-// ─── src/screens/OnboardingScreen.tsx ────────────────────────────────
+﻿// ─── src/screens/OnboardingScreen.tsx ──────────────────────────────────
 
 import React, { useState } from 'react';
 import {
@@ -13,61 +13,51 @@ import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
 import { MboaButton } from '../components/common/MboaButton';
-
-// ─── REMOVED: 
-// ─── REMOVED: import LanguageSwitcher from '../components/common/LanguageSwitcher';
+import { LanguageSwitcher } from '../components/common/LanguageSwitcher';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface OnboardingScreenProps {
   onFinish: () => void;
 }
 
 const OnboardingScreen = ({ onFinish }: OnboardingScreenProps) => {
-  // ─── REMOVED: 
-  // ─── REMOVED: const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const { t, language } = useTranslation();
 
   return (
     <FadeInView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.earthBlack} />
-      
-      {/* ─── REMOVED: Language Button ────────────────────────────────── */}
-      {/* 
+
       <TouchableOpacity
         style={styles.languageButton}
         onPress={() => setShowLanguageModal(true)}
         activeOpacity={0.8}
       >
         <Text style={styles.languageButtonText}>
-          🌍 {language.toUpperCase()}
+          {language.toUpperCase()}
         </Text>
       </TouchableOpacity>
-      */}
 
       <View style={styles.content}>
-        {/* Logo */}
         <Image
           source={require('../../assets/Logo/mboa_zen_logo_3D.jpeg')}
           style={styles.logo}
           resizeMode="contain"
         />
 
-        <Text style={styles.title}>Local Food. Real Strength.</Text>
-        <Text style={styles.subtitle}>
-          Nutrition plans built around the foods you already know and trust.
-        </Text>
+        <Text style={styles.title}>{t('onboarding.title')}</Text>
+        <Text style={styles.subtitle}>{t('onboarding.subtitle')}</Text>
 
         <MboaButton
-          title="Start Journey"
+          title={t('onboarding.startButton')}
           onPress={onFinish}
         />
       </View>
 
-      {/* ─── REMOVED: Language Modal ────────────────────────────────── */}
-      {/* 
-      <LanguageSwitcher 
-        visible={showLanguageModal} 
-        onClose={() => setShowLanguageModal(false)} 
+      <LanguageSwitcher
+        visible={showLanguageModal}
+        onClose={() => setShowLanguageModal(false)}
       />
-      */}
     </FadeInView>
   );
 };
@@ -124,8 +114,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginBottom: 40,
   },
-  
 });
 
 export default OnboardingScreen;
-
