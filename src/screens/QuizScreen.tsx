@@ -1,4 +1,4 @@
-// ─── src/screens/QuizScreen.tsx ─────────────────────────────────────────
+﻿// â”€â”€â”€ src/screens/QuizScreen.tsx â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import React, { useState } from 'react';
 import {
@@ -13,13 +13,14 @@ import {
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
+import { useTranslation } from '../i18n/useTranslation';
 import { quizQuestions, calculateQuizResult, ArchetypeType } from '../data/quizLogic';
 
 type Props = {
   onFinish: () => void;
 };
 
-// ─── TREE IMAGES ────────────────────────────────────────────────────────
+// â”€â”€â”€ TREE IMAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import plantainTree from '../../assets/Media/Trees/plantain_tree.jpg';
 import irokoTree from '../../assets/Media/Trees/iroko_tree.jpg';
@@ -31,7 +32,7 @@ const TREE_IMAGES = {
   guardian: mangoTree,
 };
 
-// ─── ICON IMAGES ────────────────────────────────────────────────────────
+// â”€â”€â”€ ICON IMAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import runnerIcon from '../../assets/Media/Icons/runner_icon.png';
 import warriorIcon from '../../assets/Media/Icons/warrior_icon.png';
@@ -48,7 +49,7 @@ import balanceIcon from '../../assets/Media/Icons/balance_icon.png';
 
 
 
-// ─── OPTION CARD ────────────────────────────────────────────────────────
+// â”€â”€â”€ OPTION CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const OptionCard = ({
   label,
@@ -102,7 +103,7 @@ const OptionCard = ({
 
   const imageSource = icon ? getIconSource(icon) : null;
   const isImageIcon = imageSource !== null;
-  console.log('🔍 Q3 icon:', icon, 'imageSource:', imageSource ? 'FOUND' : 'NULL');
+  console.log('ðŸ” Q3 icon:', icon, 'imageSource:', imageSource ? 'FOUND' : 'NULL');
 
   return (
     <Animated.View style={{ transform: [{ scale }] }}>
@@ -129,7 +130,7 @@ const OptionCard = ({
   );
 };
 
-// ─── TREE OPTION CARD (with images) ────────────────────────────────────
+// â”€â”€â”€ TREE OPTION CARD (with images) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const TreeOptionCard = ({
   label,
@@ -184,9 +185,10 @@ const TreeOptionCard = ({
   );
 };
 
-// ─── QUIZ SCREEN ────────────────────────────────────────────────────────
+// â”€â”€â”€ QUIZ SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const QuizScreen = ({ onFinish }: Props) => {
+  const { t } = useTranslation();
   const [answers, setAnswers] = useState<ArchetypeType[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -239,7 +241,7 @@ const QuizScreen = ({ onFinish }: Props) => {
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.headerRow}>
-            <Text style={styles.accentLabel}>DISCOVER YOUR ARCHETYPE</Text>
+            <Text style={styles.accentLabel}>{t('quiz.eyebrow')}</Text>
             <Text style={styles.stepCounter}>
               {currentQuestion + 1} / {totalQuestions}
             </Text>
@@ -250,8 +252,8 @@ const QuizScreen = ({ onFinish }: Props) => {
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false}>
-          <Text style={styles.questionNumber}>Question {currentQuestion + 1}</Text>
-          <Text style={styles.question}>{currentQ.question}</Text>
+          <Text style={styles.questionNumber}>{t('quiz.questionLabel')} {currentQuestion + 1}</Text>
+          <Text style={styles.question}>{t(currentQ.questionKey)}</Text>
 
           <View style={styles.optionsContainer}>
             {currentQ.options.map((option: any, index: number) => {
@@ -259,7 +261,7 @@ const QuizScreen = ({ onFinish }: Props) => {
                 return (
                   <TreeOptionCard
                     key={option.id}
-                    label={option.label}
+                    label={t(option.labelKey)}
                     archetype={option.archetype}
                     onPress={() => handleOptionPress(index)}
                     isSelected={selectedOption === index}
@@ -269,7 +271,7 @@ const QuizScreen = ({ onFinish }: Props) => {
               return (
                 <OptionCard
                   key={option.id}
-                  label={option.label}
+                  label={t(option.labelKey)}
                   icon={option.icon}
                   onPress={() => handleOptionPress(index)}
                   isSelected={selectedOption === index}
@@ -280,15 +282,13 @@ const QuizScreen = ({ onFinish }: Props) => {
 
           {currentQuestion === 0 && (
             <View style={styles.imageHintContainer}>
-              <Text style={styles.imageHintText}>🌴 Plantain • 🌳 Iroko • 🥭 Mango</Text>
-            </View>
+          <Text style={styles.imageHintText}>{t('quiz.imageHint')}</Text>
+      </View>
           )}
 
           {currentQuestion === 3 && (
             <View style={styles.safetyNote}>
-              <Text style={styles.safetyNoteText}>
-                ⚠ If you have any health conditions, we'll recommend the safest path for you.
-              </Text>
+              <Text style={styles.safetyNoteText}>{t('quiz.safetyNote')}</Text>
             </View>
           )}
 
@@ -299,7 +299,7 @@ const QuizScreen = ({ onFinish }: Props) => {
   );
 };
 
-// ─── STYLES ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const styles = StyleSheet.create({
   container: {

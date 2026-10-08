@@ -1,10 +1,10 @@
-// src/data/quizLogic.ts
+﻿// src/data/quizLogic.ts
 
 export type ArchetypeType = 'runner' | 'warrior' | 'guardian' | null;
 
 type QuizOption = {
   id: string;
-  label: string;
+  labelKey: string;
   archetype: ArchetypeType;
   icon?: string;
   forceGuardian?: boolean;
@@ -12,52 +12,54 @@ type QuizOption = {
 
 type QuizQuestion = {
   id: string;
-  question: string;
+  questionKey: string;
   options: QuizOption[];
 };
 
 export const quizQuestions: QuizQuestion[] = [
   {
     id: 'q1',
-    question: 'Which body type looks like you?',
+    questionKey: 'quiz.q1.question',
     options: [
-      { id: 'a', label: 'Slim, long, light - like plantain tree', archetype: 'runner', icon: '🌴' },
-      { id: 'b', label: 'Solid, broad, strong - like iroko tree', archetype: 'warrior', icon: '🌳' },
-      { id: 'c', label: 'Steady, soft, balanced - like mango tree', archetype: 'guardian', icon: '🥭' },
+      { id: 'a', labelKey: 'quiz.q1.a', archetype: 'runner' },
+      { id: 'b', labelKey: 'quiz.q1.b', archetype: 'warrior' },
+      { id: 'c', labelKey: 'quiz.q1.c', archetype: 'guardian' },
     ],
   },
   {
     id: 'q2',
-    question: 'What do you do every day?',
+    questionKey: 'quiz.q2.question',
     options: [
-      { id: 'a', label: 'I walk a lot - school, market, farm', archetype: 'runner', icon: 'walk_icon' },
-      { id: 'b', label: 'I carry heavy things, push, build', archetype: 'warrior', icon: 'carry_icon' },
-      { id: 'c', label: 'I sit at shop, office, or home', archetype: 'guardian', icon: 'sit_icon' },
+      { id: 'a', labelKey: 'quiz.q2.a', archetype: 'runner', icon: 'walk_icon' },
+      { id: 'b', labelKey: 'quiz.q2.b', archetype: 'warrior', icon: 'carry_icon' },
+      { id: 'c', labelKey: 'quiz.q2.c', archetype: 'guardian', icon: 'sit_icon' },
     ],
   },
   {
     id: 'q3',
-    question: 'After eating fufu, how do you feel?',
+    questionKey: 'quiz.q3.question',
     options: [
-      { id: 'a', label: 'Hungry again quickly (fast burn)', archetype: 'runner', icon: 'hungry_icon' },
-      { id: 'b', label: 'Strong for long work', archetype: 'warrior', icon: 'strong_icon' },
-      { id: 'c', label: 'Tired if I eat too much', archetype: 'guardian', icon: 'tired_icon' },    ],
+      { id: 'a', labelKey: 'quiz.q3.a', archetype: 'runner', icon: 'hungry_icon' },
+      { id: 'b', labelKey: 'quiz.q3.b', archetype: 'warrior', icon: 'strong_icon' },
+      { id: 'c', labelKey: 'quiz.q3.c', archetype: 'guardian', icon: 'tired_icon' },
+    ],
   },
   {
     id: 'q4',
-    question: 'Do you have any pain or special condition?',
+    questionKey: 'quiz.q4.question',
     options: [
-      { id: 'a', label: 'No, I can do anything', archetype: 'runner' },
-      { id: 'b', label: 'Yes: knee/back pain, big belly, gave birth, 50+, doctor says no jump', archetype: 'guardian', forceGuardian: true },
+      { id: 'a', labelKey: 'quiz.q4.a', archetype: 'runner' },
+      { id: 'b', labelKey: 'quiz.q4.b', archetype: 'guardian', forceGuardian: true },
     ],
   },
   {
     id: 'q5',
-    question: 'What is your goal?',
+    questionKey: 'quiz.q5.question',
     options: [
-      { id: 'a', label: 'I want power for walking, no tiredness', archetype: 'runner', icon: 'power_icon' },
-      { id: 'b', label: 'I want muscle, strong hands', archetype: 'warrior', icon: 'muscle_icon' },
-      { id: 'c', label: 'I want balance, to feel fine', archetype: 'guardian', icon: 'balance_icon' },    ],
+      { id: 'a', labelKey: 'quiz.q5.a', archetype: 'runner', icon: 'power_icon' },
+      { id: 'b', labelKey: 'quiz.q5.b', archetype: 'warrior', icon: 'muscle_icon' },
+      { id: 'c', labelKey: 'quiz.q5.c', archetype: 'guardian', icon: 'balance_icon' },
+    ],
   },
 ];
 
