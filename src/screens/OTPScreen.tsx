@@ -65,6 +65,9 @@ const OTPScreen = ({ phone, onFinish, onBack }: Props) => {
         <Text style={styles.title}>Enter the code</Text>
         <Text style={styles.subtitle}>We sent a 6-digit code to</Text>
         <Text style={styles.phone}>{phone}</Text>
+        <Text style={styles.note}>
+          Note: SMS verification is coming soon. For now, you can type any 6 digits to continue.
+        </Text>
 
         <View style={styles.codeRow}>
           {code.map((digit, index) => (
@@ -194,4 +197,5 @@ const styles = StyleSheet.create({
 });
 
 export default OTPScreen;
+
 

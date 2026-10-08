@@ -97,7 +97,7 @@ const PhoneScreen = ({ onFinish, onSkip }: Props) => {
           />
 
           <MboaButton
-            title="Skip"
+            title="Continue as Guest"
             onPress={handleSkip}
             variant="outline"
           />
@@ -203,4 +203,6 @@ const styles = StyleSheet.create({
 });
 
 export default PhoneScreen;
+
+
 
