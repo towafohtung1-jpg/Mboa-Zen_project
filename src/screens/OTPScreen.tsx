@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { Colors } from '../constants/colors';
 import { FONTS, SIZES } from '../constants/typography';
 import { FadeInView } from '../components/common/FadeInView';
 import { MboaButton } from '../components/common/MboaButton';
+import { useTranslation } from '../i18n/useTranslation';
 
 type Props = {
   phone: string;
@@ -14,6 +15,7 @@ type Props = {
 const OTP_LENGTH = 6;
 
 const OTPScreen = ({ phone, onFinish, onBack }: Props) => {
+  const { t } = useTranslation();
   const [code, setCode] = useState<string[]>(Array(OTP_LENGTH).fill(''));
   const inputs = useRef<TextInput[]>([]);
 
@@ -51,9 +53,9 @@ const OTPScreen = ({ phone, onFinish, onBack }: Props) => {
       onFinish();
     }
   };
-
+   
   const handleResend = () => {
-    Alert.alert('Code Resent', `A new code has been sent to ${phone}`);
+    Alert.alert(t('otp.resentTitle'), `${t('otp.resentBody')} ${phone}`);
   };
 
   return (
@@ -61,13 +63,11 @@ const OTPScreen = ({ phone, onFinish, onBack }: Props) => {
       <View style={styles.topAccentBar} />
 
       <View style={styles.content}>
-        <Text style={styles.accentLabel}>VERIFICATION</Text>
-        <Text style={styles.title}>Enter the code</Text>
-        <Text style={styles.subtitle}>We sent a 6-digit code to</Text>
+        <Text style={styles.accentLabel}>{t('otp.eyebrow')}</Text>
+        <Text style={styles.title}>{t('otp.title')}</Text>
+        <Text style={styles.subtitle}>{t('otp.subtitle')}</Text>
         <Text style={styles.phone}>{phone}</Text>
-        <Text style={styles.note}>
-          Note: SMS verification is coming soon. For now, you can type any 6 digits to continue.
-        </Text>
+        <Text style={styles.note}>{t('otp.note')}</Text>
 
         <View style={styles.codeRow}>
           {code.map((digit, index) => (
@@ -88,16 +88,16 @@ const OTPScreen = ({ phone, onFinish, onBack }: Props) => {
         </View>
 
                 <View style={styles.resendRow}>
-          <Text style={styles.resendText}>Didn't get the code?</Text>
+          <Text style={styles.resendText}>{t('otp.resendQuestion')}</Text>
           <MboaButton
-            title="Resend"
+            title={t('otp.resend')}
             onPress={handleResend}
             variant="outline"
           />
         </View>
 
         <TouchableOpacity onPress={onBack} style={styles.changeButton}>
-          <Text style={styles.changeText}>Change phone number</Text>
+          <Text style={styles.changeText}>{t('otp.changePhone')}</Text>
         </TouchableOpacity>
       </View>
     </FadeInView>
@@ -194,8 +194,19 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     textDecorationLine: 'underline',
   },
+    note: {
+    fontSize: 12,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    marginTop: 12,
+    marginBottom: 8,
+    paddingHorizontal: 20,
+    lineHeight: 18,
+  },
 });
 
 export default OTPScreen;
+
 
 

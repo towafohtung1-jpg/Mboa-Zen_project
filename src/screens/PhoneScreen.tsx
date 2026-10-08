@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
 import { Colors } from '../constants/colors';
 import { FONTS, SIZES } from '../constants/typography';
@@ -6,12 +6,14 @@ import { useUserStore } from '../store/useUserStore';
 import { saveUserState } from '../utils/storage';
 import { FadeInView } from '../components/common/FadeInView';
 import { MboaButton } from '../components/common/MboaButton';
+import { useTranslation } from '../i18n/useTranslation';
 type Props = {
   onFinish: () => void;
   onSkip: () => void;
 };
 
 const PhoneScreen = ({ onFinish, onSkip }: Props) => {
+  const { t } = useTranslation();
   const setPhone = useUserStore((state) => state.setPhone);
   const [phone, setPhoneInput] = useState('');
 
@@ -20,8 +22,8 @@ const PhoneScreen = ({ onFinish, onSkip }: Props) => {
   const handleContinue = async () => {
     if (!isValid) {
       Alert.alert(
-        'Invalid Number',
-        'Please enter a valid 9-digit Cameroon phone number starting with 6.'
+        t('phone.alertTitle'),
+        t('phone.alertBody')
       );
       return;
     }
@@ -59,11 +61,9 @@ const PhoneScreen = ({ onFinish, onSkip }: Props) => {
       <View style={styles.topAccentBar} />
 
       <View style={styles.content}>
-        <Text style={styles.accentLabel}>ALMOST DONE</Text>
-        <Text style={styles.title}>Enter your{'\n'}phone number</Text>
-        <Text style={styles.subtitle}>
-          We use this to save your progress and process Mobile Money payments.
-        </Text>
+        <Text style={styles.accentLabel}>{t('phone.eyebrow')}</Text>
+        <Text style={styles.title}>{t('phone.title')}</Text>
+        <Text style={styles.subtitle}>{t('phone.subtitle')}</Text>
 
         <View style={styles.phoneRow}>
           <View style={styles.countryCode}>
@@ -71,7 +71,7 @@ const PhoneScreen = ({ onFinish, onSkip }: Props) => {
           </View>
           <TextInput
             style={styles.phoneInput}
-            placeholder="6XX XXX XXX"
+            placeholder={t('phone.placeholder')}
             placeholderTextColor={Colors.textMuted}
             keyboardType="phone-pad"
             maxLength={9}
@@ -81,23 +81,21 @@ const PhoneScreen = ({ onFinish, onSkip }: Props) => {
         </View>
 
         {phone.length > 0 && !isValid && (
-          <Text style={styles.helperText}>
-            Must be 9 digits and start with 6.
-          </Text>
+          <Text style={styles.helperText}>{t('phone.helper')}</Text>
         )}
       </View>
 
             <View style={styles.footer}>
         <View style={styles.buttonRow}>
           <MboaButton
-            title="Continue  →"
+            title={t('phone.continueBtn')}
             onPress={handleContinue}
             variant="primary"
             disabled={!isValid}
           />
 
           <MboaButton
-            title="Continue as Guest"
+            title={t('phone.guestBtn')}
             onPress={handleSkip}
             variant="outline"
           />
@@ -203,6 +201,7 @@ const styles = StyleSheet.create({
 });
 
 export default PhoneScreen;
+
 
 
 
