@@ -1,4 +1,4 @@
-﻿﻿﻿// â”€â”€â”€ src/screens/HubScreen.tsx â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// â”€â”€â”€ src/screens/HubScreen.tsx â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import {
@@ -57,29 +57,29 @@ const GUIDE_CARDS: Record<
 > = {
   runner: [
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Drink More In Harmattan', tip: 'When the dry season comes, your body loses water much faster than normal. Drink at least 8 cups of water every day. Start every morning with warm water and ginger before you go anywhere.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Food For Hard Work', tip: 'A working person needs starchy food for energy — plantain, yam, rice, or fufu. Add any protein you can find — beans, fish, egg, or meat. Without proper food, your body cannot keep up.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Food For Hard Work', tip: 'A working person needs starchy food for energy —” plantain, yam, rice, or fufu. Add any protein you can find —” beans, fish, egg, or meat. Without proper food, your body cannot keep up.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'What To Eat Before You Move', tip: 'Before exercise or a long day of work, eat something starchy 30 to 45 minutes before you start. Ripe plantain, sweet potato, or pap gives your body clean energy. Do not exercise on an empty stomach.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Rest Is Part Of The Plan', tip: 'Your body repairs itself when you sleep, not when you exercise. Seven to eight hours of sleep is not laziness — it is part of staying healthy and strong.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Rest Is Part Of The Plan', tip: 'Your body repairs itself when you sleep, not when you exercise. Seven to eight hours of sleep is not laziness —” it is part of staying healthy and strong.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rainy_season.png'), title: 'Eating In The Rainy Season', tip: 'During the rainy season, your body needs more immune support. Add ginger, garlic, and bitter leaf to your meals. Eat warm, freshly cooked food as much as possible.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: "Runner's Road Side Guide", tip: 'When buying food outside before an active day, choose fish or egg over heavy meat. Ask for boiled plantain instead of fried. Your stomach needs to be light to move well.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Morning Water Habit', tip: 'Before you eat anything in the morning, drink one full cup of clean water. This simple habit wakes up your digestion and gives your body a clean start.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Affordable Energy Foods', tip: 'Pap, boiled yam, ripe plantain, sweet potato — these are among the best energy foods available and they cost very little. Eat them regularly and your body will feel the difference.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Affordable Energy Foods', tip: 'Pap, boiled yam, ripe plantain, sweet potato —” these are among the best energy foods available and they cost very little. Eat them regularly and your body will feel the difference.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'Walk More Than You Think', tip: 'Walking fast for 30 minutes every day is enough to improve your heart health. Park further away. Take the stairs. Choose movement wherever you can.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Your Body Speaks To You', tip: 'When you feel exhausted mid-day, it is often dehydration or low blood sugar. Drink water and eat a small snack before assuming you are just tired.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: 'Add Vegetables Everywhere', tip: 'Whatever you are eating today, add one vegetable to it. Njama-njama, bitter leaf, garden egg, tomatoes — any vegetable counts. This one habit improves your nutrition without changing your entire diet.', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: 'Add Vegetables Everywhere', tip: 'Whatever you are eating today, add one vegetable to it. Njama-njama, bitter leaf, garden egg, tomatoes —” any vegetable counts. This one habit improves your nutrition without changing your entire diet.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), title: 'Eat Earlier In The Evening', tip: 'Try to finish your last meal before 7pm whenever possible. A lighter, earlier supper improves your sleep and your energy the next morning.', color: Colors.zenGold },
   ],
   warrior: [
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: 'Eating Outside? Choose Well', tip: 'When you buy from a road-side vendor, always choose grilled over fried. Ask for fish or chicken instead of processed meat. These small choices every day make a real difference.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'For Those Who Work With Their Hands', tip: 'Builders, electricians, plumbers, farmers, drivers — your body works harder than most. After a heavy day, eat beans, fish, eggs, or any meat alongside your starch.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'For Those Who Work With Their Hands', tip: 'Builders, electricians, plumbers, farmers, drivers —” your body works harder than most. After a heavy day, eat beans, fish, eggs, or any meat alongside your starch.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Water Makes You Stronger', tip: 'When you are dehydrated, your muscles become weak and your mind slows down. Drink water before you start work. Choose water or fresh juice over sodas.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rainy_season.png'), title: 'Stay Safe Eating In The Rain', tip: 'During the rainy season, food goes bad faster. Choose food that is freshly cooked and visibly hot. Avoid food that has been sitting open for a long time.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'Protein After Physical Work', tip: 'After any heavy physical work, your muscles need to be rebuilt. Eat beans, fish, groundnuts, or any available meat within two hours of finishing work.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Rest Days Are Not Wasted Days', tip: 'Your muscles do not grow during exercise — they grow during rest. Taking one or two rest days per week is not laziness. Sleep well, eat well, and let your body do its work.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: "Groundnuts Are A Warrior's Friend", tip: 'Roasted groundnuts are one of the best affordable protein sources in Cameroon. Keep some in your bag — they are the perfect working person\'s snack.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Eggs Every Day', tip: 'If you can afford one egg per day, eat it. Boiled, fried, or mixed into any meal — eggs support muscle recovery better than most foods at their price.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Salt And Physical Work', tip: 'When you sweat heavily during physical work, your body loses salt alongside water. A little extra salt on heavy work days is not unhealthy — it replaces what your body lost.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: 'The Suya Option', tip: 'Suya — grilled spiced meat on a skewer — is actually a good protein choice when eating outside. It is grilled not fried. Choose suya over fried options when available.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Rest Days Are Not Wasted Days', tip: 'Your muscles do not grow during exercise —” they grow during rest. Taking one or two rest days per week is not laziness. Sleep well, eat well, and let your body do its work.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: "Groundnuts Are A Warrior's Friend", tip: 'Roasted groundnuts are one of the best affordable protein sources in Cameroon. Keep some in your bag —” they are the perfect working person\'s snack.', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Eggs Every Day', tip: 'If you can afford one egg per day, eat it. Boiled, fried, or mixed into any meal —” eggs support muscle recovery better than most foods at their price.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Salt And Physical Work', tip: 'When you sweat heavily during physical work, your body loses salt alongside water. A little extra salt on heavy work days is not unhealthy —” it replaces what your body lost.', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: 'The Suya Option', tip: 'Suya —” grilled spiced meat on a skewer —” is actually a good protein choice when eating outside. It is grilled not fried. Choose suya over fried options when available.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'Stretch Before You Start', tip: 'Before any heavy physical work, spend five minutes stretching your back, arms, and legs. A builder who injures their back loses weeks of income. Prevention costs nothing.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), title: 'Do Not Skip Breakfast', tip: 'Starting heavy physical work without eating is like starting a car without fuel. Even pap and puff-puff is better than nothing before a hard day.', color: Colors.zenGold },
   ],
@@ -87,9 +87,9 @@ const GUIDE_CARDS: Record<
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: 'Buying Food Outside? Here Is How', tip: 'When buying from vendors, ask for boiled or grilled instead of fried. Choose pepper soup, plain rice with vegetables, or beans over heavy fried options.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: "You Don't Have To Finish The Plate", tip: 'Vendor plates in Cameroon are often very large portions. Stop eating when you feel satisfied. Eat slowly and stop when full. Save the rest or share it.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'Foods That Cool The Body Down', tip: 'Ginger, garlic, njama-njama, pumpkin leaves, and bitter leaf reduce pain and tiredness inside the body. Try to include one in your meals every day.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), title: 'Eat Light At Night', tip: 'Choose something light for supper — pepper soup, boiled vegetables, a small portion of beans. Heavy fufu or fried food late at night makes weight control very difficult.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), title: 'Eat Light At Night', tip: 'Choose something light for supper —” pepper soup, boiled vegetables, a small portion of beans. Heavy fufu or fried food late at night makes weight control very difficult.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Drink Water Before You Eat', tip: 'Drinking one full glass of water 15 to 20 minutes before a meal reduces how much you eat naturally. Your body often confuses thirst with hunger.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Sleep And Weight Control', tip: 'Poor sleep increases hunger hormones and cravings for heavy food. Good sleep is not optional — it is a health tool that supports every other effort you make.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Sleep And Weight Control', tip: 'Poor sleep increases hunger hormones and cravings for heavy food. Good sleep is not optional —” it is a health tool that supports every other effort you make.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Beans Are Your Best Friend', tip: 'Beans are high in fiber, protein, and complex carbohydrates. They fill you up for longer than rice or fufu and cost less. Eat beans regularly and you will naturally eat less of everything else.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rainy_season.png'), title: 'Soups Over Solids', tip: 'Pepper soup, light egusi soup, and vegetable soups fill you up with fewer calories than solid starchy meals. Choose soup-based meals when managing your weight.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: 'Chew Slowly', tip: 'It takes 20 minutes for your brain to receive the signal that you are full. If you eat quickly, you will eat far more than your body needs. Slow down between bites.', color: Colors.mboaGreen },
@@ -163,22 +163,24 @@ const getWaterMessage = ({
   waterGoal,
   currentStreak,
   personalBest,
+  t,
 }: {
   waterIntake: number;
   waterGoal: number;
   currentStreak: number;
   personalBest: number;
+  t: (k: string) => string;
 }): { text: string; color: string } | null => {
   if (currentStreak > 0 && waterIntake < waterGoal) {
     const remaining = waterGoal - waterIntake;
     if (remaining >= 3) {
       return {
-        text: `You're at ${waterIntake}/${waterGoal} today. Your kidneys are waiting. Drink ${remaining} more before you sleep.`,
+        text: t('hub.waterKidneys').replace('{n}', String(waterIntake)).replace('{goal}', String(waterGoal)).replace('{m}', String(remaining)),
         color: Colors.mboaGreen,
       };
     } else if (remaining > 0) {
       return {
-        text: `Almost there. ${remaining} glass${remaining > 1 ? 'es' : ''} to go. Your kidneys thank you.`,
+        text: t('hub.waterAlmost').replace('{m}', String(remaining)),
         color: Colors.mboaGreen,
       };
     }
@@ -191,26 +193,26 @@ const getWaterMessage = ({
   ) {
     const diff = personalBest - currentStreak;
     return {
-      text: `${diff} day${diff > 1 ? 's' : ''} to beat your record (${personalBest} days). Your body is already proud.`,
+      text: t('hub.waterRecord').replace('{d}', String(diff)).replace('{best}', String(personalBest)),
       color: Colors.zenGold,
     };
   }
 
   const milestones = [
-    { days: 3, label: 'Getting Started' },
-    { days: 7, label: 'One Week Strong' },
-    { days: 14, label: 'Two Weeks' },
-    { days: 30, label: 'One Month' },
-    { days: 60, label: 'Two Months' },
-    { days: 100, label: 'Century' },
-    { days: 365, label: 'One Year Ocean' },
+    { days: 3, label: t('hub.mile3') },
+    { days: 7, label: t('hub.mile7') },
+    { days: 14, label: t('hub.mile14') },
+    { days: 30, label: t('hub.mile30') },
+    { days: 60, label: t('hub.mile60') },
+    { days: 100, label: t('hub.mile100') },
+    { days: 365, label: t('hub.mile365') },
   ];
   const nextMilestone = milestones.find((m) => m.days > currentStreak);
   if (nextMilestone) {
     const diff = nextMilestone.days - currentStreak;
     if (diff <= 3 && diff > 0) {
       return {
-        text: `${diff} day${diff > 1 ? 's' : ''} to "${nextMilestone.label}". Keep going.`,
+        text: t('hub.waterMilestone').replace('{d}', String(diff)).replace('{label}', nextMilestone.label),
         color: Colors.zenGold,
       };
     }
@@ -218,7 +220,7 @@ const getWaterMessage = ({
 
   if (waterIntake >= waterGoal) {
     return {
-      text: `Your kidneys thank you. ${waterGoal}/${waterGoal} today.`,
+      text: t('hub.waterComplete').replace('{goal}', String(waterGoal)),
       color: Colors.mboaGreen,
     };
   }
@@ -228,38 +230,40 @@ const getWaterMessage = ({
 
 // â”€â”€â”€ MILESTONE DEFINITIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-const MILESTONES: Record<number, { title: string; message: string }> = {
+const getMilestones = (t: (k: string) => string): Record<number, { title: string; message: string }> => ({
   7: {
-    title: 'One Week Strong',
-    message: "You've shown up for 7 days straight. That's not small.",
+    title: t('hub.ms7'),
+    message: t('hub.ms7'),
   },
   14: {
-    title: 'Two Weeks',
-    message: '14 days. A real habit is forming.',
+    title: t('hub.ms14'),
+    message: t('hub.ms14'),
   },
   30: {
-    title: 'One Month',
-    message: "30 days. You're a different person now.",
+    title: t('hub.ms30'),
+    message: t('hub.ms30'),
   },
   60: {
-    title: 'Two Months',
-    message: '60 days. Na real discipline.',
+    title: t('hub.ms60'),
+    message: t('hub.ms60'),
   },
   100: {
-    title: 'Century',
-    message: '100 days. Legend status.',
+    title: t('hub.ms100'),
+    message: t('hub.ms100'),
   },
   365: {
-    title: 'One Year Ocean',
-    message: '365 days. You built a whole ocean.',
+    title: t('hub.ms365'),
+    message: t('hub.ms365'),
   },
-};
+});
 
 const getNewMilestone = (
   waterStreak: number,
   checkInStreak: number,
-  celebrated: string[]
+  celebrated: string[],
+  t: (k: string) => string
 ): { days: number; title: string; message: string; key: string } | null => {
+  const MILESTONES = getMilestones(t);
   if (MILESTONES[waterStreak]) {
     const key = `water-${waterStreak}`;
     if (!celebrated.includes(key)) {
@@ -279,35 +283,35 @@ const getNewMilestone = (
 
 // â”€â”€â”€ BROKEN-STREAK ORGAN MESSAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-const getBrokenStreakMessage = (daysSinceLastGoal: number): { text: string; color: string } | null => {
+const getBrokenStreakMessage = (daysSinceLastGoal: number, t: (k: string) => string): { text: string; color: string } | null => {
   if (daysSinceLastGoal <= 0) return null;
 
   if (daysSinceLastGoal >= 999) {
     return {
-      text: `You haven't started your water goal yet. One glass now. That's how it begins.`,
+      text: t('hub.brokenNew'),
       color: Colors.mboaGreen,
     };
   }
   if (daysSinceLastGoal === 1) {
     return {
-      text: `You missed your water goal yesterday. Your kidneys filter your blood all day. Give them water. One glass now.`,
+      text: t('hub.broken1'),
       color: '#FF9800',
     };
   }
   if (daysSinceLastGoal <= 3) {
     return {
-      text: `${daysSinceLastGoal} days without your water goal. Your liver is working harder to clean your blood. Help it. One glass now.`,
+      text: t('hub.broken3').replace('{n}', String(daysSinceLastGoal)),
       color: '#FF9800',
     };
   }
   if (daysSinceLastGoal <= 6) {
     return {
-      text: `${daysSinceLastGoal} days dry. Your brain needs water to think clearly. Foggy mind? Drink. One glass now.`,
+      text: t('hub.broken6').replace('{n}', String(daysSinceLastGoal)),
       color: Colors.errorRed,
     };
   }
   return {
-    text: `A full week without your goal. Your whole body is asking for water. Start with one glass.`,
+    text: t('hub.brokenWeek'),
     color: Colors.errorRed,
   };
 };
@@ -362,7 +366,7 @@ const PrevMonthSummary = ({
   return (
     <View style={styles.prevMonthCard}>
       <Text style={styles.prevMonthTitle}>
-        {monthName} {prevYear} — Your Month Is Complete!
+        {monthName} {prevYear} —” Your Month Is Complete!
       </Text>
       <Text style={styles.prevMonthSubtitle}>
         Here is how your health journey went last month.
@@ -385,7 +389,7 @@ const PrevMonthSummary = ({
       <View style={styles.reportDivider} />
 
       <Text style={styles.reportOverall}>
-        Overall: {overallScore}% — {getHarmonyLabel(overallScore)}
+        Overall: {overallScore}% —” {getHarmonyLabel(overallScore)}
       </Text>
       <Text style={[styles.reportHabit, { color: Colors.mboaGreen }]}>
         Strongest: {strongest.label} ({strongest.days}/{daysInPrevMonth} days)
@@ -446,7 +450,7 @@ const MonthlyReport = ({
 
   return (
     <View style={styles.reportCard}>
-      <Text style={styles.reportTitle}>{monthName} {year} — Your Health Report</Text>
+      <Text style={styles.reportTitle}>{monthName} {year} —” Your Health Report</Text>
       <View style={styles.reportRow}>
         {[
           { label: 'Optimal', count: optimal, bg: Colors.mboaGreen, tc: Colors.cleanWhite },
@@ -462,7 +466,7 @@ const MonthlyReport = ({
       </View>
       <View style={styles.reportDivider} />
       <Text style={styles.reportOverall}>
-        Overall Score: {overallScore}% — {getHarmonyLabel(overallScore)}
+        Overall Score: {overallScore}% —” {getHarmonyLabel(overallScore)}
       </Text>
       <Text style={[styles.reportHabit, { color: Colors.mboaGreen }]}>
         Strongest: {strongest.label} ({strongest.days}/{totalDays} days)
@@ -762,10 +766,11 @@ const HubScreen = () => {
       const checkInStreak = streak;
 
       const milestone = getNewMilestone(
-        waterStreak,
-        checkInStreak,
-        celebratedMilestones
-      );
+  waterStreak,
+  checkInStreak,
+  celebratedMilestones,
+  t
+);
 
       if (milestone) {
         setMilestoneData(milestone);
@@ -780,9 +785,9 @@ const HubScreen = () => {
     try {
       await Share.share({
         message:
-          'I am using Mboa-Zen — a health and fitness app built for Cameroon using our local foods and home workouts. No gym needed. Try it free: https://mboa-zen.vercel.app',
+          'I am using Mboa-Zen —” a health and fitness app built for Cameroon using our local foods and home workouts. No gym needed. Try it free: https://mboa-zen.vercel.app',
         url: 'https://mboa-zen.vercel.app',
-        title: 'Mboa-Zen — Local Wellness for Cameroon',
+        title: 'Mboa-Zen —” Local Wellness for Cameroon',
       });
     } catch (error) {
       console.log('Share error:', error);
@@ -868,7 +873,7 @@ const HubScreen = () => {
           <View style={styles.proverbCard}>
             <View style={styles.accentLine} />
             <Text style={styles.proverb}>"{dailyProverb.proverb}"</Text>
-            <Text style={styles.author}>— {dailyProverb.origin}</Text>
+            <Text style={styles.author}>—” {dailyProverb.origin}</Text>
             <View style={styles.divider} />
             <Text style={styles.lesson}>{dailyProverb.lesson}</Text>
           </View>
@@ -947,7 +952,7 @@ const HubScreen = () => {
             {/* â”€â”€â”€ NEAR-MISS / HEALTH MESSAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {(() => {
               const daysSinceLastGoal = getDaysSinceLastGoal();
-              const brokenStreakMsg = getBrokenStreakMessage(daysSinceLastGoal);
+              const brokenStreakMsg = getBrokenStreakMessage(daysSinceLastGoal, t);
               if (brokenStreakMsg) {
                 return (
                   <View style={styles.waterMessageBox}>
@@ -963,6 +968,7 @@ const HubScreen = () => {
                 waterGoal,
                 currentStreak: getWaterStreak(),
                 personalBest: getPersonalBest(),
+                t,
               });
 
               if (nearMissMsg) {
@@ -1000,7 +1006,7 @@ const HubScreen = () => {
             <Text style={styles.scanCardArrow}>→</Text>
           </TouchableOpacity>
 
-          {/* Previous month summary — first day of new month only */}
+          {/* Previous month summary —” first day of new month only */}
           {showPrevMonthSummary && (
             <>
               <Text style={styles.sectionLabel}>{t('hub.lastMonthSummary')}</Text>
@@ -1032,7 +1038,7 @@ const HubScreen = () => {
                 />
               </View>
               <Text style={[styles.harmonyRevealScore, { color: getHarmonyColor(harmonyScore), marginTop: 8 }]}>
-                {harmonyScore}% — {getHarmonyLabel(harmonyScore)}
+                {harmonyScore}% —” {getHarmonyLabel(harmonyScore)}
               </Text>
             </View>
           ) : (
@@ -1265,7 +1271,7 @@ const HubScreen = () => {
           onPress={scrollToTop}
           activeOpacity={0.8}
         >
-          <Text style={styles.scrollTopArrow}>↑</Text>
+          <Text style={styles.scrollTopArrow}>â†‘</Text>
         </TouchableOpacity>
       )}
     </FadeInView>
@@ -1758,5 +1764,7 @@ const styles = StyleSheet.create({
 
 
 export default HubScreen;
+
+
 
 
