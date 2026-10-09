@@ -1,4 +1,4 @@
-// ─── src/screens/HubScreen.tsx ─────────────────────────────────────────
+﻿// â”€â”€â”€ src/screens/HubScreen.tsx â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import {
@@ -20,35 +20,36 @@ import { FadeInView } from '../components/common/FadeInView';
 import WaterDrop from '../components/common/WaterDrop';
 import { MboaButton } from '../components/common/MboaButton';
 import { useSwipeTabs } from '../hooks/useSwipeTabs';
+import { useTranslation } from '../i18n/useTranslation';
 
 
 
 
   
-// ─── ARCHETYPE DATA ──────────────────────────────────────────────────────
+// â”€â”€â”€ ARCHETYPE DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const ARCHETYPE_DATA: Record<
   string,
-  { image: any; title: string; subtitle: string }
+  { image: any; titleKey: string; subtitleKey: string }
 > = {
   runner: {
     image: require('../../assets/Media/Archetype/runner_hero.jpeg'),
-    title: 'The Runner (Swift)',
-    subtitle: 'Fast Leg - You move fast, walk plenty, burn energy quick',
+    titleKey: 'hub.runnerTitle',
+    subtitleKey: 'hub.runnerSubtitle',
   },
   warrior: {
     image: require('../../assets/Media/Archetype/warrior_hero.jpeg'),
-    title: 'The Warrior (Strong)',
-    subtitle: 'Strong Hand - You carry heavy, work hard, need strength',
+    titleKey: 'hub.warriorTitle',
+    subtitleKey: 'hub.warriorSubtitle',
   },
   guardian: {
     image: require('../../assets/Media/Archetype/guardian_hero.jpeg'),
-    title: 'The Guardian (Steady)',
-    subtitle: 'Strong Heart - You balance life, need steady health',
+    titleKey: 'hub.guardianTitle',
+    subtitleKey: 'hub.guardianSubtitle',
   },
 };
 
-// ─── GUIDE CARDS ──────────────────────────────────────────────────────────
+// â”€â”€â”€ GUIDE CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const GUIDE_CARDS: Record<
   string,
@@ -56,29 +57,29 @@ const GUIDE_CARDS: Record<
 > = {
   runner: [
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Drink More In Harmattan', tip: 'When the dry season comes, your body loses water much faster than normal. Drink at least 8 cups of water every day. Start every morning with warm water and ginger before you go anywhere.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Food For Hard Work', tip: 'A working person needs starchy food for energy — plantain, yam, rice, or fufu. Add any protein you can find — beans, fish, egg, or meat. Without proper food, your body cannot keep up.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Food For Hard Work', tip: 'A working person needs starchy food for energy â€” plantain, yam, rice, or fufu. Add any protein you can find â€” beans, fish, egg, or meat. Without proper food, your body cannot keep up.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'What To Eat Before You Move', tip: 'Before exercise or a long day of work, eat something starchy 30 to 45 minutes before you start. Ripe plantain, sweet potato, or pap gives your body clean energy. Do not exercise on an empty stomach.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Rest Is Part Of The Plan', tip: 'Your body repairs itself when you sleep, not when you exercise. Seven to eight hours of sleep is not laziness — it is part of staying healthy and strong.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Rest Is Part Of The Plan', tip: 'Your body repairs itself when you sleep, not when you exercise. Seven to eight hours of sleep is not laziness â€” it is part of staying healthy and strong.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rainy_season.png'), title: 'Eating In The Rainy Season', tip: 'During the rainy season, your body needs more immune support. Add ginger, garlic, and bitter leaf to your meals. Eat warm, freshly cooked food as much as possible.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: "Runner's Road Side Guide", tip: 'When buying food outside before an active day, choose fish or egg over heavy meat. Ask for boiled plantain instead of fried. Your stomach needs to be light to move well.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Morning Water Habit', tip: 'Before you eat anything in the morning, drink one full cup of clean water. This simple habit wakes up your digestion and gives your body a clean start.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Affordable Energy Foods', tip: 'Pap, boiled yam, ripe plantain, sweet potato — these are among the best energy foods available and they cost very little. Eat them regularly and your body will feel the difference.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Affordable Energy Foods', tip: 'Pap, boiled yam, ripe plantain, sweet potato â€” these are among the best energy foods available and they cost very little. Eat them regularly and your body will feel the difference.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'Walk More Than You Think', tip: 'Walking fast for 30 minutes every day is enough to improve your heart health. Park further away. Take the stairs. Choose movement wherever you can.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Your Body Speaks To You', tip: 'When you feel exhausted mid-day, it is often dehydration or low blood sugar. Drink water and eat a small snack before assuming you are just tired.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: 'Add Vegetables Everywhere', tip: 'Whatever you are eating today, add one vegetable to it. Njama-njama, bitter leaf, garden egg, tomatoes — any vegetable counts. This one habit improves your nutrition without changing your entire diet.', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: 'Add Vegetables Everywhere', tip: 'Whatever you are eating today, add one vegetable to it. Njama-njama, bitter leaf, garden egg, tomatoes â€” any vegetable counts. This one habit improves your nutrition without changing your entire diet.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), title: 'Eat Earlier In The Evening', tip: 'Try to finish your last meal before 7pm whenever possible. A lighter, earlier supper improves your sleep and your energy the next morning.', color: Colors.zenGold },
   ],
   warrior: [
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: 'Eating Outside? Choose Well', tip: 'When you buy from a road-side vendor, always choose grilled over fried. Ask for fish or chicken instead of processed meat. These small choices every day make a real difference.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'For Those Who Work With Their Hands', tip: 'Builders, electricians, plumbers, farmers, drivers — your body works harder than most. After a heavy day, eat beans, fish, eggs, or any meat alongside your starch.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'For Those Who Work With Their Hands', tip: 'Builders, electricians, plumbers, farmers, drivers â€” your body works harder than most. After a heavy day, eat beans, fish, eggs, or any meat alongside your starch.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Water Makes You Stronger', tip: 'When you are dehydrated, your muscles become weak and your mind slows down. Drink water before you start work. Choose water or fresh juice over sodas.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rainy_season.png'), title: 'Stay Safe Eating In The Rain', tip: 'During the rainy season, food goes bad faster. Choose food that is freshly cooked and visibly hot. Avoid food that has been sitting open for a long time.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'Protein After Physical Work', tip: 'After any heavy physical work, your muscles need to be rebuilt. Eat beans, fish, groundnuts, or any available meat within two hours of finishing work.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Rest Days Are Not Wasted Days', tip: 'Your muscles do not grow during exercise — they grow during rest. Taking one or two rest days per week is not laziness. Sleep well, eat well, and let your body do its work.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: "Groundnuts Are A Warrior's Friend", tip: 'Roasted groundnuts are one of the best affordable protein sources in Cameroon. Keep some in your bag — they are the perfect working person\'s snack.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Eggs Every Day', tip: 'If you can afford one egg per day, eat it. Boiled, fried, or mixed into any meal — eggs support muscle recovery better than most foods at their price.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Salt And Physical Work', tip: 'When you sweat heavily during physical work, your body loses salt alongside water. A little extra salt on heavy work days is not unhealthy — it replaces what your body lost.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: 'The Suya Option', tip: 'Suya — grilled spiced meat on a skewer — is actually a good protein choice when eating outside. It is grilled not fried. Choose suya over fried options when available.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Rest Days Are Not Wasted Days', tip: 'Your muscles do not grow during exercise â€” they grow during rest. Taking one or two rest days per week is not laziness. Sleep well, eat well, and let your body do its work.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: "Groundnuts Are A Warrior's Friend", tip: 'Roasted groundnuts are one of the best affordable protein sources in Cameroon. Keep some in your bag â€” they are the perfect working person\'s snack.', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Eggs Every Day', tip: 'If you can afford one egg per day, eat it. Boiled, fried, or mixed into any meal â€” eggs support muscle recovery better than most foods at their price.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Salt And Physical Work', tip: 'When you sweat heavily during physical work, your body loses salt alongside water. A little extra salt on heavy work days is not unhealthy â€” it replaces what your body lost.', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: 'The Suya Option', tip: 'Suya â€” grilled spiced meat on a skewer â€” is actually a good protein choice when eating outside. It is grilled not fried. Choose suya over fried options when available.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'Stretch Before You Start', tip: 'Before any heavy physical work, spend five minutes stretching your back, arms, and legs. A builder who injures their back loses weeks of income. Prevention costs nothing.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), title: 'Do Not Skip Breakfast', tip: 'Starting heavy physical work without eating is like starting a car without fuel. Even pap and puff-puff is better than nothing before a hard day.', color: Colors.zenGold },
   ],
@@ -86,9 +87,9 @@ const GUIDE_CARDS: Record<
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: 'Buying Food Outside? Here Is How', tip: 'When buying from vendors, ask for boiled or grilled instead of fried. Choose pepper soup, plain rice with vegetables, or beans over heavy fried options.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: "You Don't Have To Finish The Plate", tip: 'Vendor plates in Cameroon are often very large portions. Stop eating when you feel satisfied. Eat slowly and stop when full. Save the rest or share it.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'Foods That Cool The Body Down', tip: 'Ginger, garlic, njama-njama, pumpkin leaves, and bitter leaf reduce pain and tiredness inside the body. Try to include one in your meals every day.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), title: 'Eat Light At Night', tip: 'Choose something light for supper — pepper soup, boiled vegetables, a small portion of beans. Heavy fufu or fried food late at night makes weight control very difficult.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), title: 'Eat Light At Night', tip: 'Choose something light for supper â€” pepper soup, boiled vegetables, a small portion of beans. Heavy fufu or fried food late at night makes weight control very difficult.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Drink Water Before You Eat', tip: 'Drinking one full glass of water 15 to 20 minutes before a meal reduces how much you eat naturally. Your body often confuses thirst with hunger.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Sleep And Weight Control', tip: 'Poor sleep increases hunger hormones and cravings for heavy food. Good sleep is not optional — it is a health tool that supports every other effort you make.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Sleep And Weight Control', tip: 'Poor sleep increases hunger hormones and cravings for heavy food. Good sleep is not optional â€” it is a health tool that supports every other effort you make.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Beans Are Your Best Friend', tip: 'Beans are high in fiber, protein, and complex carbohydrates. They fill you up for longer than rice or fufu and cost less. Eat beans regularly and you will naturally eat less of everything else.', color: Colors.mboaGreen },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rainy_season.png'), title: 'Soups Over Solids', tip: 'Pepper soup, light egusi soup, and vegetable soups fill you up with fewer calories than solid starchy meals. Choose soup-based meals when managing your weight.', color: Colors.zenGold },
     { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: 'Chew Slowly', tip: 'It takes 20 minutes for your brain to receive the signal that you are full. If you eat quickly, you will eat far more than your body needs. Slow down between bites.', color: Colors.mboaGreen },
@@ -98,7 +99,7 @@ const GUIDE_CARDS: Record<
   ],
 };
 
-// ─── HELPERS ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const getDailyGuides = (archetype: string): any[] => {
   const allCards = GUIDE_CARDS[archetype] || [];
@@ -155,7 +156,7 @@ const getHarmonyColor = (score: number): string => {
   return Colors.textMuted;
 };
 
-// ─── WATER NEAR-MISS / HEALTH MESSAGE ───────────────────────────────────
+// â”€â”€â”€ WATER NEAR-MISS / HEALTH MESSAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const getWaterMessage = ({
   waterIntake,
@@ -225,7 +226,7 @@ const getWaterMessage = ({
   return null;
 };
 
-// ─── MILESTONE DEFINITIONS ──────────────────────────────────────────────
+// â”€â”€â”€ MILESTONE DEFINITIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const MILESTONES: Record<number, { title: string; message: string }> = {
   7: {
@@ -276,7 +277,7 @@ const getNewMilestone = (
   return null;
 };
 
-// ─── BROKEN-STREAK ORGAN MESSAGE ────────────────────────────────────────
+// â”€â”€â”€ BROKEN-STREAK ORGAN MESSAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const getBrokenStreakMessage = (daysSinceLastGoal: number): { text: string; color: string } | null => {
   if (daysSinceLastGoal <= 0) return null;
@@ -311,7 +312,7 @@ const getBrokenStreakMessage = (daysSinceLastGoal: number): { text: string; colo
   };
 };
 
-// ─── PREVIOUS MONTH SUMMARY ───────────────────────────────────────────────
+// â”€â”€â”€ PREVIOUS MONTH SUMMARY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const PrevMonthSummary = ({
   checkInHistory,
@@ -324,6 +325,7 @@ const PrevMonthSummary = ({
   year: number;
   onDismiss: () => void;
 }) => {
+  const { t } = useTranslation();
   const today = new Date();
   const prevMonth = today.getMonth() === 0 ? 11 : today.getMonth() - 1;
   const prevYear = today.getMonth() === 0 ? year - 1 : year;
@@ -360,7 +362,7 @@ const PrevMonthSummary = ({
   return (
     <View style={styles.prevMonthCard}>
       <Text style={styles.prevMonthTitle}>
-        {monthName} {prevYear} — Your Month Is Complete!
+        {monthName} {prevYear} â€” Your Month Is Complete!
       </Text>
       <Text style={styles.prevMonthSubtitle}>
         Here is how your health journey went last month.
@@ -383,7 +385,7 @@ const PrevMonthSummary = ({
       <View style={styles.reportDivider} />
 
       <Text style={styles.reportOverall}>
-        Overall: {overallScore}% — {getHarmonyLabel(overallScore)}
+        Overall: {overallScore}% â€” {getHarmonyLabel(overallScore)}
       </Text>
       <Text style={[styles.reportHabit, { color: Colors.mboaGreen }]}>
         Strongest: {strongest.label} ({strongest.days}/{daysInPrevMonth} days)
@@ -393,7 +395,7 @@ const PrevMonthSummary = ({
       </Text>
 
       <MboaButton
-        title="Start New Month →"
+        title={t('hub.startNewMonth')}
         onPress={onDismiss}
         variant="primary"
       />
@@ -401,7 +403,7 @@ const PrevMonthSummary = ({
   );
 };
 
-// ─── MONTHLY REPORT ───────────────────────────────────────────────────────
+// â”€â”€â”€ MONTHLY REPORT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const MonthlyReport = ({
   checkInHistory,
@@ -444,7 +446,7 @@ const MonthlyReport = ({
 
   return (
     <View style={styles.reportCard}>
-      <Text style={styles.reportTitle}>{monthName} {year} — Your Health Report</Text>
+      <Text style={styles.reportTitle}>{monthName} {year} â€” Your Health Report</Text>
       <View style={styles.reportRow}>
         {[
           { label: 'Optimal', count: optimal, bg: Colors.mboaGreen, tc: Colors.cleanWhite },
@@ -460,7 +462,7 @@ const MonthlyReport = ({
       </View>
       <View style={styles.reportDivider} />
       <Text style={styles.reportOverall}>
-        Overall Score: {overallScore}% — {getHarmonyLabel(overallScore)}
+        Overall Score: {overallScore}% â€” {getHarmonyLabel(overallScore)}
       </Text>
       <Text style={[styles.reportHabit, { color: Colors.mboaGreen }]}>
         Strongest: {strongest.label} ({strongest.days}/{totalDays} days)
@@ -472,7 +474,7 @@ const MonthlyReport = ({
   );
 };
 
-// ─── MONTHLY CALENDAR ─────────────────────────────────────────────────────
+// â”€â”€â”€ MONTHLY CALENDAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const MonthlyCalendar = ({
   checkInHistory,
@@ -568,7 +570,7 @@ const MonthlyCalendar = ({
   );
 };
 
-// ─── GUIDE CARD LIST ──────────────────────────────────────────────────────
+// â”€â”€â”€ GUIDE CARD LIST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const GuideCardList = ({ guideCards }: { guideCards: any[] }) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
@@ -591,7 +593,7 @@ const GuideCardList = ({ guideCards }: { guideCards: any[] }) => {
               />
               <Text style={styles.guideTitle}>{guide.title}</Text>
               <Text style={[styles.guideToggle, { color: guide.color }]}>
-                {isOpen ? '▲' : '▼'}
+                {isOpen ? 'â–²' : 'â–¼'}
               </Text>
             </View>
             {isOpen && <Text style={styles.guideTip}>{guide.tip}</Text>}
@@ -602,13 +604,14 @@ const GuideCardList = ({ guideCards }: { guideCards: any[] }) => {
   );
 };
 
-// ─── ANSWER TYPE ──────────────────────────────────────────────────────────
+// â”€â”€â”€ ANSWER TYPE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type Answer = 'yes' | 'not_yet' | null;
 
-// ─── MAIN HUB SCREEN ──────────────────────────────────────────────────────
+// â”€â”€â”€ MAIN HUB SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const HubScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const {
     archetype,
@@ -777,19 +780,19 @@ const HubScreen = () => {
     try {
       await Share.share({
         message:
-          'I am using Mboa-Zen — a health and fitness app built for Cameroon using our local foods and home workouts. No gym needed. Try it free: https://mboa-zen.vercel.app',
+          'I am using Mboa-Zen â€” a health and fitness app built for Cameroon using our local foods and home workouts. No gym needed. Try it free: https://mboa-zen.vercel.app',
         url: 'https://mboa-zen.vercel.app',
-        title: 'Mboa-Zen — Local Wellness for Cameroon',
+        title: 'Mboa-Zen â€” Local Wellness for Cameroon',
       });
     } catch (error) {
       console.log('Share error:', error);
     }
   };
 
-  const options: { id: 'runner' | 'warrior' | 'guardian'; label: string }[] = [
-    { id: 'runner', label: 'The Swift' },
-    { id: 'warrior', label: 'The Strong' },
-    { id: 'guardian', label: 'The Steady' },
+    const options: { id: 'runner' | 'warrior' | 'guardian'; label: string }[] = [
+    { id: 'runner', label: t('hub.runnerTitle') },
+    { id: 'warrior', label: t('hub.warriorTitle') },
+    { id: 'guardian', label: t('hub.guardianTitle') },
   ];
 
   const questions: {
@@ -806,11 +809,9 @@ const HubScreen = () => {
     return (
       <FadeInView style={styles.container} key={refreshKey}>
         <View style={styles.section}>
-          <Text style={styles.eyebrow}>YOUR JOURNEY</Text>
-          <Text style={styles.header}>Find Your Archetype</Text>
-          <Text style={styles.subHeader}>
-            Select your path to wellness
-          </Text>
+          <Text style={styles.eyebrow}>{t('hub.eyebrow')}</Text>
+          <Text style={styles.header}>{t('hub.archetypeTitle')}</Text>
+          <Text style={styles.subHeader}>{t('hub.archetypeSubtitle')}</Text>
           <View style={styles.archetypeButtonRow}>
             {options.map((option) => (
               <MboaButton
@@ -828,7 +829,7 @@ const HubScreen = () => {
           onPress={scrollToTop}
           activeOpacity={0.8}
         >
-          <Text style={styles.scrollTopArrow}>↑</Text>
+          <Text style={styles.scrollTopArrow}>â†‘</Text>
         </TouchableOpacity>
       )}
       </FadeInView>
@@ -850,7 +851,7 @@ const HubScreen = () => {
       >
         <View style={styles.section}>
 
-          {/* ─── ARCHETYPE HERO ────────────────────────────────────────── */}
+          {/* â”€â”€â”€ ARCHETYPE HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <View style={styles.heroContainer}>
             <Image
               source={archetypeData.image}
@@ -858,8 +859,8 @@ const HubScreen = () => {
               resizeMode="cover"
             />
             <View style={styles.heroOverlay}>
-              <Text style={styles.heroTitle}>{archetypeData.title}</Text>
-              <Text style={styles.heroSubtitle}>{archetypeData.subtitle}</Text>
+              <Text style={styles.heroTitle}>{t(archetypeData.titleKey)}</Text>
+              <Text style={styles.heroSubtitle}>{t(archetypeData.subtitleKey)}</Text>
             </View>
           </View>
 
@@ -867,15 +868,14 @@ const HubScreen = () => {
           <View style={styles.proverbCard}>
             <View style={styles.accentLine} />
             <Text style={styles.proverb}>"{dailyProverb.proverb}"</Text>
-            <Text style={styles.author}>— {dailyProverb.origin}</Text>
+            <Text style={styles.author}>â€” {dailyProverb.origin}</Text>
             <View style={styles.divider} />
             <Text style={styles.lesson}>{dailyProverb.lesson}</Text>
           </View>
 
-          {/* ─── WATER TRACKER ──────────────────────────────────────────── */}
+          {/* â”€â”€â”€ WATER TRACKER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <View style={styles.waterSection}>
-            <Text style={styles.waterTitle}>💧 Water Tracker</Text>
-
+            <Text style={styles.waterTitle}>{t('hub.waterTitle')}</Text>
             <View style={styles.dropsContainer}>
               {Array.from({ length: 8 }).map((_, index) => (
                 <WaterDrop
@@ -908,10 +908,10 @@ const HubScreen = () => {
             </Text>
 
             {waterIntake >= waterGoal && (
-              <Text style={styles.waterComplete}>🌊 Ocean full! Good job!</Text>
+              <Text style={styles.waterComplete}>{t('hub.waterComplete')}</Text>
             )}
 
-            {/* ─── WATER STREAK ROW ────────────────────────────────── */}
+            {/* â”€â”€â”€ WATER STREAK ROW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             <View style={styles.streakDivider} />
             <View style={styles.streakRow}>
               {Array.from({ length: 7 }).map((_, i) => {
@@ -944,7 +944,7 @@ const HubScreen = () => {
                 : 'Start your streak today'}
             </Text>
 
-            {/* ─── NEAR-MISS / HEALTH MESSAGE ──────────────────── */}
+            {/* â”€â”€â”€ NEAR-MISS / HEALTH MESSAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {(() => {
               const daysSinceLastGoal = getDaysSinceLastGoal();
               const brokenStreakMsg = getBrokenStreakMessage(daysSinceLastGoal);
@@ -978,7 +978,7 @@ const HubScreen = () => {
               return null;
             })()}
 
-            {/* ─── LIFETIME ACTIVE DAYS ──────────────────────────── */}
+            {/* â”€â”€â”€ LIFETIME ACTIVE DAYS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             <View style={styles.daysActiveBox}>
               <Text style={styles.daysActiveNumber}>{getDaysActive()}</Text>
               <Text style={styles.daysActiveLabel}>
@@ -994,18 +994,16 @@ const HubScreen = () => {
             activeOpacity={0.85}
           >
             <View style={styles.scanCardContent}>
-              <Text style={styles.scanCardTitle}>Body Snapshot</Text>
-              <Text style={styles.scanCardSubtitle}>
-                Check your BMI and body health indicators
-              </Text>
+              <Text style={styles.scanCardTitle}>{t('hub.bodySnapshot')}</Text>
+              <Text style={styles.scanCardSubtitle}>{t('hub.bodySnapshotSubtitle')}</Text>
             </View>
-            <Text style={styles.scanCardArrow}>→</Text>
+            <Text style={styles.scanCardArrow}>â†’</Text>
           </TouchableOpacity>
 
-          {/* Previous month summary — first day of new month only */}
+          {/* Previous month summary â€” first day of new month only */}
           {showPrevMonthSummary && (
             <>
-              <Text style={styles.sectionLabel}>Last Month's Summary</Text>
+              <Text style={styles.sectionLabel}>{t('hub.lastMonthSummary')}</Text>
               <PrevMonthSummary
                 checkInHistory={checkInHistory}
                 monthName={prevMonthName}
@@ -1016,11 +1014,11 @@ const HubScreen = () => {
           )}
 
           {/* Q&A Check-In */}
-          <Text style={styles.sectionLabel}>Today's Check-In</Text>
+          <Text style={styles.sectionLabel}>{t('hub.todayCheckIn')}</Text>
 
           {todayAlreadyAnswered ? (
             <View style={styles.alreadyDoneCard}>
-              <Text style={styles.alreadyDoneTitle}>✓ Check-in Complete!</Text>
+              <Text style={styles.alreadyDoneTitle}>âœ“ Check-in Complete!</Text>
               <Text style={styles.alreadyDoneSubtitle}>
                 Come back tomorrow to continue your streak
               </Text>
@@ -1036,7 +1034,7 @@ const HubScreen = () => {
                 />
               </View>
               <Text style={[styles.harmonyRevealScore, { color: getHarmonyColor(harmonyScore), marginTop: 8 }]}>
-                {harmonyScore}% — {getHarmonyLabel(harmonyScore)}
+                {harmonyScore}% â€” {getHarmonyLabel(harmonyScore)}
               </Text>
             </View>
           ) : (
@@ -1060,7 +1058,7 @@ const HubScreen = () => {
               </View>
               <Text style={styles.progressHint}>
                 {answeredCount}/3 answered
-                {allAnswered ? ` — Ready to see your harmony!` : ''}
+                {allAnswered ? ` â€” Ready to see your harmony!` : ''}
               </Text>
 
               <View style={styles.questionsDivider} />
@@ -1085,7 +1083,7 @@ const HubScreen = () => {
                           styles.qaBtnText,
                           answer === 'yes' && styles.qaBtnTextWhite,
                         ]}>
-                          ✓  Yes
+                          âœ“  Yes
                         </Text>
                       </TouchableOpacity>
 
@@ -1114,7 +1112,7 @@ const HubScreen = () => {
           {/* View Monthly Progress Button */}
           {allAnswered && (
             <MboaButton
-              title="View Monthly Progress"
+              title={t('hub.viewMonthlyProgress')}
               onPress={() => setShowProgressModal(true)}
               variant="primary"
             />
@@ -1126,7 +1124,7 @@ const HubScreen = () => {
             onPress={() => setGuidesExpanded(!guidesExpanded)}
             activeOpacity={0.8}
           >
-            <Text style={styles.sectionLabel}>Wellness Guides</Text>
+            <Text style={styles.sectionLabel}>{t('hub.wellnessGuides')}</Text>
             <Text style={styles.guidesToggle}>
               {guidesExpanded ? 'Hide' : 'Show'}
             </Text>
@@ -1136,12 +1134,10 @@ const HubScreen = () => {
 
           {/* Share */}
           <View style={styles.shareCard}>
-            <Text style={styles.shareTitle}>Share Mboa-Zen</Text>
-            <Text style={styles.shareSubtitle}>
-              Help others discover wellness the Cameroon way
-            </Text>
+            <Text style={styles.shareTitle}>{t('hub.shareTitle')}</Text>
+            <Text style={styles.shareSubtitle}>{t('hub.shareSubtitle')}</Text>
             <MboaButton
-              title="Share App"
+              title={t('hub.shareApp')}
               onPress={handleShare}
               variant="primary"
             />
@@ -1151,7 +1147,7 @@ const HubScreen = () => {
         </View>
       </ScrollView>
 
-      {/* ─── MONTHLY PROGRESS MODAL ──────────────────────────────────── */}
+      {/* â”€â”€â”€ MONTHLY PROGRESS MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <Modal
         visible={showProgressModal}
         animationType="slide"
@@ -1165,7 +1161,7 @@ const HubScreen = () => {
               onPress={() => setShowProgressModal(false)}
               activeOpacity={0.8}
             >
-              <Text style={styles.modalCloseText}>✕</Text>
+              <Text style={styles.modalCloseText}>âœ•</Text>
             </TouchableOpacity>
 
             <ScrollView
@@ -1174,9 +1170,9 @@ const HubScreen = () => {
               showsVerticalScrollIndicator={false}
             >
               <View style={styles.harmonyReveal}>
-                <Text style={styles.harmonyRevealLabel}>Today's Harmony Score</Text>
+                <Text style={styles.harmonyRevealLabel}>{t('hub.todayHarmony')}</Text>
                 <Text style={[styles.harmonyRevealScore, { color: getHarmonyColor(harmonyScore) }]}>
-                  {harmonyScore}% — {getHarmonyLabel(harmonyScore)}
+                  {harmonyScore}% â€” {getHarmonyLabel(harmonyScore)}
                 </Text>
                 <View style={styles.progressBarBgLarge}>
                   <View
@@ -1200,7 +1196,7 @@ const HubScreen = () => {
                 </Text>
               </View>
 
-              <Text style={styles.sectionLabel}>This Month's Progress</Text>
+              <Text style={styles.sectionLabel}>{t('hub.thisMonthProgress')}</Text>
               <MonthlyCalendar
                 checkInHistory={checkInHistory}
                 streak={streak}
@@ -1210,7 +1206,7 @@ const HubScreen = () => {
         </View>
       </Modal>
 
-      {/* ─── GOOD JOB MODAL ──────────────────────────────────────────── */}
+      {/* â”€â”€â”€ GOOD JOB MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <Modal
         visible={showGoodJobModal}
         animationType="fade"
@@ -1219,8 +1215,8 @@ const HubScreen = () => {
       >
         <View style={styles.goodJobOverlay}>
           <View style={styles.goodJobContainer}>
-            <Text style={styles.goodJobEmoji}>🌊</Text>
-            <Text style={styles.goodJobTitle}>Good Job!</Text>
+            <Text style={styles.goodJobEmoji}>ðŸŒŠ</Text>
+            <Text style={styles.goodJobTitle}>{t('hub.goodJobTitle')}</Text>
             <Text style={styles.goodJobSubtitle}>
               You drank {waterGoal} glasses today.
             </Text>
@@ -1249,7 +1245,7 @@ const HubScreen = () => {
 
             <View style={styles.goodJobButtonRow}>
               <MboaButton
-                title="Done"
+                title={t('hub.done')}
                 onPress={() => setShowGoodJobModal(false)}
                 variant="primary"
               />
@@ -1258,7 +1254,7 @@ const HubScreen = () => {
         </View>
       </Modal>
 
-      {/* ─── MILESTONE CELEBRATION MODAL ──────────────────────────────── */}
+      {/* â”€â”€â”€ MILESTONE CELEBRATION MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <Modal
         visible={!!milestoneData}
         animationType="fade"
@@ -1267,7 +1263,7 @@ const HubScreen = () => {
       >
         <View style={styles.milestoneOverlay}>
           <View style={styles.milestoneContainer}>
-            <Text style={styles.milestoneStar}>⭐</Text>
+            <Text style={styles.milestoneStar}>â­</Text>
             <Text style={styles.milestoneDays}>{milestoneData?.days}</Text>
             <Text style={styles.milestoneDaysLabel}>
               {milestoneData?.days === 1 ? 'day' : 'days'}
@@ -1277,7 +1273,7 @@ const HubScreen = () => {
 
             <View style={styles.milestoneButtonRow}>
               <MboaButton
-                title="Keep Going"
+                title={t('hub.keepGoing')}
                 onPress={() => setMilestoneData(null)}
                 variant="primary"
               />
@@ -1286,14 +1282,14 @@ const HubScreen = () => {
         </View>
       </Modal>
 
-      {/* ─── SCROLL TO TOP BUTTON ────────────────────────────────────── */}
+      {/* â”€â”€â”€ SCROLL TO TOP BUTTON â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {showScrollTop && (
         <TouchableOpacity
           style={styles.scrollTopButton}
           onPress={scrollToTop}
           activeOpacity={0.8}
         >
-          <Text style={styles.scrollTopArrow}>↑</Text>
+          <Text style={styles.scrollTopArrow}>â†‘</Text>
         </TouchableOpacity>
       )}
     </FadeInView>
@@ -1301,7 +1297,7 @@ const HubScreen = () => {
 };
     
 
-// ─── STYLES ───────────────────────────────────────────────────────────────
+// â”€â”€â”€ STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.cleanWhite, alignItems: 'center' },
@@ -1316,7 +1312,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
 
-  // ─── HERO STYLES ──────────────────────────────────────────────────────
+  // â”€â”€â”€ HERO STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   heroContainer: {
     width: '100%',
     height: 200,
@@ -1453,7 +1449,7 @@ const styles = StyleSheet.create({
   shareTitle: { fontSize: 16, ...FONTS.bold, color: Colors.earthBlack, textAlign: 'center', marginBottom: 8 },
   shareSubtitle: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, textAlign: 'center', lineHeight: 20, marginBottom: 16 },
 
-  // ─── WATER TRACKER STYLES ─────────────────────────────────────────────
+  // â”€â”€â”€ WATER TRACKER STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   waterSection: {
     width: '100%',
     backgroundColor: Colors.softBg,
@@ -1567,7 +1563,7 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
   },
 
-  // ─── BODY SNAPSHOT CARD ───────────────────────────────────────────────
+  // â”€â”€â”€ BODY SNAPSHOT CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   scanCard: {
     width: '100%',
     flexDirection: 'row',
@@ -1601,7 +1597,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
 
-  // ─── PROGRESS MODAL STYLES ────────────────────────────────────────────
+  // â”€â”€â”€ PROGRESS MODAL STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',
@@ -1640,7 +1636,7 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
 
-  // ─── GOOD JOB MODAL STYLES ────────────────────────────────────────────
+  // â”€â”€â”€ GOOD JOB MODAL STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   goodJobOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',
@@ -1702,7 +1698,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // ─── MILESTONE MODAL STYLES ───────────────────────────────────────────
+  // â”€â”€â”€ MILESTONE MODAL STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   milestoneOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.75)',
@@ -1786,3 +1782,4 @@ const styles = StyleSheet.create({
 
 
 export default HubScreen;
+
