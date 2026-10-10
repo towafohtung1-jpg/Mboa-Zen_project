@@ -53,49 +53,49 @@ const ARCHETYPE_DATA: Record<
 
 const GUIDE_CARDS: Record<
   string,
-  { icon: any; title: string; tip: string; color: string }[]
+  { icon: any; titleKey: string; tipKey: string; color: string }[]
 > = {
   runner: [
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Drink More In Harmattan', tip: 'When the dry season comes, your body loses water much faster than normal. Drink at least 8 cups of water every day. Start every morning with warm water and ginger before you go anywhere.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Food For Hard Work', tip: 'A working person needs starchy food for energy —” plantain, yam, rice, or fufu. Add any protein you can find —” beans, fish, egg, or meat. Without proper food, your body cannot keep up.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'What To Eat Before You Move', tip: 'Before exercise or a long day of work, eat something starchy 30 to 45 minutes before you start. Ripe plantain, sweet potato, or pap gives your body clean energy. Do not exercise on an empty stomach.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Rest Is Part Of The Plan', tip: 'Your body repairs itself when you sleep, not when you exercise. Seven to eight hours of sleep is not laziness —” it is part of staying healthy and strong.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rainy_season.png'), title: 'Eating In The Rainy Season', tip: 'During the rainy season, your body needs more immune support. Add ginger, garlic, and bitter leaf to your meals. Eat warm, freshly cooked food as much as possible.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: "Runner's Road Side Guide", tip: 'When buying food outside before an active day, choose fish or egg over heavy meat. Ask for boiled plantain instead of fried. Your stomach needs to be light to move well.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Morning Water Habit', tip: 'Before you eat anything in the morning, drink one full cup of clean water. This simple habit wakes up your digestion and gives your body a clean start.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Affordable Energy Foods', tip: 'Pap, boiled yam, ripe plantain, sweet potato —” these are among the best energy foods available and they cost very little. Eat them regularly and your body will feel the difference.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'Walk More Than You Think', tip: 'Walking fast for 30 minutes every day is enough to improve your heart health. Park further away. Take the stairs. Choose movement wherever you can.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Your Body Speaks To You', tip: 'When you feel exhausted mid-day, it is often dehydration or low blood sugar. Drink water and eat a small snack before assuming you are just tired.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: 'Add Vegetables Everywhere', tip: 'Whatever you are eating today, add one vegetable to it. Njama-njama, bitter leaf, garden egg, tomatoes —” any vegetable counts. This one habit improves your nutrition without changing your entire diet.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), title: 'Eat Earlier In The Evening', tip: 'Try to finish your last meal before 7pm whenever possible. A lighter, earlier supper improves your sleep and your energy the next morning.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), titleKey: 'hub.guideR1Title', tipKey: 'hub.guideR1Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), titleKey: 'hub.guideR2Title', tipKey: 'hub.guideR2Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), titleKey: 'hub.guideR3Title', tipKey: 'hub.guideR3Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), titleKey: 'hub.guideR4Title', tipKey: 'hub.guideR4Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rainy_season.png'), titleKey: 'hub.guideR5Title', tipKey: 'hub.guideR5Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), titleKey: 'hub.guideR6Title', tipKey: 'hub.guideR6Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), titleKey: 'hub.guideR7Title', tipKey: 'hub.guideR7Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), titleKey: 'hub.guideR8Title', tipKey: 'hub.guideR8Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), titleKey: 'hub.guideR9Title', tipKey: 'hub.guideR9Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), titleKey: 'hub.guideR10Title', tipKey: 'hub.guideR10Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), titleKey: 'hub.guideR11Title', tipKey: 'hub.guideR11Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), titleKey: 'hub.guideR12Title', tipKey: 'hub.guideR12Tip', color: Colors.zenGold },
   ],
   warrior: [
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: 'Eating Outside? Choose Well', tip: 'When you buy from a road-side vendor, always choose grilled over fried. Ask for fish or chicken instead of processed meat. These small choices every day make a real difference.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'For Those Who Work With Their Hands', tip: 'Builders, electricians, plumbers, farmers, drivers —” your body works harder than most. After a heavy day, eat beans, fish, eggs, or any meat alongside your starch.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Water Makes You Stronger', tip: 'When you are dehydrated, your muscles become weak and your mind slows down. Drink water before you start work. Choose water or fresh juice over sodas.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rainy_season.png'), title: 'Stay Safe Eating In The Rain', tip: 'During the rainy season, food goes bad faster. Choose food that is freshly cooked and visibly hot. Avoid food that has been sitting open for a long time.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'Protein After Physical Work', tip: 'After any heavy physical work, your muscles need to be rebuilt. Eat beans, fish, groundnuts, or any available meat within two hours of finishing work.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Rest Days Are Not Wasted Days', tip: 'Your muscles do not grow during exercise —” they grow during rest. Taking one or two rest days per week is not laziness. Sleep well, eat well, and let your body do its work.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: "Groundnuts Are A Warrior's Friend", tip: 'Roasted groundnuts are one of the best affordable protein sources in Cameroon. Keep some in your bag —” they are the perfect working person\'s snack.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Eggs Every Day', tip: 'If you can afford one egg per day, eat it. Boiled, fried, or mixed into any meal —” eggs support muscle recovery better than most foods at their price.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Salt And Physical Work', tip: 'When you sweat heavily during physical work, your body loses salt alongside water. A little extra salt on heavy work days is not unhealthy —” it replaces what your body lost.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: 'The Suya Option', tip: 'Suya —” grilled spiced meat on a skewer —” is actually a good protein choice when eating outside. It is grilled not fried. Choose suya over fried options when available.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'Stretch Before You Start', tip: 'Before any heavy physical work, spend five minutes stretching your back, arms, and legs. A builder who injures their back loses weeks of income. Prevention costs nothing.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), title: 'Do Not Skip Breakfast', tip: 'Starting heavy physical work without eating is like starting a car without fuel. Even pap and puff-puff is better than nothing before a hard day.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), titleKey: 'hub.guideW1Title', tipKey: 'hub.guideW1Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), titleKey: 'hub.guideW2Title', tipKey: 'hub.guideW2Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), titleKey: 'hub.guideW3Title', tipKey: 'hub.guideW3Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rainy_season.png'), titleKey: 'hub.guideW4Title', tipKey: 'hub.guideW4Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), titleKey: 'hub.guideW5Title', tipKey: 'hub.guideW5Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), titleKey: 'hub.guideW6Title', tipKey: 'hub.guideW6Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), titleKey: 'hub.guideW7Title', tipKey: 'hub.guideW7Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), titleKey: 'hub.guideW8Title', tipKey: 'hub.guideW8Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), titleKey: 'hub.guideW9Title', tipKey: 'hub.guideW9Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), titleKey: 'hub.guideW10Title', tipKey: 'hub.guideW10Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), titleKey: 'hub.guideW11Title', tipKey: 'hub.guideW11Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), titleKey: 'hub.guideW12Title', tipKey: 'hub.guideW12Tip', color: Colors.zenGold },
   ],
   guardian: [
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: 'Buying Food Outside? Here Is How', tip: 'When buying from vendors, ask for boiled or grilled instead of fried. Choose pepper soup, plain rice with vegetables, or beans over heavy fried options.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: "You Don't Have To Finish The Plate", tip: 'Vendor plates in Cameroon are often very large portions. Stop eating when you feel satisfied. Eat slowly and stop when full. Save the rest or share it.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'Foods That Cool The Body Down', tip: 'Ginger, garlic, njama-njama, pumpkin leaves, and bitter leaf reduce pain and tiredness inside the body. Try to include one in your meals every day.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), title: 'Eat Light At Night', tip: 'Choose something light for supper —” pepper soup, boiled vegetables, a small portion of beans. Heavy fufu or fried food late at night makes weight control very difficult.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), title: 'Drink Water Before You Eat', tip: 'Drinking one full glass of water 15 to 20 minutes before a meal reduces how much you eat naturally. Your body often confuses thirst with hunger.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), title: 'Sleep And Weight Control', tip: 'Poor sleep increases hunger hormones and cravings for heavy food. Good sleep is not optional —” it is a health tool that supports every other effort you make.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), title: 'Beans Are Your Best Friend', tip: 'Beans are high in fiber, protein, and complex carbohydrates. They fill you up for longer than rice or fufu and cost less. Eat beans regularly and you will naturally eat less of everything else.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rainy_season.png'), title: 'Soups Over Solids', tip: 'Pepper soup, light egusi soup, and vegetable soups fill you up with fewer calories than solid starchy meals. Choose soup-based meals when managing your weight.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), title: 'Chew Slowly', tip: 'It takes 20 minutes for your brain to receive the signal that you are full. If you eat quickly, you will eat far more than your body needs. Slow down between bites.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), title: 'Move After You Eat', tip: 'A short 10-minute walk after a meal significantly improves how your body processes food. It reduces blood sugar spikes and aids digestion.', color: Colors.zenGold },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), title: 'Avoid Sugary Drinks', tip: 'Sodas, energy drinks, and sweetened juices add significant calories with no nutritional benefit. Replace one sugary drink per day with water or lemon water.', color: Colors.mboaGreen },
-    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), title: 'The Two-Hour Rule', tip: 'Stop eating two hours before you go to sleep. Whatever you eat late gets stored more easily. If you feel hungry late at night, drink warm water or ginger tea instead.', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), titleKey: 'hub.guideG1Title', tipKey: 'hub.guideG1Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), titleKey: 'hub.guideG2Title', tipKey: 'hub.guideG2Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), titleKey: 'hub.guideG3Title', tipKey: 'hub.guideG3Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), titleKey: 'hub.guideG4Title', tipKey: 'hub.guideG4Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_dry_season.png'), titleKey: 'hub.guideG5Title', tipKey: 'hub.guideG5Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rest_day.png'), titleKey: 'hub.guideG6Title', tipKey: 'hub.guideG6Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_budget_meals.png'), titleKey: 'hub.guideG7Title', tipKey: 'hub.guideG7Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_rainy_season.png'), titleKey: 'hub.guideG8Title', tipKey: 'hub.guideG8Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_cheap_add_ons.png'), titleKey: 'hub.guideG9Title', tipKey: 'hub.guideG9Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_active_day.png'), titleKey: 'hub.guideG10Title', tipKey: 'hub.guideG10Tip', color: Colors.zenGold },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_roadside_choices.png'), titleKey: 'hub.guideG11Title', tipKey: 'hub.guideG11Tip', color: Colors.mboaGreen },
+    { icon: require('../../assets/Graphics/UI_vectors_icon_set/guide_fasting_period.png'), titleKey: 'hub.guideG12Title', tipKey: 'hub.guideG12Tip', color: Colors.zenGold },
   ],
 };
 
@@ -576,7 +576,7 @@ const MonthlyCalendar = ({
 
 // â”€â”€â”€ GUIDE CARD LIST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-const GuideCardList = ({ guideCards }: { guideCards: any[] }) => {
+const GuideCardList = ({ guideCards, t }: { guideCards: any[]; t: (k: string) => string }) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   return (
     <View>
@@ -595,12 +595,12 @@ const GuideCardList = ({ guideCards }: { guideCards: any[] }) => {
                 style={[styles.guideIconImage, { tintColor: guide.color }]}
                 resizeMode="contain"
               />
-              <Text style={styles.guideTitle}>{guide.title}</Text>
+              <Text style={styles.guideTitle}>{t(guide.titleKey)}</Text>
               <Text style={[styles.guideToggle, { color: guide.color }]}>
                 {isOpen ? '▲' : '▼'}
               </Text>
             </View>
-            {isOpen && <Text style={styles.guideTip}>{guide.tip}</Text>}
+            {isOpen && <Text style={styles.guideTip}>{t(guide.tipKey)}</Text>}
           </TouchableOpacity>
         );
       })}
@@ -1144,7 +1144,7 @@ const HubScreen = () => {
             </Text>
           </TouchableOpacity>
 
-          {guidesExpanded && <GuideCardList guideCards={guideCards} />}
+          {guidesExpanded && <GuideCardList guideCards={guideCards} t={t} />}
 
           {/* Share */}
           <View style={styles.shareCard}>
