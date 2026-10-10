@@ -615,7 +615,7 @@ type Answer = 'yes' | 'not_yet' | null;
 // â”€â”€â”€ MAIN HUB SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const HubScreen = () => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const navigation = useNavigation<any>();
   const {
     archetype,
@@ -872,10 +872,22 @@ const HubScreen = () => {
           {/* Daily Proverb */}
           <View style={styles.proverbCard}>
             <View style={styles.accentLine} />
-            <Text style={styles.proverb}>"{dailyProverb.proverb}"</Text>
-            <Text style={styles.author}>—” {dailyProverb.origin}</Text>
-            <View style={styles.divider} />
-            <Text style={styles.lesson}>{dailyProverb.lesson}</Text>
+            <Text style={styles.proverb}>
+  "{language === 'pidgin'
+    ? dailyProverb.proverb_pidgin
+    : language === 'fr'
+    ? dailyProverb.proverb_fr
+    : dailyProverb.proverb}"
+</Text>
+<Text style={styles.author}>— {dailyProverb.origin}</Text>
+<View style={styles.divider} />
+<Text style={styles.lesson}>
+  {language === 'pidgin'
+    ? dailyProverb.lesson_pidgin
+    : language === 'fr'
+    ? dailyProverb.lesson_fr
+    : dailyProverb.lesson}
+</Text>
           </View>
 
           {/* â”€â”€â”€ WATER TRACKER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
