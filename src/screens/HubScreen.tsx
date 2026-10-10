@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ src/screens/HubScreen.tsx â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ─── src/screens/HubScreen.tsx ─────────────────────────────────────────
 
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import {
@@ -22,11 +22,7 @@ import { MboaButton } from '../components/common/MboaButton';
 import { useSwipeTabs } from '../hooks/useSwipeTabs';
 import { useTranslation } from '../i18n/useTranslation';
 
-
-
-
-  
-// â”€â”€â”€ ARCHETYPE DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── ARCHETYPE DATA ──────────────────────────────────────────────────────
 
 const ARCHETYPE_DATA: Record<
   string,
@@ -49,7 +45,7 @@ const ARCHETYPE_DATA: Record<
   },
 };
 
-// â”€â”€â”€ GUIDE CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── GUIDE CARDS ─────────────────────────────────────────────────────────
 
 const GUIDE_CARDS: Record<
   string,
@@ -99,7 +95,7 @@ const GUIDE_CARDS: Record<
   ],
 };
 
-// â”€â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── HELPERS ──────────────────────────────────────────────────────────────
 
 const getDailyGuides = (archetype: string): any[] => {
   const allCards = GUIDE_CARDS[archetype] || [];
@@ -156,7 +152,7 @@ const getHarmonyColor = (score: number): string => {
   return Colors.textMuted;
 };
 
-// â”€â”€â”€ WATER NEAR-MISS / HEALTH MESSAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── WATER NEAR-MISS / HEALTH MESSAGE ────────────────────────────────────
 
 const getWaterMessage = ({
   waterIntake,
@@ -228,33 +224,15 @@ const getWaterMessage = ({
   return null;
 };
 
-// â”€â”€â”€ MILESTONE DEFINITIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── MILESTONE DEFINITIONS ────────────────────────────────────────────────
 
 const getMilestones = (t: (k: string) => string): Record<number, { title: string; message: string }> => ({
-  7: {
-    title: t('hub.ms7'),
-    message: t('hub.ms7'),
-  },
-  14: {
-    title: t('hub.ms14'),
-    message: t('hub.ms14'),
-  },
-  30: {
-    title: t('hub.ms30'),
-    message: t('hub.ms30'),
-  },
-  60: {
-    title: t('hub.ms60'),
-    message: t('hub.ms60'),
-  },
-  100: {
-    title: t('hub.ms100'),
-    message: t('hub.ms100'),
-  },
-  365: {
-    title: t('hub.ms365'),
-    message: t('hub.ms365'),
-  },
+  7: { title: t('hub.ms7'), message: t('hub.ms7') },
+  14: { title: t('hub.ms14'), message: t('hub.ms14') },
+  30: { title: t('hub.ms30'), message: t('hub.ms30') },
+  60: { title: t('hub.ms60'), message: t('hub.ms60') },
+  100: { title: t('hub.ms100'), message: t('hub.ms100') },
+  365: { title: t('hub.ms365'), message: t('hub.ms365') },
 });
 
 const getNewMilestone = (
@@ -270,53 +248,36 @@ const getNewMilestone = (
       return { days: waterStreak, key, ...MILESTONES[waterStreak] };
     }
   }
-
   if (MILESTONES[checkInStreak]) {
     const key = `checkin-${checkInStreak}`;
     if (!celebrated.includes(key)) {
       return { days: checkInStreak, key, ...MILESTONES[checkInStreak] };
     }
   }
-
   return null;
 };
 
-// â”€â”€â”€ BROKEN-STREAK ORGAN MESSAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── BROKEN-STREAK ORGAN MESSAGE ──────────────────────────────────────────
 
 const getBrokenStreakMessage = (daysSinceLastGoal: number, t: (k: string) => string): { text: string; color: string } | null => {
   if (daysSinceLastGoal <= 0) return null;
 
   if (daysSinceLastGoal >= 999) {
-    return {
-      text: t('hub.brokenNew'),
-      color: Colors.mboaGreen,
-    };
+    return { text: t('hub.brokenNew'), color: Colors.mboaGreen };
   }
   if (daysSinceLastGoal === 1) {
-    return {
-      text: t('hub.broken1'),
-      color: '#FF9800',
-    };
+    return { text: t('hub.broken1'), color: '#FF9800' };
   }
   if (daysSinceLastGoal <= 3) {
-    return {
-      text: t('hub.broken3').replace('{n}', String(daysSinceLastGoal)),
-      color: '#FF9800',
-    };
+    return { text: t('hub.broken3').replace('{n}', String(daysSinceLastGoal)), color: '#FF9800' };
   }
   if (daysSinceLastGoal <= 6) {
-    return {
-      text: t('hub.broken6').replace('{n}', String(daysSinceLastGoal)),
-      color: Colors.errorRed,
-    };
+    return { text: t('hub.broken6').replace('{n}', String(daysSinceLastGoal)), color: Colors.errorRed };
   }
-  return {
-    text: t('hub.brokenWeek'),
-    color: Colors.errorRed,
-  };
+  return { text: t('hub.brokenWeek'), color: Colors.errorRed };
 };
 
-// â”€â”€â”€ PREVIOUS MONTH SUMMARY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── PREVIOUS MONTH SUMMARY ───────────────────────────────────────────────
 
 const PrevMonthSummary = ({
   checkInHistory,
@@ -356,9 +317,9 @@ const PrevMonthSummary = ({
   );
 
   const habitStats = [
-    { label: 'Hydration', days: hydrationDays },
-    { label: 'Nutrition', days: nutritionDays },
-    { label: 'Movement', days: trainingDays },
+    { label: t('hub.hydration'), days: hydrationDays },
+    { label: t('hub.nutrition'), days: nutritionDays },
+    { label: t('hub.movement'), days: trainingDays },
   ];
   const strongest = [...habitStats].sort((a, b) => b.days - a.days)[0];
   const weakest = [...habitStats].sort((a, b) => a.days - b.days)[0];
@@ -366,18 +327,18 @@ const PrevMonthSummary = ({
   return (
     <View style={styles.prevMonthCard}>
       <Text style={styles.prevMonthTitle}>
-        {monthName} {prevYear} —” Your Month Is Complete!
+        {monthName} {prevYear} — {t('hub.yourMonthComplete')}
       </Text>
       <Text style={styles.prevMonthSubtitle}>
-        Here is how your health journey went last month.
+        {t('hub.howHealthJourney')}
       </Text>
 
       <View style={styles.reportRow}>
         {[
-          { label: 'Optimal', count: optimal, bg: Colors.mboaGreen, tc: Colors.cleanWhite },
-          { label: 'Rising', count: rising, bg: Colors.zenGold, tc: Colors.earthBlack },
-          { label: 'Beginning', count: beginning, bg: '#FF9800', tc: Colors.cleanWhite },
-          { label: 'Missed', count: missed, bg: '#EEEEEE', tc: Colors.textMuted },
+          { label: t('hub.optimal'), count: optimal, bg: Colors.mboaGreen, tc: Colors.cleanWhite },
+          { label: t('hub.rising'), count: rising, bg: Colors.zenGold, tc: Colors.earthBlack },
+          { label: t('hub.beginning'), count: beginning, bg: '#FF9800', tc: Colors.cleanWhite },
+          { label: t('hub.missed'), count: missed, bg: '#EEEEEE', tc: Colors.textMuted },
         ].map((item) => (
           <View key={item.label} style={[styles.reportBadge, { backgroundColor: item.bg }]}>
             <Text style={[styles.reportBadgeNum, { color: item.tc }]}>{item.count}</Text>
@@ -389,13 +350,13 @@ const PrevMonthSummary = ({
       <View style={styles.reportDivider} />
 
       <Text style={styles.reportOverall}>
-        Overall: {overallScore}% —” {getHarmonyLabel(overallScore)}
+        {t('hub.overall')}: {overallScore}% — {getHarmonyLabel(overallScore)}
       </Text>
       <Text style={[styles.reportHabit, { color: Colors.mboaGreen }]}>
-        Strongest: {strongest.label} ({strongest.days}/{daysInPrevMonth} days)
+        {t('hub.strongest')}: {strongest.label} ({strongest.days}/{daysInPrevMonth} {t('hub.daysSuffix')})
       </Text>
       <Text style={[styles.reportHabit, { color: '#FF9800' }]}>
-        Needs attention: {weakest.label} ({weakest.days}/{daysInPrevMonth} days)
+        {t('hub.needsAttention')}: {weakest.label} ({weakest.days}/{daysInPrevMonth} {t('hub.daysSuffix')})
       </Text>
 
       <MboaButton
@@ -407,13 +368,14 @@ const PrevMonthSummary = ({
   );
 };
 
-// â”€â”€â”€ MONTHLY REPORT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── MONTHLY REPORT ───────────────────────────────────────────────────────
 
 const MonthlyReport = ({
   checkInHistory,
 }: {
   checkInHistory: Record<string, any>;
 }) => {
+  const { t } = useTranslation();
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth();
@@ -441,22 +403,22 @@ const MonthlyReport = ({
     : 0;
 
   const habitStats = [
-    { label: 'Hydration', days: hydrationDays },
-    { label: 'Nutrition', days: nutritionDays },
-    { label: 'Movement', days: trainingDays },
+    { label: t('hub.hydration'), days: hydrationDays },
+    { label: t('hub.nutrition'), days: nutritionDays },
+    { label: t('hub.movement'), days: trainingDays },
   ];
   const strongest = [...habitStats].sort((a, b) => b.days - a.days)[0];
   const weakest = [...habitStats].sort((a, b) => a.days - b.days)[0];
 
   return (
     <View style={styles.reportCard}>
-      <Text style={styles.reportTitle}>{monthName} {year} —” Your Health Report</Text>
+      <Text style={styles.reportTitle}>{monthName} {year} — {t('hub.yourHealthReport')}</Text>
       <View style={styles.reportRow}>
         {[
-          { label: 'Optimal', count: optimal, bg: Colors.mboaGreen, tc: Colors.cleanWhite },
-          { label: 'Rising', count: rising, bg: Colors.zenGold, tc: Colors.earthBlack },
-          { label: 'Beginning', count: beginning, bg: '#FF9800', tc: Colors.cleanWhite },
-          { label: 'Missed', count: missed, bg: '#EEEEEE', tc: Colors.textMuted },
+          { label: t('hub.optimal'), count: optimal, bg: Colors.mboaGreen, tc: Colors.cleanWhite },
+          { label: t('hub.rising'), count: rising, bg: Colors.zenGold, tc: Colors.earthBlack },
+          { label: t('hub.beginning'), count: beginning, bg: '#FF9800', tc: Colors.cleanWhite },
+          { label: t('hub.missed'), count: missed, bg: '#EEEEEE', tc: Colors.textMuted },
         ].map((item) => (
           <View key={item.label} style={[styles.reportBadge, { backgroundColor: item.bg }]}>
             <Text style={[styles.reportBadgeNum, { color: item.tc }]}>{item.count}</Text>
@@ -466,19 +428,19 @@ const MonthlyReport = ({
       </View>
       <View style={styles.reportDivider} />
       <Text style={styles.reportOverall}>
-        Overall Score: {overallScore}% —” {getHarmonyLabel(overallScore)}
+        {t('hub.overallScore')}: {overallScore}% — {getHarmonyLabel(overallScore)}
       </Text>
       <Text style={[styles.reportHabit, { color: Colors.mboaGreen }]}>
-        Strongest: {strongest.label} ({strongest.days}/{totalDays} days)
+        {t('hub.strongest')}: {strongest.label} ({strongest.days}/{totalDays} {t('hub.daysSuffix')})
       </Text>
       <Text style={[styles.reportHabit, { color: '#FF9800' }]}>
-        Needs attention: {weakest.label} ({weakest.days}/{totalDays} days)
+        {t('hub.needsAttention')}: {weakest.label} ({weakest.days}/{totalDays} {t('hub.daysSuffix')})
       </Text>
     </View>
   );
 };
 
-// â”€â”€â”€ MONTHLY CALENDAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── MONTHLY CALENDAR ─────────────────────────────────────────────────────
 
 const MonthlyCalendar = ({
   checkInHistory,
@@ -487,6 +449,7 @@ const MonthlyCalendar = ({
   checkInHistory: Record<string, any>;
   streak: number;
 }) => {
+  const { t } = useTranslation();
   const [showReport, setShowReport] = useState(false);
   const today = new Date();
   const year = today.getFullYear();
@@ -511,7 +474,7 @@ const MonthlyCalendar = ({
       <View style={styles.calendarTopRow}>
         <View>
           <Text style={styles.calendarMonth}>{monthName} {year}</Text>
-          <Text style={styles.streakText}>{streak} day streak</Text>
+          <Text style={styles.streakText}>{streak} {t('hub.daysSuffix')}</Text>
         </View>
         <TouchableOpacity
           style={styles.reportButton}
@@ -519,7 +482,7 @@ const MonthlyCalendar = ({
           activeOpacity={0.8}
         >
           <Text style={styles.reportButtonText}>
-            {showReport ? 'Hide Report' : 'Monthly Report'}
+            {showReport ? t('hub.hideReport') : t('hub.monthlyReport')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -557,10 +520,10 @@ const MonthlyCalendar = ({
 
       <View style={styles.calendarLegend}>
         {[
-          { label: 'Optimal (3/3)', color: Colors.mboaGreen },
-          { label: 'Rising (2/3)', color: Colors.zenGold },
-          { label: 'Beginning (1/3)', color: '#FF9800' },
-          { label: 'Missed', color: '#EEEEEE' },
+          { label: `${t('hub.optimal')} (3/3)`, color: Colors.mboaGreen },
+          { label: `${t('hub.rising')} (2/3)`, color: Colors.zenGold },
+          { label: `${t('hub.beginning')} (1/3)`, color: '#FF9800' },
+          { label: t('hub.missed'), color: '#EEEEEE' },
         ].map((item) => (
           <View key={item.label} style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: item.color }]} />
@@ -574,7 +537,7 @@ const MonthlyCalendar = ({
   );
 };
 
-// â”€â”€â”€ GUIDE CARD LIST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── GUIDE CARD LIST ──────────────────────────────────────────────────────
 
 const GuideCardList = ({ guideCards, t }: { guideCards: any[]; t: (k: string) => string }) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
@@ -608,11 +571,11 @@ const GuideCardList = ({ guideCards, t }: { guideCards: any[]; t: (k: string) =>
   );
 };
 
-// â”€â”€â”€ ANSWER TYPE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── ANSWER TYPE ──────────────────────────────────────────────────────────
 
 type Answer = 'yes' | 'not_yet' | null;
 
-// â”€â”€â”€ MAIN HUB SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── MAIN HUB SCREEN ──────────────────────────────────────────────────────
 
 const HubScreen = () => {
   const { t, language } = useTranslation();
@@ -652,12 +615,9 @@ const HubScreen = () => {
     key: string;
   } | null>(null);
 
-  // Ref to ensure the milestone check runs only once per mount
   const milestoneCheckedRef = useRef(false);
-
   const panHandlers = useSwipeTabs();
 
-    // Scroll-to-top
   const scrollRef = useRef<any>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -670,7 +630,6 @@ const HubScreen = () => {
     scrollRef.current?.scrollTo({ y: 0, animated: true });
   };
 
-  // Date helpers
   const todayStr = new Date().toISOString().split('T')[0];
   const today = new Date();
   const isFirstDayOfMonth = today.getDate() === 1;
@@ -702,7 +661,6 @@ const HubScreen = () => {
     setAnswers(newAnswers);
     if (!checkIns[key]) toggleCheckIn(key);
 
-    // Auto-complete Njangi items
     if (key === 'nutrition') addNjangiItem('food');
     if (key === 'training') addNjangiItem('move');
 
@@ -751,12 +709,10 @@ const HubScreen = () => {
     logCheckInHistory();
   }, [checkIns]);
 
-  // Sync water tracker to today's date on mount
   useEffect(() => {
     syncWaterForToday();
   }, []);
 
-  // Check for milestone celebrations on mount (once per session)
   useEffect(() => {
     if (milestoneCheckedRef.current) return;
     milestoneCheckedRef.current = true;
@@ -766,11 +722,11 @@ const HubScreen = () => {
       const checkInStreak = streak;
 
       const milestone = getNewMilestone(
-  waterStreak,
-  checkInStreak,
-  celebratedMilestones,
-  t
-);
+        waterStreak,
+        checkInStreak,
+        celebratedMilestones,
+        t
+      );
 
       if (milestone) {
         setMilestoneData(milestone);
@@ -784,17 +740,16 @@ const HubScreen = () => {
   const handleShare = async () => {
     try {
       await Share.share({
-        message:
-          'I am using Mboa-Zen —” a health and fitness app built for Cameroon using our local foods and home workouts. No gym needed. Try it free: https://mboa-zen.vercel.app',
+        message: t('hub.shareMessage'),
         url: 'https://mboa-zen.vercel.app',
-        title: 'Mboa-Zen —” Local Wellness for Cameroon',
+        title: 'Mboa-Zen',
       });
     } catch (error) {
       console.log('Share error:', error);
     }
   };
 
-    const options: { id: 'runner' | 'warrior' | 'guardian'; label: string }[] = [
+  const options: { id: 'runner' | 'warrior' | 'guardian'; label: string }[] = [
     { id: 'runner', label: t('hub.runnerTitle') },
     { id: 'warrior', label: t('hub.warriorTitle') },
     { id: 'guardian', label: t('hub.guardianTitle') },
@@ -809,7 +764,6 @@ const HubScreen = () => {
     { key: 'training', question: t('hub.qa3') },
   ];
 
-  // Archetype selection screen
   if (!archetype) {
     return (
       <FadeInView style={styles.container} key={refreshKey}>
@@ -828,15 +782,15 @@ const HubScreen = () => {
             ))}
           </View>
         </View>
-              {showScrollTop && (
-        <TouchableOpacity
-          style={styles.scrollTopButton}
-          onPress={scrollToTop}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.scrollTopArrow}>↑</Text>
-        </TouchableOpacity>
-      )}
+        {showScrollTop && (
+          <TouchableOpacity
+            style={styles.scrollTopButton}
+            onPress={scrollToTop}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.scrollTopArrow}>↑</Text>
+          </TouchableOpacity>
+        )}
       </FadeInView>
     );
   }
@@ -856,7 +810,6 @@ const HubScreen = () => {
       >
         <View style={styles.section}>
 
-          {/* â”€â”€â”€ ARCHETYPE HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <View style={styles.heroContainer}>
             <Image
               source={archetypeData.image}
@@ -869,28 +822,18 @@ const HubScreen = () => {
             </View>
           </View>
 
-          {/* Daily Proverb */}
           <View style={styles.proverbCard}>
             <View style={styles.accentLine} />
             <Text style={styles.proverb}>
-  "{language === 'pidgin'
-    ? dailyProverb.proverb_pidgin
-    : language === 'fr'
-    ? dailyProverb.proverb_fr
-    : dailyProverb.proverb}"
-</Text>
-<Text style={styles.author}>— {dailyProverb.origin}</Text>
-<View style={styles.divider} />
-<Text style={styles.lesson}>
-  {language === 'pidgin'
-    ? dailyProverb.lesson_pidgin
-    : language === 'fr'
-    ? dailyProverb.lesson_fr
-    : dailyProverb.lesson}
-</Text>
+              "{language === 'pidgin' ? dailyProverb.proverb_pidgin : language === 'fr' ? dailyProverb.proverb_fr : dailyProverb.proverb}"
+            </Text>
+            <Text style={styles.author}>— {dailyProverb.origin}</Text>
+            <View style={styles.divider} />
+            <Text style={styles.lesson}>
+              {language === 'pidgin' ? dailyProverb.lesson_pidgin : language === 'fr' ? dailyProverb.lesson_fr : dailyProverb.lesson}
+            </Text>
           </View>
 
-          {/* â”€â”€â”€ WATER TRACKER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <View style={styles.waterSection}>
             <Text style={styles.waterTitle}>{t('hub.waterTitle')}</Text>
             <View style={styles.dropsContainer}>
@@ -908,10 +851,8 @@ const HubScreen = () => {
 
                       setWaterIntake(nextAmount);
 
-                      // Show "Good Job" modal only when crossing from <8 to 8
                       if (wasBelowGoal && willHitGoal) {
                         setTimeout(() => setShowGoodJobModal(true), 300);
-                        // Auto-complete Njangi water item
                         addNjangiItem('water');
                       }
                     }
@@ -921,14 +862,13 @@ const HubScreen = () => {
             </View>
 
             <Text style={styles.waterStatus}>
-              {waterIntake} / {waterGoal} glasses
+              {waterIntake} / {waterGoal} {t('hub.glasses')}
             </Text>
 
             {waterIntake >= waterGoal && (
               <Text style={styles.waterComplete}>{t('hub.waterComplete')}</Text>
             )}
 
-            {/* â”€â”€â”€ WATER STREAK ROW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             <View style={styles.streakDivider} />
             <View style={styles.streakRow}>
               {Array.from({ length: 7 }).map((_, i) => {
@@ -957,11 +897,10 @@ const HubScreen = () => {
             </View>
             <Text style={styles.waterStreakText}>
               {getWaterStreak() > 0
-                ? `${getWaterStreak()} day${getWaterStreak() > 1 ? 's' : ''} strong`
-                : 'Start your streak today'}
+                ? t('hub.daysStrong').replace('{n}', String(getWaterStreak()))
+                : t('hub.startYourStreak')}
             </Text>
 
-            {/* â”€â”€â”€ NEAR-MISS / HEALTH MESSAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {(() => {
               const daysSinceLastGoal = getDaysSinceLastGoal();
               const brokenStreakMsg = getBrokenStreakMessage(daysSinceLastGoal, t);
@@ -996,16 +935,14 @@ const HubScreen = () => {
               return null;
             })()}
 
-            {/* â”€â”€â”€ LIFETIME ACTIVE DAYS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             <View style={styles.daysActiveBox}>
               <Text style={styles.daysActiveNumber}>{getDaysActive()}</Text>
               <Text style={styles.daysActiveLabel}>
-                {getDaysActive() === 1 ? 'day active' : 'days active'}
+                {getDaysActive() === 1 ? t('hub.dayActive') : t('hub.daysActive')}
               </Text>
             </View>
           </View>
 
-          {/* Body Snapshot Card */}
           <TouchableOpacity
             style={styles.scanCard}
             onPress={() => navigation.navigate('Scan')}
@@ -1018,7 +955,6 @@ const HubScreen = () => {
             <Text style={styles.scanCardArrow}>→</Text>
           </TouchableOpacity>
 
-          {/* Previous month summary —” first day of new month only */}
           {showPrevMonthSummary && (
             <>
               <Text style={styles.sectionLabel}>{t('hub.lastMonthSummary')}</Text>
@@ -1031,12 +967,11 @@ const HubScreen = () => {
             </>
           )}
 
-          {/* Q&A Check-In */}
           <Text style={styles.sectionLabel}>{t('hub.todayCheckIn')}</Text>
 
           {todayAlreadyAnswered ? (
             <View style={styles.alreadyDoneCard}>
-              <Text style={styles.alreadyDoneTitle}>✓“ Check-in Complete!</Text>
+              <Text style={styles.alreadyDoneTitle}>✓ {t('hub.checkInComplete')}</Text>
               <Text style={styles.alreadyDoneSubtitle}>{t('hub.comeBackTomorrow')}</Text>
               <View style={[styles.progressBarBgLarge, { marginTop: 14 }]}>
                 <View
@@ -1050,7 +985,7 @@ const HubScreen = () => {
                 />
               </View>
               <Text style={[styles.harmonyRevealScore, { color: getHarmonyColor(harmonyScore), marginTop: 8 }]}>
-                {harmonyScore}% —” {getHarmonyLabel(harmonyScore)}
+                {harmonyScore}% — {getHarmonyLabel(harmonyScore)}
               </Text>
             </View>
           ) : (
@@ -1097,7 +1032,7 @@ const HubScreen = () => {
                           styles.qaBtnText,
                           answer === 'yes' && styles.qaBtnTextWhite,
                         ]}>
-                      {t('hub.yes')}
+                          {t('hub.yes')}
                         </Text>
                       </TouchableOpacity>
 
@@ -1123,7 +1058,6 @@ const HubScreen = () => {
             </View>
           )}
 
-          {/* View Monthly Progress Button */}
           {allAnswered && (
             <MboaButton
               title={t('hub.viewMonthlyProgress')}
@@ -1132,7 +1066,6 @@ const HubScreen = () => {
             />
           )}
 
-          {/* Wellness Guides */}
           <TouchableOpacity
             style={styles.guidesHeader}
             onPress={() => setGuidesExpanded(!guidesExpanded)}
@@ -1140,13 +1073,12 @@ const HubScreen = () => {
           >
             <Text style={styles.sectionLabel}>{t('hub.wellnessGuides')}</Text>
             <Text style={styles.guidesToggle}>
-              {guidesExpanded ? 'Hide' : 'Show'}
+              {guidesExpanded ? t('hub.hide') : t('hub.show')}
             </Text>
           </TouchableOpacity>
 
           {guidesExpanded && <GuideCardList guideCards={guideCards} t={t} />}
 
-          {/* Share */}
           <View style={styles.shareCard}>
             <Text style={styles.shareTitle}>{t('hub.shareTitle')}</Text>
             <Text style={styles.shareSubtitle}>{t('hub.shareSubtitle')}</Text>
@@ -1161,7 +1093,6 @@ const HubScreen = () => {
         </View>
       </ScrollView>
 
-      {/* â”€â”€â”€ MONTHLY PROGRESS MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <Modal
         visible={showProgressModal}
         animationType="slide"
@@ -1186,7 +1117,7 @@ const HubScreen = () => {
               <View style={styles.harmonyReveal}>
                 <Text style={styles.harmonyRevealLabel}>{t('hub.todayHarmony')}</Text>
                 <Text style={[styles.harmonyRevealScore, { color: getHarmonyColor(harmonyScore) }]}>
-                  {harmonyScore}% -” {getHarmonyLabel(harmonyScore)}
+                  {harmonyScore}% — {getHarmonyLabel(harmonyScore)}
                 </Text>
                 <View style={styles.progressBarBgLarge}>
                   <View
@@ -1214,7 +1145,6 @@ const HubScreen = () => {
         </View>
       </Modal>
 
-      {/* â”€â”€â”€ GOOD JOB MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <Modal
         visible={showGoodJobModal}
         animationType="fade"
@@ -1229,7 +1159,7 @@ const HubScreen = () => {
 
             <View style={styles.goodJobStreakBadge}>
               <Text style={styles.goodJobStreakText}>
-                {getWaterStreak()} day{getWaterStreak() > 1 ? 's' : ''} strong
+                {t('hub.daysStrong').replace('{n}', String(getWaterStreak()))}
               </Text>
             </View>
 
@@ -1248,7 +1178,6 @@ const HubScreen = () => {
         </View>
       </Modal>
 
-      {/* â”€â”€â”€ MILESTONE CELEBRATION MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <Modal
         visible={!!milestoneData}
         animationType="fade"
@@ -1260,7 +1189,7 @@ const HubScreen = () => {
             <Text style={styles.milestoneStar}>⭐</Text>
             <Text style={styles.milestoneDays}>{milestoneData?.days}</Text>
             <Text style={styles.milestoneDaysLabel}>
-              {milestoneData?.days === 1 ? 'day' : 'days'}
+              {milestoneData?.days === 1 ? t('hub.daySuffix') : t('hub.daysSuffix')}
             </Text>
             <Text style={styles.milestoneTitle}>{milestoneData?.title}</Text>
             <Text style={styles.milestoneMessage}>{milestoneData?.message}</Text>
@@ -1276,7 +1205,6 @@ const HubScreen = () => {
         </View>
       </Modal>
 
-      {/* â”€â”€â”€ SCROLL TO TOP BUTTON â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {showScrollTop && (
         <TouchableOpacity
           style={styles.scrollTopButton}
@@ -1289,9 +1217,8 @@ const HubScreen = () => {
     </FadeInView>
   );
 };
-    
 
-// â”€â”€â”€ STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── STYLES ────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.cleanWhite, alignItems: 'center' },
@@ -1306,7 +1233,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
 
-  // â”€â”€â”€ HERO STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   heroContainer: {
     width: '100%',
     height: 200,
@@ -1443,7 +1369,6 @@ const styles = StyleSheet.create({
   shareTitle: { fontSize: 16, ...FONTS.bold, color: Colors.earthBlack, textAlign: 'center', marginBottom: 8 },
   shareSubtitle: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, textAlign: 'center', lineHeight: 20, marginBottom: 16 },
 
-  // â”€â”€â”€ WATER TRACKER STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   waterSection: {
     width: '100%',
     backgroundColor: Colors.softBg,
@@ -1557,7 +1482,6 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
   },
 
-  // â”€â”€â”€ BODY SNAPSHOT CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   scanCard: {
     width: '100%',
     flexDirection: 'row',
@@ -1591,7 +1515,6 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
 
-  // â”€â”€â”€ PROGRESS MODAL STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',
@@ -1630,7 +1553,6 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
 
-  // â”€â”€â”€ GOOD JOB MODAL STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   goodJobOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',
@@ -1692,7 +1614,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // â”€â”€â”€ MILESTONE MODAL STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   milestoneOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.75)',
@@ -1748,7 +1669,7 @@ const styles = StyleSheet.create({
   milestoneButtonRow: {
     alignItems: 'center',
   },
-    scrollTopButton: {
+  scrollTopButton: {
     position: 'absolute',
     bottom: 30,
     right: 24,
@@ -1774,9 +1695,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
 export default HubScreen;
-
-
-
-
