@@ -1283,7 +1283,7 @@ const HubScreen = () => {
           onPress={scrollToTop}
           activeOpacity={0.8}
         >
-          <Text style={styles.scrollTopArrow}>â†‘</Text>
+          <Text style={styles.scrollTopArrow}>↑</Text>
         </TouchableOpacity>
       )}
     </FadeInView>
