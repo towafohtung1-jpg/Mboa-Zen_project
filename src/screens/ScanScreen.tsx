@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { FadeInView } from '../components/common/FadeInView';
 import { AnimatedButton } from '../components/common/AnimatedButton';
 import { useUserStore } from '../store/useUserStore';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface Results {
   bmi: number;
@@ -25,6 +26,7 @@ interface Results {
 }
 
 const ScanScreen = () => {
+  const { t } = useTranslation();
   const isPremium = useUserStore((state) => state.isPremium);
     const navigation = useNavigation<any>();
 
@@ -40,17 +42,17 @@ const ScanScreen = () => {
     const wc = parseFloat(waist);
 
     if (!w || !h) {
-      Alert.alert('Missing Values', 'Please enter at least your weight and height.');
+      Alert.alert(t('scan.alertMissingTitle'), t('scan.alertMissingBody'));
       return;
     }
 
     if (w < 20 || w > 300) {
-      Alert.alert('Invalid Weight', 'Please enter a realistic weight in kilograms (20-300 kg).');
+      Alert.alert(t('scan.alertWeightTitle'), t('scan.alertWeightBody'));
       return;
     }
 
     if (h < 50 || h > 250) {
-      Alert.alert('Invalid Height', 'Please enter a realistic height in centimeters (50-250 cm).');
+      Alert.alert(t('scan.alertHeightTitle'), t('scan.alertHeightBody'));
       return;
     }
 
@@ -61,16 +63,16 @@ const ScanScreen = () => {
     let bmiColor = Colors.mboaGreen;
 
     if (bmi < 18.5) {
-      bmiCategory = 'Underweight';
+      bmiCategory = t('scan.bmiUnder');
       bmiColor = '#FF9800';
     } else if (bmi < 25) {
-      bmiCategory = 'Normal range';
+      bmiCategory = t('scan.bmiNormal');
       bmiColor = Colors.mboaGreen;
     } else if (bmi < 30) {
-      bmiCategory = 'Overweight';
+      bmiCategory = t('scan.bmiOver');
       bmiColor = '#FF9800';
     } else {
-      bmiCategory = 'Obese';
+      bmiCategory = t('scan.bmiObese');
       bmiColor = Colors.errorRed;
     }
 
@@ -82,16 +84,16 @@ const ScanScreen = () => {
       waistToHeight = wc / h;
 
       if (waistToHeight < 0.4) {
-        waistCategory = 'Low risk';
+        waistCategory = t('scan.waistLow');
         waistColor = Colors.mboaGreen;
       } else if (waistToHeight < 0.5) {
-        waistCategory = 'Healthy';
+        waistCategory = t('scan.waistHealthy');
         waistColor = Colors.mboaGreen;
       } else if (waistToHeight < 0.6) {
-        waistCategory = 'Increased risk';
+        waistCategory = t('scan.waistIncreased');
         waistColor = '#FF9800';
       } else {
-        waistCategory = 'High risk';
+        waistCategory = t('scan.waistHigh');
         waistColor = Colors.errorRed;
       }
     }
@@ -108,15 +110,9 @@ const ScanScreen = () => {
 
   const handlePremiumTap = () => {
     if (isPremium) {
-      Alert.alert(
-        'AI Body Scan',
-        'AI-powered body composition analysis is coming soon in a future update. Thank you for being a Premium member.'
-      );
+      Alert.alert(t('scan.alertPremiumTitle1'), t('scan.alertPremiumBody1'));
     } else {
-      Alert.alert(
-        'Upgrade to Premium',
-        'AI Body Scan is a Premium feature. Visit the Market tab to upgrade and unlock advanced body analysis.'
-      );
+      Alert.alert(t('scan.alertPremiumTitle2'), t('scan.alertPremiumBody2'));
     }
   };
 
@@ -128,13 +124,11 @@ const ScanScreen = () => {
           style={styles.backButton}
           activeOpacity={0.8}
         >
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Text style={styles.backButtonText}>{t('scan.back')}</Text>
         </TouchableOpacity>
-        <Text style={styles.eyebrow}>YOUR HEALTH</Text>
-        <Text style={styles.header}>Body Snapshot</Text>
-        <Text style={styles.subHeader}>
-          Enter your measurements to see your body health indicators
-        </Text>
+        <Text style={styles.eyebrow}>{t('scan.eyebrow')}</Text>
+<Text style={styles.header}>{t('scan.header')}</Text>
+<Text style={styles.subHeader}>{t('scan.subheader')}</Text>
       </View>
 
       <ScrollView
@@ -147,22 +141,22 @@ const ScanScreen = () => {
           <View style={styles.card}>
             <View style={styles.inputRow}>
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Weight (kg)</Text>
+                <Text style={styles.inputLabel}>{t('scan.weightLabel')}</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="70"
+                  placeholder={t('scan.weightPlaceholder')}
                   placeholderTextColor={Colors.textMuted}
                   keyboardType="decimal-pad"
                   value={weight}
                   onChangeText={setWeight}
                   maxLength={5}
                 />
-              </View>
+                            </View>
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Height (cm)</Text>
+                <Text style={styles.inputLabel}>{t('scan.heightLabel')}</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="170"
+                  placeholder={t('scan.heightPlaceholder')}
                   placeholderTextColor={Colors.textMuted}
                   keyboardType="decimal-pad"
                   value={height}
@@ -174,10 +168,10 @@ const ScanScreen = () => {
 
             <View style={styles.inputRow}>
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Waist (cm)</Text>
+                <Text style={styles.inputLabel}>{t('scan.waistLabel')}</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="80"
+                  placeholder={t('scan.waistPlaceholder')}
                   placeholderTextColor={Colors.textMuted}
                   keyboardType="decimal-pad"
                   value={waist}
@@ -186,10 +180,10 @@ const ScanScreen = () => {
                 />
               </View>
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Age</Text>
+                <Text style={styles.inputLabel}>{t('scan.ageLabel')}</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="30"
+                   placeholder={t('scan.agePlaceholder')}
                   placeholderTextColor={Colors.textMuted}
                   keyboardType="number-pad"
                   value={age}
@@ -200,26 +194,23 @@ const ScanScreen = () => {
             </View>
 
             <AnimatedButton
-              title="Calculate"
+              title={t('scan.calculate')}
               onPress={handleCalculate}
               variant="primary"
               style={styles.calculateButton}
             />
 
-            <Text style={styles.disclaimer}>
-              These calculations are general wellness indicators only. Consult a
-              qualified nutritionist or doctor for personalized medical advice.
-            </Text>
+            <Text style={styles.disclaimer}>{t('scan.disclaimer')}</Text>
           </View>
 
           {/* Results */}
           {results && (
             <View style={styles.card}>
-              <Text style={styles.resultsTitle}>Your Results</Text>
+              <Text style={styles.resultsTitle}>{t('scan.resultsTitle')}</Text>
 
               <View style={styles.resultRow}>
                 <View style={styles.resultLabel}>
-                  <Text style={styles.resultName}>Body Mass Index</Text>
+                  <Text style={styles.resultName}>{t('scan.bmiLabel')}</Text>
                   <Text style={styles.resultValue}>{results.bmi.toFixed(1)}</Text>
                 </View>
                 <View
@@ -239,7 +230,7 @@ const ScanScreen = () => {
                   <View style={styles.resultDivider} />
                   <View style={styles.resultRow}>
                     <View style={styles.resultLabel}>
-                      <Text style={styles.resultName}>Waist-to-Height</Text>
+                      <Text style={styles.resultName}>{t('scan.waistLabel2')}</Text>
                       <Text style={styles.resultValue}>
                         {results.waistToHeight.toFixed(2)}
                       </Text>
@@ -267,32 +258,24 @@ const ScanScreen = () => {
             activeOpacity={0.85}
           >
             <View style={styles.premiumBadge}>
-              <Text style={styles.premiumBadgeText}>PREMIUM FEATURE</Text>
+              <Text style={styles.premiumBadgeText}>{t('scan.premiumBadge')}</Text>
             </View>
 
-            <Text style={styles.premiumTitle}>AI Body Scan</Text>
+            <Text style={styles.premiumTitle}>{t('scan.premiumTitle')}</Text>
 
-            <Text style={styles.premiumDescription}>
-              Get instant body composition analysis using your phone camera.
-              Powered by machine learning to give you deeper insights than
-              manual measurements alone.
-            </Text>
+            <Text style={styles.premiumDescription}>{t('scan.premiumDesc')}</Text>
 
             <View style={styles.premiumFeatures}>
-              <Text style={styles.premiumFeatureItem}>
-                ✓ Body composition estimate
-              </Text>
-              <Text style={styles.premiumFeatureItem}>✓ Posture analysis</Text>
-              <Text style={styles.premiumFeatureItem}>
-                ✓ Progress tracking over time
-              </Text>
+              <Text style={styles.premiumFeatureItem}>{t('scan.premiumFeature1')}</Text>
+<Text style={styles.premiumFeatureItem}>{t('scan.premiumFeature2')}</Text>
+<Text style={styles.premiumFeatureItem}>{t('scan.premiumFeature3')}</Text>
             </View>
 
             <View style={styles.premiumCTA}>
               <Text style={styles.premiumCTAText}>
-                {isPremium ? 'Coming soon in Premium' : 'Upgrade to Premium'}
+                {isPremium ? t('scan.premiumCTAPremium') : t('scan.premiumCTAUpgrade')}              
               </Text>
-              <Text style={styles.premiumArrow}>→</Text>
+              <Text style={styles.premiumArrow}>â†’</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -344,7 +327,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 
-  // Card — matches Nurture pattern exactly (no width, no maxWidth, no margins)
+  // Card â€” matches Nurture pattern exactly (no width, no maxWidth, no margins)
   card: {
     backgroundColor: Colors.cleanWhite,
     borderRadius: 18,
@@ -442,7 +425,7 @@ const styles = StyleSheet.create({
     marginVertical: 14,
   },
 
-  // Premium card — same width behavior as regular card, but dark styling
+  // Premium card â€” same width behavior as regular card, but dark styling
   premiumCard: {
     backgroundColor: Colors.earthBlack,
     borderRadius: 18,
@@ -522,4 +505,5 @@ const styles = StyleSheet.create({
 });
 
 export default ScanScreen;
+
 
