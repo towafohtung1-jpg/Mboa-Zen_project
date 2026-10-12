@@ -1,4 +1,4 @@
-// ─── src/screens/NurtureScreen.tsx ──────────────────────────────────────
+﻿// â”€â”€â”€ src/screens/NurtureScreen.tsx â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import React, { useState, useRef } from 'react';
 import {View,Text,StyleSheet,ScrollView,TouchableOpacity,Image,Alert,Modal,} from 'react-native';
@@ -13,8 +13,9 @@ import { MboaButton } from '../components/common/MboaButton';
 import { getTodaySwap } from '../data/chopSwaps';
 import chopSwapIcon from '../../assets/Graphics/UI_vectors_icon_set/chop_swap.png';
 import { useSwipeTabs } from '../hooks/useSwipeTabs';
+import { useTranslation } from '../i18n/useTranslation';
 
-// ─── FOOD IMAGES ────────────────────────────────────────────────────────
+// â”€â”€â”€ FOOD IMAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import akara_break_pepper from '../../assets/Media/Meals/high-res/akara_break_pepper.jpg';
 import kumba_bread_akara_pap from '../../assets/Media/Meals/high-res/kumba_bread_akara_pap.jpg';
@@ -94,7 +95,7 @@ const MEAL_TIMES = [
   { key: 'supper' as const, label: 'Supper' },
 ];
 
-// ─── NUTRITION BAR ──────────────────────────────────────────────────────
+// â”€â”€â”€ NUTRITION BAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const NutritionBar = ({ label, value, max, color }: { label: string; value: number; max: number; color: string }) => {
   const percentage = Math.min((value / max) * 100, 100);
@@ -109,7 +110,7 @@ const NutritionBar = ({ label, value, max, color }: { label: string; value: numb
   );
 };
 
-// ─── MEAL DETAIL MODAL ──────────────────────────────────────────────────
+// â”€â”€â”€ MEAL DETAIL MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const MealDetailModal = ({
   meal,
@@ -122,6 +123,7 @@ const MealDetailModal = ({
   onClose: () => void;
   onLogMeal: (meal: MealOption) => void;
 }) => {
+  const { t } = useTranslation();
   if (!meal) return null;
 
   const foodImage = meal.image ? FOOD_IMAGES[meal.image] : null;
@@ -140,7 +142,7 @@ const MealDetailModal = ({
             onPress={onClose}
             activeOpacity={0.8}
           >
-            <Text style={styles.modalCloseText}>✕</Text>
+            <Text style={styles.modalCloseText}>âœ•</Text>
           </TouchableOpacity>
 
           <ScrollView
@@ -158,7 +160,7 @@ const MealDetailModal = ({
 
             <View style={styles.modalHeader}>
               <View style={styles.optionBadge}>
-                <Text style={styles.optionBadgeText}>Option {meal.option_number}</Text>
+                <Text style={styles.optionBadgeText}>{t('nurture.option').replace('{n}', String(meal.option_number))}</Text>
               </View>
               <Text style={styles.modalMealName}>{meal.meal_name}</Text>
               <Text style={styles.modalRegion}>{meal.region}</Text>
@@ -167,27 +169,27 @@ const MealDetailModal = ({
             <View style={styles.quickNutrition}>
               <View style={styles.quickNutritionItem}>
                 <Text style={styles.quickNutritionValue}>{meal.nutrition.calories}</Text>
-                <Text style={styles.quickNutritionLabel}>kcal</Text>
+                <Text style={styles.quickNutritionLabel}>{t('nurture.kcal')}</Text>
               </View>
               <View style={styles.quickNutritionDivider} />
               <View style={styles.quickNutritionItem}>
                 <Text style={styles.quickNutritionValue}>{meal.nutrition.protein}g</Text>
-                <Text style={styles.quickNutritionLabel}>protein</Text>
+                <Text style={styles.quickNutritionLabel}>{t('nurture.protein')}</Text>
               </View>
               <View style={styles.quickNutritionDivider} />
               <View style={styles.quickNutritionItem}>
                 <Text style={styles.quickNutritionValue}>{meal.nutrition.carbohydrates}g</Text>
-                <Text style={styles.quickNutritionLabel}>carbs</Text>
+                <Text style={styles.quickNutritionLabel}>{t('nurture.carbs')}</Text>
               </View>
               <View style={styles.quickNutritionDivider} />
               <View style={styles.quickNutritionItem}>
                 <Text style={styles.quickNutritionValue}>{meal.nutrition.fiber}g</Text>
-                <Text style={styles.quickNutritionLabel}>fiber</Text>
+                <Text style={styles.quickNutritionLabel}>{t('nurture.fiber')}</Text>
               </View>
             </View>
 
             <View style={styles.sectionDivider} />
-            <Text style={styles.bodyTitle}>What You Need</Text>
+            <Text style={styles.bodyTitle}>{t('nurture.whatYouNeed')}</Text>
             {meal.foods.map((food: MealFoodItem, index: number) => (
               <View key={index} style={styles.foodRow}>
                 <View style={styles.foodDot} />
@@ -200,25 +202,23 @@ const MealDetailModal = ({
             ))}
 
             <View style={styles.sectionDivider} />
-            <Text style={styles.bodyTitle}>Nutritional Breakdown</Text>
-            <NutritionBar label="Calories" value={meal.nutrition.calories} max={800} color={Colors.zenGold} />
-            <NutritionBar label="Protein" value={meal.nutrition.protein} max={60} color={Colors.mboaGreen} />
-            <NutritionBar label="Carbs" value={meal.nutrition.carbohydrates} max={100} color="#FF9800" />
-            <NutritionBar label="Fat" value={meal.nutrition.fat} max={40} color="#9C27B0" />
-            <NutritionBar label="Fiber" value={meal.nutrition.fiber} max={20} color="#00BCD4" />
+            <Text style={styles.bodyTitle}>{t('nurture.nutritionalBreakdown')}</Text>
+            <NutritionBar label={t('nurture.calories')} value={meal.nutrition.calories} max={800} color={Colors.zenGold} />
+            <NutritionBar label={t('nurture.proteinBar')} value={meal.nutrition.protein} max={60} color={Colors.mboaGreen} />
+            <NutritionBar label={t('nurture.carbsBar')} value={meal.nutrition.carbohydrates} max={100} color="#FF9800" />
+            <NutritionBar label={t('nurture.fat')} value={meal.nutrition.fat} max={40} color="#9C27B0" />
+            <NutritionBar label={t('nurture.fiberBar')} value={meal.nutrition.fiber} max={20} color="#00BCD4" />
 
             <View style={styles.sectionDivider} />
-            <Text style={styles.bodyTitle}>Why This Is Good For You</Text>
+            <Text style={styles.bodyTitle}>{t('nurture.whyGood')}</Text>
             <Text style={styles.whyGoodText}>{meal.why_good}</Text>
 
             <View style={styles.availableBox}>
-              <Text style={styles.availableLabel}>📍 Where to get it</Text>
-              <Text style={styles.availableText}>{meal.available_from}</Text>
-            </View>
+              <Text style={styles.availableLabel}>📍 {t('nurture.whereToGet')}</Text>            </View>
 
             <View style={{ marginTop: 14, alignItems: 'flex-end' }}>
               <MboaButton
-                title="I Ate This"
+                title={t('nurture.iAteThis')}
                 onPress={() => {
                   onLogMeal(meal);
                   onClose();
@@ -234,7 +234,7 @@ const MealDetailModal = ({
   );
 };
 
-// ─── MEAL CARD ──────────────────────────────────────────────────────────
+// â”€â”€â”€ MEAL CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const MealCard = ({
   meal,
@@ -245,6 +245,7 @@ const MealCard = ({
   onLogMeal: (meal: MealOption) => void;
   onOpenModal: (meal: MealOption) => void;
 }) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const foodImage = meal.image ? FOOD_IMAGES[meal.image] : null;
 
@@ -267,30 +268,30 @@ const MealCard = ({
       >
         <View style={styles.mealCardTitleRow}>
           <View style={styles.optionBadge}>
-            <Text style={styles.optionBadgeText}>Option {meal.option_number}</Text>
+            <Text style={styles.optionBadgeText}>{t('nurture.option').replace('{n}', String(meal.option_number))}</Text>
           </View>
-          <Text style={styles.mealCardToggle}>{expanded ? '▲' : '▼'}</Text>
+          <Text style={styles.mealCardToggle}>{expanded ? 'â–²' : 'â–¼'}</Text>
         </View>
         <Text style={styles.mealCardName}>{meal.meal_name}</Text>
         <View style={styles.quickNutrition}>
           <View style={styles.quickNutritionItem}>
             <Text style={styles.quickNutritionValue}>{meal.nutrition.calories}</Text>
-            <Text style={styles.quickNutritionLabel}>kcal</Text>
+            <Text style={styles.quickNutritionLabel}>{t('nurture.kcal')}</Text>
           </View>
           <View style={styles.quickNutritionDivider} />
           <View style={styles.quickNutritionItem}>
             <Text style={styles.quickNutritionValue}>{meal.nutrition.protein}g</Text>
-            <Text style={styles.quickNutritionLabel}>protein</Text>
+            <Text style={styles.quickNutritionLabel}>{t('nurture.protein')}</Text>
           </View>
           <View style={styles.quickNutritionDivider} />
           <View style={styles.quickNutritionItem}>
             <Text style={styles.quickNutritionValue}>{meal.nutrition.carbohydrates}g</Text>
-            <Text style={styles.quickNutritionLabel}>carbs</Text>
+            <Text style={styles.quickNutritionLabel}>{t('nurture.carbs')}</Text>
           </View>
           <View style={styles.quickNutritionDivider} />
           <View style={styles.quickNutritionItem}>
             <Text style={styles.quickNutritionValue}>{meal.nutrition.fiber}g</Text>
-            <Text style={styles.quickNutritionLabel}>fiber</Text>
+            <Text style={styles.quickNutritionLabel}>{t('nurture.fiber')}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -299,14 +300,14 @@ const MealCard = ({
         <View style={styles.mealCardBody}>
           <View style={{ marginBottom: 14 }}>
             <MboaButton
-              title="View Full Details"
+              title={t('nurture.viewFullDetails')}
               onPress={() => onOpenModal(meal)}
               variant="outline"
             />
           </View>
 
           <View style={styles.sectionDivider} />
-          <Text style={styles.bodyTitle}>What You Need</Text>
+          <Text style={styles.bodyTitle}>{t('nurture.whatYouNeed')}</Text>
           {meal.foods.map((food: MealFoodItem, index: number) => (
             <View key={index} style={styles.foodRow}>
               <View style={styles.foodDot} />
@@ -318,22 +319,22 @@ const MealCard = ({
             </View>
           ))}
           <View style={styles.sectionDivider} />
-          <Text style={styles.bodyTitle}>Nutritional Breakdown</Text>
-          <NutritionBar label="Calories" value={meal.nutrition.calories} max={800} color={Colors.zenGold} />
-          <NutritionBar label="Protein" value={meal.nutrition.protein} max={60} color={Colors.mboaGreen} />
-          <NutritionBar label="Carbs" value={meal.nutrition.carbohydrates} max={100} color="#FF9800" />
-          <NutritionBar label="Fat" value={meal.nutrition.fat} max={40} color="#9C27B0" />
-          <NutritionBar label="Fiber" value={meal.nutrition.fiber} max={20} color="#00BCD4" />
+          <Text style={styles.bodyTitle}>{t('nurture.nutritionalBreakdown')}</Text>
+          <NutritionBar label={t('nurture.calories')} value={meal.nutrition.calories} max={800} color={Colors.zenGold} />
+          <NutritionBar label={t('nurture.proteinBar')} value={meal.nutrition.protein} max={60} color={Colors.mboaGreen} />
+          <NutritionBar label={t('nurture.carbsBar')} value={meal.nutrition.carbohydrates} max={100} color="#FF9800" />
+          <NutritionBar label={t('nurture.fat')} value={meal.nutrition.fat} max={40} color="#9C27B0" />
+          <NutritionBar label={t('nurture.fiberBar')} value={meal.nutrition.fiber} max={20} color="#00BCD4" />
           <View style={styles.sectionDivider} />
-          <Text style={styles.bodyTitle}>Why This Is Good For You</Text>
+          <Text style={styles.bodyTitle}>{t('nurture.whyGood')}</Text>
           <Text style={styles.whyGoodText}>{meal.why_good}</Text>
           <View style={styles.availableBox}>
-            <Text style={styles.availableLabel}>📍 Where to get it</Text>
+            <Text style={styles.availableLabel}>📍 {t('nurture.whereToGet')}</Text>
             <Text style={styles.availableText}>{meal.available_from}</Text>
           </View>
           <View style={{ marginTop: 14, alignItems: 'flex-end' }}>
             <MboaButton
-              title="I Ate This"
+              title={t('nurture.iAteThis')}
               onPress={() => onLogMeal(meal)}
               variant="primary"
             />
@@ -344,7 +345,7 @@ const MealCard = ({
   );
 };
 
-// ─── NURTURE SCREEN ─────────────────────────────────────────────────────
+// â”€â”€â”€ NURTURE SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const NurtureScreen = () => {
   const { archetype } = useUserStore();
@@ -368,6 +369,7 @@ const NurtureScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<MealOption | null>(null);
   const panHandlers = useSwipeTabs();
+  const { t } = useTranslation();
 
   const bodyType = getBodyTypeFromArchetype(archetype);
   const todaySwap = getTodaySwap(
@@ -375,15 +377,15 @@ const NurtureScreen = () => {
   );
 
   const profileLabels: Record<string, { main: string; sub: string }> = {
-    slim: { main: 'The Runner', sub: 'Slim Body' },
-    strong: { main: 'The Warrior', sub: 'Strong Body' },
-    steady: { main: 'The Guardian', sub: 'The Steady' },
+    slim: { main: t('nurture.runnerMain'), sub: t('nurture.runnerSub') },
+    strong: { main: t('nurture.warriorMain'), sub: t('nurture.warriorSub') },
+    steady: { main: t('nurture.guardianMain'), sub: t('nurture.guardianSub') },
   };
 
   const profileDescriptions: Record<string, string> = {
-    slim: 'High energy foods to fuel an active, fast-burning body.',
-    strong: 'Protein-rich meals to support physical work and muscle recovery.',
-    steady: 'Balanced, lower glycemic foods to support weight management.',
+    slim: t('nurture.runnerDesc'),
+    strong: t('nurture.warriorDesc'),
+    steady: t('nurture.guardianDesc'),
   };
 
   const mealOptions = bodyType ? getMealOptions(bodyType, selectedMealTime) : [];
@@ -400,13 +402,13 @@ const NurtureScreen = () => {
       const newTotal = await offlineAgent.getTodayCalories();
       setTodayCalories(newTotal);
       Alert.alert(
-        'Meal Logged!',
-        `${meal.meal_name} (${meal.nutrition.calories} kcal) saved offline. Today's total: ${newTotal} kcal`,
+        t('nurture.mealLoggedTitle'),
+        t('nurture.mealLoggedBody').replace('{name}', meal.meal_name).replace('{kcal}', String(meal.nutrition.calories)).replace('{total}', String(newTotal)),
         [{ text: 'OK' }]
       );
     } catch (error) {
       console.error('Failed to log meal:', error);
-      Alert.alert('Error', 'Could not log meal. Please try again.');
+      Alert.alert(t('nurture.errorTitle'), t('nurture.errorBody'));
     }
   };
 
@@ -431,9 +433,9 @@ const NurtureScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headerArea}>
-          <Text style={styles.eyebrow}>YOUR MEALS</Text>
+          <Text style={styles.eyebrow}>{t('nurture.eyebrow')}</Text>
           <Text style={styles.header}>
-            {bodyType ? profileLabels[bodyType].main : 'Nurture Your Body'}
+            {bodyType ? profileLabels[bodyType].main : t('nurture.fallbackHeader')}
           </Text>
           {bodyType && (
             <Text style={styles.profileSub}>{profileLabels[bodyType].sub}</Text>
@@ -442,7 +444,7 @@ const NurtureScreen = () => {
             <Text style={styles.subHeader}>{profileDescriptions[bodyType]}</Text>
           )}
           <View style={styles.calorieBanner}>
-            <Text style={styles.calorieBannerLabel}>Today's Calories</Text>
+            <Text style={styles.calorieBannerLabel}>{t('nurture.caloriesToday')}</Text>
             <Text style={styles.calorieBannerValue}>{todayCalories} kcal</Text>
           </View>
 
@@ -450,12 +452,12 @@ const NurtureScreen = () => {
             <View style={styles.chopSwapCard}>
               <View style={styles.chopSwapHeader}>
                 <Image source={chopSwapIcon} style={styles.chopSwapIcon} />
-                <Text style={styles.chopSwapTitle}>Today's Chop Swap</Text>
+                <Text style={styles.chopSwapTitle}>{t('nurture.chopSwapTitle')}</Text>
               </View>
               <Text style={styles.chopSwapFrom}>
-                Instead of: {todaySwap.from}
+                {t('nurture.chopSwapInstead').replace('{from}', todaySwap.from)}
               </Text>
-              <Text style={styles.chopSwapTo}>Try: {todaySwap.to}</Text>
+              <Text style={styles.chopSwapTo}>{t('nurture.chopSwapTry').replace('{to}', todaySwap.to)}</Text>
               <Text style={styles.chopSwapReason}>{todaySwap.reason}</Text>
             </View>
           )}
@@ -474,18 +476,14 @@ const NurtureScreen = () => {
               </TouchableOpacity>
             ))}
           </View>
-          <Text style={styles.chooseText}>
-            Tap any meal to see full details and log it.
-          </Text>
+          <Text style={styles.chooseText}>{t('nurture.chooseText')}</Text>
         </View>
 
         <View style={styles.section}>
           {mealOptions.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyTitle}>No meals found</Text>
-              <Text style={styles.emptySubtitle}>
-                Complete your archetype quiz on the Home screen to unlock your personalized meal options.
-              </Text>
+              <Text style={styles.emptyTitle}>{t('nurture.emptyTitle')}</Text>
+              <Text style={styles.emptySubtitle}>{t('nurture.emptySubtitle')}</Text>
             </View>
           ) : (
             mealOptions.map((meal) => (
@@ -498,9 +496,7 @@ const NurtureScreen = () => {
             ))
           )}
           <View style={styles.disclaimerBox}>
-            <Text style={styles.disclaimerText}>
-              These meal suggestions are general wellness guidance only. Nutritional values are approximate. Consult a qualified nutritionist for personalized dietary advice.
-            </Text>
+            <Text style={styles.disclaimerText}>{t('nurture.disclaimer')}</Text>
           </View>
           <View style={{ height: 20 }} />
         </View>
@@ -514,21 +510,21 @@ const NurtureScreen = () => {
         onLogMeal={handleLogMeal}
       />
 
-      {/* ─── SCROLL TO TOP BUTTON ────────────────────────────────────── */}
+      {/* â”€â”€â”€ SCROLL TO TOP BUTTON â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {showScrollTop && (
         <TouchableOpacity
           style={styles.scrollTopButton}
           onPress={scrollToTop}
           activeOpacity={0.8}
         >
-          <Text style={styles.scrollTopArrow}>↑</Text>
+          <Text style={styles.scrollTopArrow}>â†‘</Text>
         </TouchableOpacity>
       )}
     </FadeInView>
   );
 };
 
-// ─── STYLES ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.softBg, alignItems: 'center' },
@@ -603,7 +599,7 @@ const styles = StyleSheet.create({
   disclaimerBox: { backgroundColor: '#FFF8E1', borderRadius: 12, padding: 14, marginTop: 8, borderLeftWidth: 3, borderLeftColor: Colors.zenGold },
   disclaimerText: { fontSize: 12, ...FONTS.regular, color: Colors.earthBlack, lineHeight: 18 },
 
-  // ─── MODAL STYLES ──────────────────────────────────────────────────────
+  // â”€â”€â”€ MODAL STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',
@@ -666,7 +662,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
-  // ─── CHOP SWAP ─────────────────────────────────────────────────────────
+  // â”€â”€â”€ CHOP SWAP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   chopSwapCard: {
     width: '100%',
     backgroundColor: '#FFF8E1',
@@ -712,7 +708,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
-  // ─── SCROLL TO TOP ─────────────────────────────────────────────────────
+  // â”€â”€â”€ SCROLL TO TOP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   scrollTopButton: {
     position: 'absolute',
     bottom: 30,
