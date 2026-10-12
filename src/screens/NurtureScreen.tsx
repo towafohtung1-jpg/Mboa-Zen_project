@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ src/screens/NurtureScreen.tsx â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ─── src/screens/NurtureScreen.tsx ──────────────────────────────────────
 
 import React, { useState, useRef } from 'react';
 import {View,Text,StyleSheet,ScrollView,TouchableOpacity,Image,Alert,Modal,} from 'react-native';
@@ -15,7 +15,7 @@ import chopSwapIcon from '../../assets/Graphics/UI_vectors_icon_set/chop_swap.pn
 import { useSwipeTabs } from '../hooks/useSwipeTabs';
 import { useTranslation } from '../i18n/useTranslation';
 
-// â”€â”€â”€ FOOD IMAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── FOOD IMAGES ────────────────────────────────────────────────────────
 
 import akara_break_pepper from '../../assets/Media/Meals/high-res/akara_break_pepper.jpg';
 import kumba_bread_akara_pap from '../../assets/Media/Meals/high-res/kumba_bread_akara_pap.jpg';
@@ -95,7 +95,7 @@ const MEAL_TIMES = [
   { key: 'supper' as const, label: 'Supper' },
 ];
 
-// â”€â”€â”€ NUTRITION BAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── NUTRITION BAR ──────────────────────────────────────────────────────
 
 const NutritionBar = ({ label, value, max, color }: { label: string; value: number; max: number; color: string }) => {
   const percentage = Math.min((value / max) * 100, 100);
@@ -110,7 +110,7 @@ const NutritionBar = ({ label, value, max, color }: { label: string; value: numb
   );
 };
 
-// â”€â”€â”€ MEAL DETAIL MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── MEAL DETAIL MODAL ──────────────────────────────────────────────────
 
 const MealDetailModal = ({
   meal,
@@ -142,7 +142,7 @@ const MealDetailModal = ({
             onPress={onClose}
             activeOpacity={0.8}
           >
-            <Text style={styles.modalCloseText}>âœ•</Text>
+            <Text style={styles.modalCloseText}>✕</Text>
           </TouchableOpacity>
 
           <ScrollView
@@ -214,7 +214,9 @@ const MealDetailModal = ({
             <Text style={styles.whyGoodText}>{meal.why_good}</Text>
 
             <View style={styles.availableBox}>
-              <Text style={styles.availableLabel}>📍 {t('nurture.whereToGet')}</Text>            </View>
+              <Text style={styles.availableLabel}>📍 {t('nurture.whereToGet')}</Text>
+              <Text style={styles.availableText}>{meal.available_from}</Text>
+            </View>
 
             <View style={{ marginTop: 14, alignItems: 'flex-end' }}>
               <MboaButton
@@ -234,7 +236,7 @@ const MealDetailModal = ({
   );
 };
 
-// â”€â”€â”€ MEAL CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── MEAL CARD ──────────────────────────────────────────────────────────
 
 const MealCard = ({
   meal,
@@ -270,7 +272,7 @@ const MealCard = ({
           <View style={styles.optionBadge}>
             <Text style={styles.optionBadgeText}>{t('nurture.option').replace('{n}', String(meal.option_number))}</Text>
           </View>
-          <Text style={styles.mealCardToggle}>{expanded ? 'â–²' : 'â–¼'}</Text>
+          <Text style={styles.mealCardToggle}>{expanded ? '▲' : '▼'}</Text>
         </View>
         <Text style={styles.mealCardName}>{meal.meal_name}</Text>
         <View style={styles.quickNutrition}>
@@ -345,7 +347,7 @@ const MealCard = ({
   );
 };
 
-// â”€â”€â”€ NURTURE SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── NURTURE SCREEN ─────────────────────────────────────────────────────
 
 const NurtureScreen = () => {
   const { archetype } = useUserStore();
@@ -369,12 +371,10 @@ const NurtureScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<MealOption | null>(null);
   const panHandlers = useSwipeTabs();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   const bodyType = getBodyTypeFromArchetype(archetype);
-  const todaySwap = getTodaySwap(
-    archetype as 'runner' | 'warrior' | 'guardian' | null
-  );
+  const todaySwap = getTodaySwap(archetype ?? 'runner');
 
   const profileLabels: Record<string, { main: string; sub: string }> = {
     slim: { main: t('nurture.runnerMain'), sub: t('nurture.runnerSub') },
@@ -455,10 +455,24 @@ const NurtureScreen = () => {
                 <Text style={styles.chopSwapTitle}>{t('nurture.chopSwapTitle')}</Text>
               </View>
               <Text style={styles.chopSwapFrom}>
-                {t('nurture.chopSwapInstead').replace('{from}', todaySwap.from)}
+                {t('nurture.chopSwapInstead').replace('{from}',
+                  language === 'pidgin' ? todaySwap.from_pidgin :
+                  language === 'fr' ? todaySwap.from_fr :
+                  todaySwap.from
+                )}
               </Text>
-              <Text style={styles.chopSwapTo}>{t('nurture.chopSwapTry').replace('{to}', todaySwap.to)}</Text>
-              <Text style={styles.chopSwapReason}>{todaySwap.reason}</Text>
+              <Text style={styles.chopSwapTo}>
+                {t('nurture.chopSwapTry').replace('{to}',
+                  language === 'pidgin' ? todaySwap.to_pidgin :
+                  language === 'fr' ? todaySwap.to_fr :
+                  todaySwap.to
+                )}
+              </Text>
+              <Text style={styles.chopSwapReason}>
+                {language === 'pidgin' ? todaySwap.reason_pidgin :
+                 language === 'fr' ? todaySwap.reason_fr :
+                 todaySwap.reason}
+              </Text>
             </View>
           )}
 
@@ -510,21 +524,21 @@ const NurtureScreen = () => {
         onLogMeal={handleLogMeal}
       />
 
-      {/* â”€â”€â”€ SCROLL TO TOP BUTTON â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ─── SCROLL TO TOP BUTTON ────────────────────────────────────── */}
       {showScrollTop && (
         <TouchableOpacity
           style={styles.scrollTopButton}
           onPress={scrollToTop}
           activeOpacity={0.8}
         >
-          <Text style={styles.scrollTopArrow}>â†‘</Text>
+          <Text style={styles.scrollTopArrow}>↑</Text>
         </TouchableOpacity>
       )}
     </FadeInView>
   );
 };
 
-// â”€â”€â”€ STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── STYLES ─────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.softBg, alignItems: 'center' },
@@ -599,7 +613,6 @@ const styles = StyleSheet.create({
   disclaimerBox: { backgroundColor: '#FFF8E1', borderRadius: 12, padding: 14, marginTop: 8, borderLeftWidth: 3, borderLeftColor: Colors.zenGold },
   disclaimerText: { fontSize: 12, ...FONTS.regular, color: Colors.earthBlack, lineHeight: 18 },
 
-  // â”€â”€â”€ MODAL STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',
@@ -662,7 +675,6 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
-  // â”€â”€â”€ CHOP SWAP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   chopSwapCard: {
     width: '100%',
     backgroundColor: '#FFF8E1',
@@ -708,7 +720,6 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
-  // â”€â”€â”€ SCROLL TO TOP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   scrollTopButton: {
     position: 'absolute',
     bottom: 30,

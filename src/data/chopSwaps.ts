@@ -4,130 +4,124 @@ export type ChopSwap = {
   from: string;
   to: string;
   reason: string;
+  from_pidgin: string;
+  to_pidgin: string;
+  reason_pidgin: string;
+  from_fr: string;
+  to_fr: string;
+  reason_fr: string;
 };
 
 export const CHOP_SWAPS: Record<'runner' | 'warrior' | 'guardian', ChopSwap[]> = {
   // ─── RUNNER (Swift) ──────────────────────────────────────────────────
-  // Slim body, fast metabolism, needs high energy. Focus: fuel without
-  // empty calories, more nutrients per bite.
   runner: [
-    { from: 'Fried plantain', to: 'Boiled plantain + groundnut', reason: 'Same money. Less oil. More energy.' },
-    { from: 'Soda (50cl)', to: 'Water + lime', reason: 'Cheaper. Your kidneys thank you.' },
-    { from: 'White bread + butter', to: 'Kumba bread + avocado', reason: 'Same filling. Better fat.' },
-    { from: 'Puff-puff (3 pieces)', to: 'Boiled egg', reason: 'Same price. Protein keeps you full longer.' },
-    { from: 'Fried rice', to: 'Jollof rice with vegetables', reason: 'Less oil. More vitamins.' },
-    { from: 'Sweetened pap', to: 'Plain pap + milk', reason: 'Less sugar. Steady energy.' },
-    { from: 'Fried dough (beignets)', to: 'Beans + bread', reason: 'Same money. More protein.' },
-    { from: 'Energy drink', to: 'Fresh orange juice', reason: 'Real sugar from fruit. No crash.' },
-    { from: 'White rice + fried fish', to: 'Jollof rice + grilled fish', reason: 'Less oil. Same taste.' },
-    { from: 'Cake slice', to: 'Banana + groundnut', reason: 'Real food. Longer energy.' },
-    { from: 'Fried eggs + white bread', to: 'Boiled eggs + Kumba bread', reason: 'Less oil. More protein per bite.' },
-    { from: 'Sweet tea (3 spoons sugar)', to: 'Tea with 1 spoon sugar + honey', reason: 'Less sugar. Same sweetness.' },
-    { from: 'Fried yam', to: 'Boiled yam + pepper sauce', reason: 'Same filling. No oil.' },
-    { from: 'Biscuits (packet)', to: 'Roasted groundnut (small)', reason: 'Real protein. No additives.' },
-    { from: 'Fried chicken', to: 'Grilled chicken', reason: 'Same meat. Less oil. More protein.' },
-    { from: 'White bread + jam', to: 'Kumba bread + groundnut paste', reason: 'Less sugar. More protein.' },
-    { from: 'Fizzy drink (33cl)', to: 'Coconut water', reason: 'Natural electrolytes. No additives.' },
-    { from: 'Fried puff-puff', to: 'Boiled corn', reason: 'Same price. Real energy.' },
-    { from: 'Chocolate spread on bread', to: 'Avocado on Kumba bread', reason: 'Less sugar. Better fat.' },
-    { from: 'Fried fish + white rice', to: 'Grilled fish + jollof rice', reason: 'Less oil. More flavor.' },
-    { from: 'Sweetened yoghurt', to: 'Plain yoghurt + honey', reason: 'Less sugar. Same creamy.' },
-    { from: 'Fried meat pie', to: 'Boiled egg + Kumba bread', reason: 'Same filling. Less oil.' },
-    { from: 'Cornflakes + sugar', to: 'Pap + groundnut', reason: 'Local energy. No additives.' },
-    { from: 'Bottled juice (sweet)', to: 'Fresh mango slices', reason: 'Real fruit. Real vitamins.' },
-    { from: 'Fried chin-chin', to: 'Roasted groundnut', reason: 'Same crunch. More protein.' },
-    { from: 'Sugary porridge', to: 'Plain porridge + milk', reason: 'Less sugar. Steady energy.' },
-    { from: 'Fried plantain chips', to: 'Boiled plantain', reason: 'Same base. Less oil.' },
-    { from: 'Ice cream (cup)', to: 'Frozen banana + groundnut', reason: 'Real food. Same sweet.' },
-    { from: 'Sweet bread (sliced)', to: 'Kumba bread', reason: 'Less sugar. More fiber.' },
-    { from: 'Fried doughnut', to: 'Boiled egg + avocado', reason: 'Same money. Real fuel.' },
+    { from: 'Fried plantain', to: 'Boiled plantain + groundnut', reason: 'Same money. Less oil. More energy.', from_pidgin: 'Dodo', to_pidgin: 'Boiled plantain + groundnut', reason_pidgin: 'Same money. Small oil. Heavy power.', from_fr: 'Plantain frit', to_fr: 'Plantain bouilli + arachides', reason_fr: 'Même prix. Moins d\'huile. Plus d\'énergie.' },
+    { from: 'Soda (50cl)', to: 'Water + lime', reason: 'Cheaper. Your kidneys thank you.', from_pidgin: 'Sweet mineral (50cl)', to_pidgin: 'Water + lime', reason_pidgin: 'Cheap pass. Your kidney go thank you.', from_fr: 'Soda (50cl)', to_fr: 'Eau + citron vert', reason_fr: 'Moins cher. Vos reins vous remercient.' },
+    { from: 'White bread + butter', to: 'Kumba bread + avocado', reason: 'Same filling. Better fat.', from_pidgin: 'White bread + butter', to_pidgin: 'Kumba bread + pear', reason_pidgin: 'Belle full same way. Better oil.', from_fr: 'Pain blanc + beurre', to_fr: 'Pain Kumba + avocat', reason_fr: 'Même satiété. Meilleure graisse.' },
+    { from: 'Puff-puff (3 pieces)', to: 'Boiled egg', reason: 'Same price. Protein keeps you full longer.', from_pidgin: 'Puff-puff (3 pieces)', to_pidgin: 'Boiled egg', reason_pidgin: 'Same price. Protein dey hold belle long pass.', from_fr: 'Beignets (3 pièces)', to_fr: 'Œuf bouilli', reason_fr: 'Même prix. Les protéines rassasient plus longtemps.' },
+    { from: 'Fried rice', to: 'Jollof rice with vegetables', reason: 'Less oil. More vitamins.', from_pidgin: 'Fried rice', to_pidgin: 'Jollof rice with greens', reason_pidgin: 'Small oil. Plenty vitamins.', from_fr: 'Riz frit', to_fr: 'Riz jollof aux légumes', reason_fr: 'Moins d\'huile. Plus de vitamines.' },
+    { from: 'Sweetened pap', to: 'Plain pap + milk', reason: 'Less sugar. Steady energy.', from_pidgin: 'Pap with sugar', to_pidgin: 'Plain pap + milk', reason_pidgin: 'Small sugar. Steady power.', from_fr: 'Bouillie sucrée', to_fr: 'Bouillie nature + lait', reason_fr: 'Moins de sucre. Énergie stable.' },
+    { from: 'Fried dough (beignets)', to: 'Beans + bread', reason: 'Same money. More protein.', from_pidgin: 'Beignet', to_pidgin: 'Beans + bread', reason_pidgin: 'Same money. More protein.', from_fr: 'Beignets frits', to_fr: 'Haricots + pain', reason_fr: 'Même prix. Plus de protéines.' },
+    { from: 'Energy drink', to: 'Fresh orange juice', reason: 'Real sugar from fruit. No crash.', from_pidgin: 'Energy drink', to_pidgin: 'Fresh orange juice', reason_pidgin: 'Natural sugar from fruit. No crash.', from_fr: 'Boisson énergisante', to_fr: 'Jus d\'orange frais', reason_fr: 'Vrai sucre de fruit. Pas de coup de barre.' },
+    { from: 'White rice + fried fish', to: 'Jollof rice + grilled fish', reason: 'Less oil. Same taste.', from_pidgin: 'White rice + fried fish', to_pidgin: 'Jollof rice + grilled fish', reason_pidgin: 'Small oil. Same correct taste.', from_fr: 'Riz blanc + poisson frit', to_fr: 'Riz jollof + poisson grillé', reason_fr: 'Moins d\'huile. Même goût.' },
+    { from: 'Cake slice', to: 'Banana + groundnut', reason: 'Real food. Longer energy.', from_pidgin: 'Cake', to_pidgin: 'Banana + groundnut', reason_pidgin: 'Natural chop. Power dey stay long.', from_fr: 'Part de gâteau', to_fr: 'Banane + arachides', reason_fr: 'Vraie nourriture. Énergie durable.' },
+    { from: 'Fried eggs + white bread', to: 'Boiled eggs + Kumba bread', reason: 'Less oil. More protein per bite.', from_pidgin: 'Fried egg + white bread', to_pidgin: 'Boiled egg + Kumba bread', reason_pidgin: 'Small oil. More protein for every bite.', from_fr: 'Œufs frits + pain blanc', to_fr: 'Œufs bouillis + pain Kumba', reason_fr: 'Moins d\'huile. Plus de protéines par bouchée.' },
+    { from: 'Sweet tea (3 spoons sugar)', to: 'Tea with 1 spoon sugar + honey', reason: 'Less sugar. Same sweetness.', from_pidgin: 'Sweet tea (3 spoon sugar)', to_pidgin: 'Tea with 1 spoon sugar + honey', reason_pidgin: 'Small sugar. Same sweet taste.', from_fr: 'Thé sucré (3 cuillères)', to_fr: 'Thé avec 1 cuillère + miel', reason_fr: 'Moins de sucre. Même douceur.' },
+    { from: 'Fried yam', to: 'Boiled yam + pepper sauce', reason: 'Same filling. No oil.', from_pidgin: 'Fried yam', to_pidgin: 'Boiled yam + pepper sauce', reason_pidgin: 'Belle full same way. No oil.', from_fr: 'Igname frite', to_fr: 'Igname bouillie + sauce piment', reason_fr: 'Même satiété. Pas d\'huile.' },
+    { from: 'Biscuits (packet)', to: 'Roasted groundnut (small)', reason: 'Real protein. No additives.', from_pidgin: 'Biscuit packet', to_pidgin: 'Small roasted groundnut', reason_pidgin: 'Natural protein. No chemical.', from_fr: 'Biscuits (paquet)', to_fr: 'Arachides grillées (petites)', reason_fr: 'Vraies protéines. Sans additifs.' },
+    { from: 'Fried chicken', to: 'Grilled chicken', reason: 'Same meat. Less oil. More protein.', from_pidgin: 'Fried chicken', to_pidgin: 'Grilled chicken', reason_pidgin: 'Same chicken. Less oil. More protein.', from_fr: 'Poulet frit', to_fr: 'Poulet grillé', reason_fr: 'Même viande. Moins d\'huile. Plus de protéines.' },
+    { from: 'White bread + jam', to: 'Kumba bread + groundnut paste', reason: 'Less sugar. More protein.', from_pidgin: 'White bread + jam', to_pidgin: 'Kumba bread + groundnut paste', reason_pidgin: 'Small sugar. More protein.', from_fr: 'Pain blanc + confiture', to_fr: 'Pain Kumba + pâte d\'arachide', reason_fr: 'Moins de sucre. Plus de protéines.' },
+    { from: 'Fizzy drink (33cl)', to: 'Coconut water', reason: 'Natural electrolytes. No additives.', from_pidgin: 'Fizzy mineral (33cl)', to_pidgin: 'Coconut water', reason_pidgin: 'Natural body water. No chemical.', from_fr: 'Boisson gazeuse (33cl)', to_fr: 'Eau de coco', reason_fr: 'Électrolytes naturels. Sans additifs.' },
+    { from: 'Fried puff-puff', to: 'Boiled corn', reason: 'Same price. Real energy.', from_pidgin: 'Fried puff-puff', to_pidgin: 'Boiled corn', reason_pidgin: 'Same price. Clean power.', from_fr: 'Beignets frits', to_fr: 'Maïs bouilli', reason_fr: 'Même prix. Vraie énergie.' },
+    { from: 'Chocolate spread on bread', to: 'Avocado on Kumba bread', reason: 'Less sugar. Better fat.', from_pidgin: 'Sweet chocolate on bread', to_pidgin: 'Pear on Kumba bread', reason_pidgin: 'Small sugar. Better oil.', from_fr: 'Pâte à tartiner au chocolat', to_fr: 'Avocat sur pain Kumba', reason_fr: 'Moins de sucre. Meilleure graisse.' },
+    { from: 'Fried fish + white rice', to: 'Grilled fish + jollof rice', reason: 'Less oil. More flavor.', from_pidgin: 'Fried fish + white rice', to_pidgin: 'Grilled fish + jollof rice', reason_pidgin: 'Small oil. Sweet pass.', from_fr: 'Poisson frit + riz blanc', to_fr: 'Poisson grillé + riz jollof', reason_fr: 'Moins d\'huile. Plus de saveur.' },
+    { from: 'Sweetened yoghurt', to: 'Plain yoghurt + honey', reason: 'Less sugar. Same creamy.', from_pidgin: 'Sweet yoghurt', to_pidgin: 'Plain yoghurt + honey', reason_pidgin: 'Small sugar. Same creamy taste.', from_fr: 'Yaourt sucré', to_fr: 'Yaourt nature + miel', reason_fr: 'Moins de sucre. Même onctuosité.' },
+    { from: 'Fried meat pie', to: 'Boiled egg + Kumba bread', reason: 'Same filling. Less oil.', from_pidgin: 'Fried meat pie', to_pidgin: 'Boiled egg + Kumba bread', reason_pidgin: 'Belle full same way. Less oil.', from_fr: 'Tourte à la viande frite', to_fr: 'Œuf bouilli + pain Kumba', reason_fr: 'Même satiété. Moins d\'huile.' },
+    { from: 'Cornflakes + sugar', to: 'Pap + groundnut', reason: 'Local energy. No additives.', from_pidgin: 'Cornflakes + sugar', to_pidgin: 'Pap + groundnut', reason_pidgin: 'Local power. No chemical.', from_fr: 'Cornflakes + sucre', to_fr: 'Bouillie + arachides', reason_fr: 'Énergie locale. Sans additifs.' },
+    { from: 'Bottled juice (sweet)', to: 'Fresh mango slices', reason: 'Real fruit. Real vitamins.', from_pidgin: 'Sweet bottle juice', to_pidgin: 'Fresh mango', reason_pidgin: 'Pure fruit. Correct vitamins.', from_fr: 'Jus en bouteille (sucré)', to_fr: 'Tranches de mangue fraîche', reason_fr: 'Vrai fruit. Vraies vitamines.' },
+    { from: 'Fried chin-chin', to: 'Roasted groundnut', reason: 'Same crunch. More protein.', from_pidgin: 'Fried chin-chin', to_pidgin: 'Roasted groundnut', reason_pidgin: 'Same crunch. More protein.', from_fr: 'Chin-chin frit', to_fr: 'Arachides grillées', reason_fr: 'Même croquant. Plus de protéines.' },
+    { from: 'Sugary porridge', to: 'Plain porridge + milk', reason: 'Less sugar. Steady energy.', from_pidgin: 'Sweet porridge', to_pidgin: 'Plain porridge + milk', reason_pidgin: 'Small sugar. Steady power.', from_fr: 'Bouillie sucrée', to_fr: 'Bouillie nature + lait', reason_fr: 'Moins de sucre. Énergie stable.' },
+    { from: 'Fried plantain chips', to: 'Boiled plantain', reason: 'Same base. Less oil.', from_pidgin: 'Plantain chips', to_pidgin: 'Boiled plantain', reason_pidgin: 'Same plantain. Less oil.', from_fr: 'Chips de plantain frites', to_fr: 'Plantain bouilli', reason_fr: 'Même base. Moins d\'huile.' },
+    { from: 'Ice cream (cup)', to: 'Frozen banana + groundnut', reason: 'Real food. Same sweet.', from_pidgin: 'Cup ice cream', to_pidgin: 'Cold banana + groundnut', reason_pidgin: 'Natural chop. Same sweet taste.', from_fr: 'Glace (pot)', to_fr: 'Banane congelée + arachides', reason_fr: 'Vraie nourriture. Même douceur.' },
+    { from: 'Sweet bread (sliced)', to: 'Kumba bread', reason: 'Less sugar. More fiber.', from_pidgin: 'Sweet sliced bread', to_pidgin: 'Kumba bread', reason_pidgin: 'Small sugar. More fiber.', from_fr: 'Pain sucré (tranché)', to_fr: 'Pain Kumba', reason_fr: 'Moins de sucre. Plus de fibres.' },
+    { from: 'Fried doughnut', to: 'Boiled egg + avocado', reason: 'Same money. Real fuel.', from_pidgin: 'Doughnut', to_pidgin: 'Boiled egg + pear', reason_pidgin: 'Same money. Clean power.', from_fr: 'Beignet frit', to_fr: 'Œuf bouilli + avocat', reason_fr: 'Même prix. Vrai carburant.' },
   ],
 
   // ─── WARRIOR (Strong) ────────────────────────────────────────────────
-  // Solid body, physical work, needs protein and strength. Focus: muscle
-  // recovery, satiety, sustained energy for hard labor.
   warrior: [
-    { from: 'Fried plantain', to: 'Boiled plantain + beans', reason: 'Same money. More protein. More strength.' },
-    { from: 'Soda (50cl)', to: 'Water + ginger', reason: 'Cheaper. Helps recovery.' },
-    { from: 'White bread + butter', to: 'Kumba bread + groundnut paste', reason: 'Same filling. More protein.' },
-    { from: 'Puff-puff (3 pieces)', to: 'Boiled eggs (2)', reason: 'Same price. Muscle food.' },
-    { from: 'Fried rice', to: 'Rice + beans + grilled fish', reason: 'More protein. Less oil.' },
-    { from: 'Sweetened pap', to: 'Pap + milk + groundnut', reason: 'More protein. Steady energy.' },
-    { from: 'Fried dough (beignets)', to: 'Beans + bread', reason: 'Same money. Protein for work.' },
-    { from: 'Energy drink', to: 'Fresh juice + groundnut', reason: 'Real energy. No crash.' },
-    { from: 'White rice + fried meat', to: 'Jollof rice + grilled meat', reason: 'Less oil. Same protein.' },
-    { from: 'Cake slice', to: 'Banana + groundnut', reason: 'Real food. Longer fuel.' },
-    { from: 'Fried eggs + white bread', to: 'Boiled eggs + Kumba bread', reason: 'Less oil. More protein per bite.' },
-    { from: 'Sweet tea (3 spoons sugar)', to: 'Tea with 1 spoon sugar + milk', reason: 'Less sugar. More protein.' },
-    { from: 'Fried yam', to: 'Boiled yam + egg sauce', reason: 'Same filling. More protein.' },
-    { from: 'Biscuits (packet)', to: 'Roasted groundnut (handful)', reason: 'Real protein. No additives.' },
-    { from: 'Fried chicken', to: 'Grilled chicken + beans', reason: 'Same meat. More protein.' },
-    { from: 'White bread + jam', to: 'Kumba bread + boiled egg', reason: 'Less sugar. Real food.' },
-    { from: 'Fizzy drink (33cl)', to: 'Coconut water + groundnut', reason: 'Natural electrolytes. Protein.' },
-    { from: 'Fried puff-puff', to: 'Boiled corn + groundnut', reason: 'Same price. Real fuel.' },
-    { from: 'Chocolate spread on bread', to: 'Groundnut paste on Kumba bread', reason: 'More protein. Less sugar.' },
-    { from: 'Fried fish + white rice', to: 'Grilled fish + beans + rice', reason: 'More protein. Less oil.' },
-    { from: 'Sweetened yoghurt', to: 'Plain yoghurt + groundnut', reason: 'More protein. Less sugar.' },
-    { from: 'Fried meat pie', to: 'Boiled eggs + Kumba bread', reason: 'Same filling. Protein for work.' },
-    { from: 'Cornflakes + sugar', to: 'Pap + groundnut + milk', reason: 'Real energy. Protein.' },
-    { from: 'Bottled juice (sweet)', to: 'Fresh mango + groundnut', reason: 'Real fruit. Real protein.' },
-    { from: 'Fried chin-chin', to: 'Roasted groundnut + banana', reason: 'Same crunch. Real fuel.' },
-    { from: 'Sugary porridge', to: 'Millet porridge + groundnut', reason: 'More protein. Steady energy.' },
-    { from: 'Fried plantain chips', to: 'Boiled plantain + beans', reason: 'Same base. More protein.' },
-    { from: 'Ice cream (cup)', to: 'Banana + groundnut + honey', reason: 'Real food. Real protein.' },
-    { from: 'Sweet bread (sliced)', to: 'Kumba bread + boiled egg', reason: 'Less sugar. More protein.' },
-    { from: 'Fried doughnut', to: 'Beans + Kumba bread', reason: 'Same money. Muscle fuel.' },
+    { from: 'Fried plantain', to: 'Boiled plantain + beans', reason: 'Same money. More protein. More strength.', from_pidgin: 'Fried plantain', to_pidgin: 'Boiled plantain + beans', reason_pidgin: 'Same money. More protein. Heavy power.', from_fr: 'Plantain frit', to_fr: 'Plantain bouilli + haricots', reason_fr: 'Même prix. Plus de protéines. Plus de force.' },
+    { from: 'Soda (50cl)', to: 'Water + ginger', reason: 'Cheaper. Helps recovery.', from_pidgin: 'Sweet mineral (50cl)', to_pidgin: 'Water + ginger', reason_pidgin: 'Cheap pass. Body dey recover quick.', from_fr: 'Soda (50cl)', to_fr: 'Eau + gingembre', reason_fr: 'Moins cher. Aide à la récupération.' },
+    { from: 'White bread + butter', to: 'Kumba bread + groundnut paste', reason: 'Same filling. More protein.', from_pidgin: 'White bread + butter', to_pidgin: 'Kumba bread + groundnut paste', reason_pidgin: 'Belle full same way. More muscle food.', from_fr: 'Pain blanc + beurre', to_fr: 'Pain Kumba + pâte d\'arachide', reason_fr: 'Même satiété. Plus de protéines.' },
+    { from: 'Puff-puff (3 pieces)', to: 'Boiled eggs (2)', reason: 'Same price. Muscle food.', from_pidgin: 'Puff-puff (3 pieces)', to_pidgin: '2 Boiled eggs', reason_pidgin: 'Same price. Heavy muscle food.', from_fr: 'Beignets (3 pièces)', to_fr: 'Œufs bouillis (2)', reason_fr: 'Même prix. Nourriture musculaire.' },
+    { from: 'Fried rice', to: 'Rice + beans + grilled fish', reason: 'More protein. Less oil.', from_pidgin: 'Fried rice', to_pidgin: 'Rice + beans + grilled fish', reason_pidgin: 'More protein. Less oil.', from_fr: 'Riz frit', to_fr: 'Riz + haricots + poisson grillé', reason_fr: 'Plus de protéines. Moins d\'huile.' },
+    { from: 'Sweetened pap', to: 'Pap + milk + groundnut', reason: 'More protein. Steady energy.', from_pidgin: 'Sweet pap', to_pidgin: 'Pap + milk + groundnut', reason_pidgin: 'Plenty protein. Steady power.', from_fr: 'Bouillie sucrée', to_fr: 'Bouillie + lait + arachides', reason_fr: 'Plus de protéines. Énergie stable.' },
+    { from: 'Fried dough (beignets)', to: 'Beans + bread', reason: 'Same money. Protein for work.', from_pidgin: 'Beignet', to_pidgin: 'Beans + bread', reason_pidgin: 'Same money. Protein for hard work.', from_fr: 'Beignets frits', to_fr: 'Haricots + pain', reason_fr: 'Même prix. Protéines pour le travail.' },
+    { from: 'Energy drink', to: 'Fresh juice + groundnut', reason: 'Real energy. No crash.', from_pidgin: 'Energy drink', to_pidgin: 'Fresh juice + groundnut', reason_pidgin: 'Pure power. No body weakness.', from_fr: 'Boisson énergisante', to_fr: 'Jus frais + arachides', reason_fr: 'Vraie énergie. Pas de coup de barre.' },
+    { from: 'White rice + fried meat', to: 'Jollof rice + grilled meat', reason: 'Less oil. Same protein.', from_pidgin: 'White rice + fried meat', to_pidgin: 'Jollof rice + grilled meat', reason_pidgin: 'Less oil. Same muscle protein.', from_fr: 'Riz blanc + viande frite', to_fr: 'Riz jollof + viande grillée', reason_fr: 'Moins d\'huile. Même protéines.' },
+    { from: 'Cake slice', to: 'Banana + groundnut', reason: 'Real food. Longer fuel.', from_pidgin: 'Cake', to_pidgin: 'Banana + groundnut', reason_pidgin: 'Natural chop. Heavy power for body.', from_fr: 'Part de gâteau', to_fr: 'Banane + arachides', reason_fr: 'Vraie nourriture. Carburant durable.' },
+    { from: 'Fried eggs + white bread', to: 'Boiled eggs + Kumba bread', reason: 'Less oil. More protein per bite.', from_pidgin: 'Fried egg + white bread', to_pidgin: 'Boiled egg + Kumba bread', reason_pidgin: 'Less oil. More protein per bite.', from_fr: 'Œufs frits + pain blanc', to_fr: 'Œufs bouillis + pain Kumba', reason_fr: 'Moins d\'huile. Plus de protéines par bouchée.' },
+    { from: 'Sweet tea (3 spoons sugar)', to: 'Tea with 1 spoon sugar + honey', reason: 'Less sugar. Same sweetness.', from_pidgin: 'Sweet tea (3 spoon sugar)', to_pidgin: 'Tea with 1 spoon sugar + honey', reason_pidgin: 'Small sugar. Same sweet taste.', from_fr: 'Thé sucré (3 cuillères)', to_fr: 'Thé avec 1 cuillère + miel', reason_fr: 'Moins de sucre. Même douceur.' },
+    { from: 'Fried yam', to: 'Boiled yam + beans', reason: 'Same filling. More protein.', from_pidgin: 'Fried yam', to_pidgin: 'Boiled yam + beans', reason_pidgin: 'Belle full same way. More protein.', from_fr: 'Igname frite', to_fr: 'Igname bouillie + haricots', reason_fr: 'Même satiété. Plus de protéines.' },
+    { from: 'Biscuits (packet)', to: 'Roasted groundnut (big handful)', reason: 'Real protein. More fuel.', from_pidgin: 'Biscuit packet', to_pidgin: 'Big handful roasted groundnut', reason_pidgin: 'Pure protein. Heavy fuel.', from_fr: 'Biscuits (paquet)', to_fr: 'Arachides grillées (grosse poignée)', reason_fr: 'Vraies protéines. Plus de carburant.' },
+    { from: 'Fried chicken', to: 'Grilled chicken + beans', reason: 'Same meat. More protein. Less oil.', from_pidgin: 'Fried chicken', to_pidgin: 'Grilled chicken + beans', reason_pidgin: 'Same chicken. Plenty protein. Less oil.', from_fr: 'Poulet frit', to_fr: 'Poulet grillé + haricots', reason_fr: 'Même viande. Plus de protéines. Moins d\'huile.' },
+    { from: 'White bread + jam', to: 'Kumba bread + groundnut paste', reason: 'Less sugar. More protein.', from_pidgin: 'White bread + jam', to_pidgin: 'Kumba bread + groundnut paste', reason_pidgin: 'Small sugar. More protein.', from_fr: 'Pain blanc + confiture', to_fr: 'Pain Kumba + pâte d\'arachide', reason_fr: 'Moins de sucre. Plus de protéines.' },
+    { from: 'Fizzy drink (33cl)', to: 'Coconut water', reason: 'Natural electrolytes. Better recovery.', from_pidgin: 'Fizzy mineral (33cl)', to_pidgin: 'Coconut water', reason_pidgin: 'Natural body water. Body dey recover sharp-sharp.', from_fr: 'Boisson gazeuse (33cl)', to_fr: 'Eau de coco', reason_fr: 'Électrolytes naturels. Meilleure récupération.' },
+    { from: 'Fried puff-puff', to: 'Boiled corn + groundnut', reason: 'Same price. Real fuel.', from_pidgin: 'Fried puff-puff', to_pidgin: 'Boiled corn + groundnut', reason_pidgin: 'Same price. Real fuel.', from_fr: 'Beignets frits', to_fr: 'Maïs bouilli + arachides', reason_fr: 'Même prix. Vrai carburant.' },
+    { from: 'Chocolate spread on bread', to: 'Groundnut paste on Kumba bread', reason: 'Less sugar. More protein.', from_pidgin: 'Sweet chocolate on bread', to_pidgin: 'Groundnut paste on Kumba bread', reason_pidgin: 'Small sugar. More protein.', from_fr: 'Pâte à tartiner au chocolat', to_fr: 'Pâte d\'arachide sur pain Kumba', reason_fr: 'Moins de sucre. Plus de protéines.' },
+    { from: 'Fried fish + white rice', to: 'Grilled fish + jollof rice', reason: 'Less oil. More protein.', from_pidgin: 'Fried fish + white rice', to_pidgin: 'Grilled fish + jollof rice', reason_pidgin: 'Less oil. More protein.', from_fr: 'Poisson frit + riz blanc', to_fr: 'Poisson grillé + riz jollof', reason_fr: 'Moins d\'huile. Plus de protéines.' },
+    { from: 'Sweetened yoghurt', to: 'Plain yoghurt + groundnut', reason: 'Less sugar. More protein.', from_pidgin: 'Sweet yoghurt', to_pidgin: 'Plain yoghurt + groundnut', reason_pidgin: 'Small sugar. More protein.', from_fr: 'Yaourt sucré', to_fr: 'Yaourt nature + arachides', reason_fr: 'Moins de sucre. Plus de protéines.' },
+    { from: 'Fried meat pie', to: 'Boiled eggs (2) + Kumba bread', reason: 'Same filling. Muscle food.', from_pidgin: 'Fried meat pie', to_pidgin: '2 Boiled eggs + Kumba bread', reason_pidgin: 'Belle full same way. Muscle power.', from_fr: 'Tourte à la viande frite', to_fr: 'Œufs bouillis (2) + pain Kumba', reason_fr: 'Même satiété. Nourriture musculaire.' },
+    { from: 'Cornflakes + sugar', to: 'Pap + milk + groundnut', reason: 'Local energy. More protein.', from_pidgin: 'Cornflakes + sugar', to_pidgin: 'Pap + milk + groundnut', reason_pidgin: 'Local power. More protein.', from_fr: 'Cornflakes + sucre', to_fr: 'Bouillie + lait + arachides', reason_fr: 'Énergie locale. Plus de protéines.' },
+    { from: 'Bottled juice (sweet)', to: 'Fresh orange + groundnut', reason: 'Real fruit. Real energy.', from_pidgin: 'Sweet bottle juice', to_pidgin: 'Fresh orange + groundnut', reason_pidgin: 'Real fruit. Real power.', from_fr: 'Jus en bouteille (sucré)', to_fr: 'Orange fraîche + arachides', reason_fr: 'Vrai fruit. Vraie énergie.' },
+    { from: 'Fried chin-chin', to: 'Roasted groundnut (big)', reason: 'Same crunch. More protein.', from_pidgin: 'Fried chin-chin', to_pidgin: 'Big roasted groundnut', reason_pidgin: 'Same crunch. More protein.', from_fr: 'Chin-chin frit', to_fr: 'Arachides grillées (grandes)', reason_fr: 'Même croquant. Plus de protéines.' },
+    { from: 'Sugary porridge', to: 'Pap + milk + groundnut', reason: 'More protein. Steady energy.', from_pidgin: 'Sweet porridge', to_pidgin: 'Pap + milk + groundnut', reason_pidgin: 'More protein. Steady energy.', from_fr: 'Bouillie sucrée', to_fr: 'Bouillie + lait + arachides', reason_fr: 'Plus de protéines. Énergie stable.' },
+    { from: 'Fried plantain chips', to: 'Boiled plantain + beans', reason: 'Same base. More protein.', from_pidgin: 'Plantain chips', to_pidgin: 'Boiled plantain + beans', reason_pidgin: 'Same plantain. More protein.', from_fr: 'Chips de plantain frites', to_fr: 'Plantain bouilli + haricots', reason_fr: 'Même base. Plus de protéines.' },
+    { from: 'Ice cream (cup)', to: 'Banana + groundnut', reason: 'Real food. Real fuel.', from_pidgin: 'Cup ice cream', to_pidgin: 'Banana + groundnut', reason_pidgin: 'Natural chop. Real power.', from_fr: 'Glace (pot)', to_fr: 'Banane + arachides', reason_fr: 'Vraie nourriture. Vrai carburant.' },
+    { from: 'Sweet bread (sliced)', to: 'Kumba bread + egg', reason: 'Less sugar. More protein.', from_pidgin: 'Sweet sliced bread', to_pidgin: 'Kumba bread + egg', reason_pidgin: 'Small sugar. More protein.', from_fr: 'Pain sucré (tranché)', to_fr: 'Pain Kumba + œuf', reason_fr: 'Moins de sucre. Plus de protéines.' },
+    { from: 'Fried doughnut', to: 'Boiled eggs (2)', reason: 'Same money. Real protein.', from_pidgin: 'Doughnut', to_pidgin: '2 Boiled eggs', reason_pidgin: 'Same money. Pure protein.', from_fr: 'Beignet frit', to_fr: 'Œufs bouillis (2)', reason_fr: 'Même prix. Vraies protéines.' },
   ],
 
   // ─── GUARDIAN (Steady) ───────────────────────────────────────────────
-  // Balanced, soft, steady. Focus: portion control, fiber, low glycemic,
-  // less oil, less sugar.
   guardian: [
-    { from: 'Fried plantain (big portion)', to: 'Boiled plantain (small) + vegetables', reason: 'Less oil. More fiber. Same filling.' },
-    { from: 'Soda (50cl)', to: 'Water + cucumber slices', reason: 'Cheaper. Less sugar.' },
-    { from: 'White bread + butter', to: 'Kumba bread + avocado (small)', reason: 'More fiber. Better fat.' },
-    { from: 'Puff-puff (3 pieces)', to: 'Boiled egg + cucumber', reason: 'Same price. Less oil.' },
-    { from: 'Fried rice (big plate)', to: 'Small jollof + plenty vegetables', reason: 'Less rice. More veg.' },
-    { from: 'Sweetened pap', to: 'Plain pap + small milk', reason: 'Less sugar. Steady energy.' },
-    { from: 'Fried dough (beignets)', to: 'Beans (small) + bread', reason: 'Same money. More fiber.' },
-    { from: 'Sweet drink', to: 'Water + lime', reason: 'Zero sugar. Better body.' },
-    { from: 'White rice + fried fish', to: 'Small rice + grilled fish + vegetables', reason: 'Less oil. More veg.' },
-    { from: 'Cake slice', to: 'Apple + small groundnut', reason: 'Less sugar. More fiber.' },
-    { from: 'Fried eggs + white bread', to: 'Boiled egg + Kumba bread (small)', reason: 'Less oil. Same filling.' },
-    { from: 'Sweet tea (3 spoons sugar)', to: 'Green tea (no sugar)', reason: 'Zero sugar. Calm energy.' },
-    { from: 'Fried yam (big)', to: 'Boiled yam (small) + vegetables', reason: 'Less oil. More fiber.' },
-    { from: 'Biscuits (packet)', to: 'Cucumber slices + groundnut', reason: 'Less sugar. Real food.' },
-    { from: 'Fried chicken', to: 'Grilled chicken (small) + salad', reason: 'Less oil. More veg.' },
-    { from: 'White bread + jam', to: 'Kumba bread + avocado', reason: 'Less sugar. Better fat.' },
-    { from: 'Fizzy drink (33cl)', to: 'Water + lemon', reason: 'Zero sugar. Hydrated.' },
-    { from: 'Fried puff-puff', to: 'Boiled corn (small)', reason: 'Same price. Real food.' },
-    { from: 'Chocolate spread on bread', to: 'Avocado on Kumba bread', reason: 'Less sugar. Better fat.' },
-    { from: 'Fried fish + white rice', to: 'Grilled fish + vegetables', reason: 'Less rice. More veg.' },
-    { from: 'Sweetened yoghurt', to: 'Plain yoghurt (small)', reason: 'Less sugar. Same creamy.' },
-    { from: 'Fried meat pie', to: 'Boiled egg + cucumber', reason: 'Same filling. Less oil.' },
-    { from: 'Cornflakes + sugar', to: 'Pap (small) + milk', reason: 'Less sugar. Steady energy.' },
-    { from: 'Bottled juice (sweet)', to: 'Fresh cucumber + water', reason: 'Zero sugar. Hydrated.' },
-    { from: 'Fried chin-chin', to: 'Roasted groundnut (small)', reason: 'Same crunch. Real food.' },
-    { from: 'Sugary porridge', to: 'Plain porridge + small milk', reason: 'Less sugar. Steady energy.' },
-    { from: 'Fried plantain chips', to: 'Boiled plantain (small)', reason: 'Same base. Less oil.' },
-    { from: 'Ice cream (cup)', to: 'Frozen grapes or banana', reason: 'Real fruit. Less sugar.' },
-    { from: 'Sweet bread (sliced)', to: 'Kumba bread (small)', reason: 'Less sugar. More fiber.' },
-    { from: 'Fried doughnut', to: 'Boiled egg + cucumber', reason: 'Same money. Real food.' },
+    { from: 'Fried plantain', to: 'Boiled plantain + vegetables', reason: 'Same money. Less oil. Better balance.', from_pidgin: 'Fried plantain', to_pidgin: 'Boiled plantain + greens', reason_pidgin: 'Same money. Less oil. Better body balance.', from_fr: 'Plantain frit', to_fr: 'Plantain bouilli + légumes', reason_fr: 'Même prix. Moins d\'huile. Meilleur équilibre.' },
+    { from: 'Soda (50cl)', to: 'Water + lemon', reason: 'Cheaper. No sugar. Better for weight.', from_pidgin: 'Sweet mineral (50cl)', to_pidgin: 'Water + lemon', reason_pidgin: 'Cheap pass. Zero sugar. Better for weight.', from_fr: 'Soda (50cl)', to_fr: 'Eau + citron', reason_fr: 'Moins cher. Sans sucre. Meilleur pour le poids.' },
+    { from: 'White bread + butter', to: 'Kumba bread + avocado', reason: 'Better fat. Keeps you full.', from_pidgin: 'White bread + butter', to_pidgin: 'Kumba bread + pear', reason_pidgin: 'Better oil. Belle dey full.', from_fr: 'Pain blanc + beurre', to_fr: 'Pain Kumba + avocat', reason_fr: 'Meilleure graisse. Rassasie plus longtemps.' },
+    { from: 'Puff-puff (3 pieces)', to: 'Boiled egg (1)', reason: 'Same price. Fills you longer.', from_pidgin: 'Puff-puff (3 pieces)', to_pidgin: '1 Boiled egg', reason_pidgin: 'Same price. Belle dey stay full long.', from_fr: 'Beignets (3 pièces)', to_fr: 'Œuf bouilli (1)', reason_fr: 'Même prix. Rassasie plus longtemps.' },
+    { from: 'Fried rice', to: 'Plain rice + vegetables', reason: 'Fewer calories. More vitamins.', from_pidgin: 'Fried rice', to_pidgin: 'Plain rice + greens', reason_pidgin: 'Small heavy calories. More vitamins.', from_fr: 'Riz frit', to_fr: 'Riz nature + légumes', reason_fr: 'Moins de calories. Plus de vitamines.' },
+    { from: 'Sweetened pap', to: 'Plain pap (no sugar)', reason: 'Less sugar. Steady energy.', from_pidgin: 'Sweet pap', to_pidgin: 'Plain pap (no sugar)', reason_pidgin: 'Small sugar. Steady power.', from_fr: 'Bouillie sucrée', to_fr: 'Bouillie nature (sans sucre)', reason_fr: 'Moins de sucre. Énergie stable.' },
+    { from: 'Fried dough (beignets)', to: 'Beans (small portion)', reason: 'Same money. Fills you longer.', from_pidgin: 'Beignet', to_pidgin: 'Small beans', reason_pidgin: 'Same money. Belle dey stay full long.', from_fr: 'Beignets frits', to_fr: 'Haricots (petite portion)', reason_fr: 'Même prix. Rassasie plus longtemps.' },
+    { from: 'Energy drink', to: 'Water + cucumber slices', reason: 'No sugar. Hydration without calories.', from_pidgin: 'Energy drink', to_pidgin: 'Water + cucumber', reason_pidgin: 'Zero sugar. Water for body without calories.', from_fr: 'Boisson énergisante', to_fr: 'Eau + tranches de concombre', reason_fr: 'Sans sucre. Hydratation sans calories.' },
+    { from: 'White rice + fried fish', to: 'Plain rice + grilled fish', reason: 'Less oil. Same taste.', from_pidgin: 'White rice + fried fish', to_pidgin: 'Plain rice + grilled fish', reason_pidgin: 'Less oil. Same taste.', from_fr: 'Riz blanc + poisson frit', to_fr: 'Riz nature + poisson grillé', reason_fr: 'Moins d\'huile. Même goût.' },
+    { from: 'Cake slice', to: 'Apple or pear', reason: 'Real fruit. Fewer calories.', from_pidgin: 'Cake', to_pidgin: 'Apple or pear', reason_pidgin: 'Pure fruit. Small calories.', from_fr: 'Part de gâteau', to_fr: 'Pomme ou poire', reason_fr: 'Vrai fruit. Moins de calories.' },
+    { from: 'Fried eggs + white bread', to: 'Boiled egg + Kumba bread (thin slice)', reason: 'Less oil. Smaller portion.', from_pidgin: 'Fried egg + white bread', to_pidgin: 'Boiled egg + thin Kumba bread', reason_pidgin: 'Less oil. Small-small chop.', from_fr: 'Œufs frits + pain blanc', to_fr: 'Œuf bouilli + pain Kumba (fine tranche)', reason_fr: 'Moins d\'huile. Portion plus petite.' },
+    { from: 'Sweet tea (3 spoons sugar)', to: 'Tea with 0 sugar + lemon', reason: 'No sugar. Same warmth.', from_pidgin: 'Sweet tea (3 spoon sugar)', to_pidgin: 'Tea (zero sugar) + lemon', reason_pidgin: 'No sugar. Warm body same way.', from_fr: 'Thé sucré (3 cuillères)', to_fr: 'Thé sans sucre + citron', reason_fr: 'Sans sucre. Même chaleur.' },
+    { from: 'Fried yam', to: 'Boiled yam (small portion)', reason: 'Same filling. Fewer calories.', from_pidgin: 'Fried yam', to_pidgin: 'Small boiled yam', reason_pidgin: 'Belle full same way. Small calories.', from_fr: 'Igname frite', to_fr: 'Igname bouillie (petite portion)', reason_fr: 'Même satiété. Moins de calories.' },
+    { from: 'Biscuits (packet)', to: 'Cucumber slices', reason: 'Fewer calories. Hydrating.', from_pidgin: 'Biscuit packet', to_pidgin: 'Cucumber slices', reason_pidgin: 'Small calories. Water for body.', from_fr: 'Biscuits (paquet)', to_fr: 'Tranches de concombre', reason_fr: 'Moins de calories. Hydratant.' },
+    { from: 'Fried chicken', to: 'Grilled chicken (small portion)', reason: 'Same meat. Less oil.', from_pidgin: 'Fried chicken', to_pidgin: 'Small grilled chicken', reason_pidgin: 'Same chicken. Less oil.', from_fr: 'Poulet frit', to_fr: 'Poulet grillé (petite portion)', reason_fr: 'Même viande. Moins d\'huile.' },
+    { from: 'White bread + jam', to: 'Kumba bread (thin) + avocado', reason: 'Less sugar. Better fat.', from_pidgin: 'White bread + jam', to_pidgin: 'Thin Kumba bread + pear', reason_pidgin: 'Small sugar. Better oil.', from_fr: 'Pain blanc + confiture', to_fr: 'Pain Kumba (fine) + avocat', reason_fr: 'Moins de sucre. Meilleure graisse.' },
+    { from: 'Fizzy drink (33cl)', to: 'Water + mint', reason: 'No sugar. Refreshing.', from_pidgin: 'Fizzy mineral (33cl)', to_pidgin: 'Water + mint', reason_pidgin: 'Zero sugar. Body dey cool.', from_fr: 'Boisson gazeuse (33cl)', to_fr: 'Eau + menthe', reason_fr: 'Sans sucre. Rafraîchissant.' },
+    { from: 'Fried puff-puff', to: 'Boiled corn (small)', reason: 'Same price. Fewer calories.', from_pidgin: 'Fried puff-puff', to_pidgin: 'Small boiled corn', reason_pidgin: 'Same price. Small calories.', from_fr: 'Beignets frits', to_fr: 'Maïs bouilli (petit)', reason_fr: 'Même prix. Moins de calories.' },
+    { from: 'Chocolate spread on bread', to: 'Avocado on Kumba bread', reason: 'Less sugar. Better fat.', from_pidgin: 'Sweet chocolate on bread', to_pidgin: 'Pear on Kumba bread', reason_pidgin: 'Small sugar. Better oil.', from_fr: 'Pâte à tartiner au chocolat', to_fr: 'Avocat sur pain Kumba', reason_fr: 'Moins de sucre. Meilleure graisse.' },
+    { from: 'Fried fish + white rice', to: 'Grilled fish + boiled vegetables', reason: 'Fewer calories. Same protein.', from_pidgin: 'Fried fish + white rice', to_pidgin: 'Grilled fish + boiled greens', reason_pidgin: 'Small calories. Same protein.', from_fr: 'Poisson frit + riz blanc', to_fr: 'Poisson grillé + légumes bouillis', reason_fr: 'Moins de calories. Même protéines.' },
+    { from: 'Sweetened yoghurt', to: 'Plain yoghurt (no sugar)', reason: 'No sugar. Same creamy.', from_pidgin: 'Sweet yoghurt', to_pidgin: 'Plain yoghurt (no sugar)', reason_pidgin: 'Zero sugar. Same creamy taste.', from_fr: 'Yaourt sucré', to_fr: 'Yaourt nature (sans sucre)', reason_fr: 'Sans sucre. Même onctuosité.' },
+    { from: 'Fried meat pie', to: 'Boiled egg + small salad', reason: 'Fewer calories. More nutrients.', from_pidgin: 'Fried meat pie', to_pidgin: 'Boiled egg + small salad', reason_pidgin: 'Small calories. Better health.', from_fr: 'Tourte à la viande frite', to_fr: 'Œuf bouilli + petite salade', reason_fr: 'Moins de calories. Plus de nutriments.' },
+    { from: 'Cornflakes + sugar', to: 'Pap (no sugar) + small groundnut', reason: 'Less sugar. Steady energy.', from_pidgin: 'Cornflakes + sugar', to_pidgin: 'Plain pap + small groundnut', reason_pidgin: 'Small sugar. Steady power.', from_fr: 'Cornflakes + sucre', to_fr: 'Bouillie nature + petites arachides', reason_fr: 'Moins de sucre. Énergie stable.' },
+    { from: 'Bottled juice (sweet)', to: 'Fresh cucumber + watermelon', reason: 'Real fruit. Fewer calories.', from_pidgin: 'Sweet bottle juice', to_pidgin: 'Fresh cucumber + watermelon', reason_pidgin: 'Natural fruit. Small calories.', from_fr: 'Jus en bouteille (sucré)', to_fr: 'Concombre frais + pastèque', reason_fr: 'Vrai fruit. Moins de calories.' },
+    { from: 'Fried chin-chin', to: 'Cucumber slices + small groundnut', reason: 'Same crunch. Fewer calories.', from_pidgin: 'Fried chin-chin', to_pidgin: 'Cucumber + small groundnut', reason_pidgin: 'Same crunch. Small calories.', from_fr: 'Chin-chin frit', to_fr: 'Tranches de concombre + petites arachides', reason_fr: 'Même croquant. Moins de calories.' },
+    { from: 'Sugary porridge', to: 'Plain porridge (no sugar)', reason: 'Less sugar. Steady energy.', from_pidgin: 'Sweet porridge', to_pidgin: 'Plain porridge (no sugar)', reason_pidgin: 'Small sugar. Steady power.', from_fr: 'Bouillie sucrée', to_fr: 'Bouillie nature (sans sucre)', reason_fr: 'Moins de sucre. Énergie stable.' },
+    { from: 'Fried plantain chips', to: 'Boiled plantain (small)', reason: 'Same base. Fewer calories.', from_pidgin: 'Plantain chips', to_pidgin: 'Small boiled plantain', reason_pidgin: 'Same plantain base. Small calories.', from_fr: 'Chips de plantain frites', to_fr: 'Plantain bouilli (petit)', reason_fr: 'Même base. Moins de calories.' },
+    { from: 'Ice cream (cup)', to: 'Frozen watermelon cubes', reason: 'Real fruit. Fewer calories.', from_pidgin: 'Cup ice cream', to_pidgin: 'Cold watermelon cubes', reason_pidgin: 'Natural fruit. Small calories.', from_fr: 'Glace (pot)', to_fr: 'Cubes de pastèque congelés', reason_fr: 'Vrai fruit. Moins de calories.' },
+    { from: 'Sweet bread (sliced)', to: 'Kumba bread (thin slice)', reason: 'Less sugar. Smaller portion.', from_pidgin: 'Sweet sliced bread', to_pidgin: 'Thin Kumba bread', reason_pidgin: 'Small sugar. Small portion.', from_fr: 'Pain sucré (tranché)', to_fr: 'Pain Kumba (fine tranche)', reason_fr: 'Moins de sucre. Portion plus petite.' },
+    { from: 'Fried doughnut', to: 'Boiled egg + small salad', reason: 'Same money. Fewer calories.', from_pidgin: 'Doughnut', to_pidgin: 'Boiled egg + small salad', reason_pidgin: 'Same money. Small calories.', from_fr: 'Beignet frit', to_fr: 'Œuf bouilli + petite salade', reason_fr: 'Même prix. Moins de calories.' },
   ],
 };
 
-// ─── HELPER: Get today's swap for archetype ─────────────────────────────
-
-export const getTodaySwap = (
-  archetype: 'runner' | 'warrior' | 'guardian' | null
-): ChopSwap | null => {
-  if (!archetype) return null;
-  const swaps = CHOP_SWAPS[archetype];
-  if (!swaps || swaps.length === 0) return null;
-
+// ─── Get today's swap for the user's archetype ─────────────────────────
+export const getTodaySwap = (archetype: string): ChopSwap | null => {
+  const swaps = CHOP_SWAPS[archetype as keyof typeof CHOP_SWAPS];
+  if (!swaps) return null;
   const dayOfYear = Math.floor(
     (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
   );
-
   return swaps[dayOfYear % swaps.length];
 };
