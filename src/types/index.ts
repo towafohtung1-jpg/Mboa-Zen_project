@@ -29,6 +29,10 @@ export interface MealOption {
   foods: MealFoodItem[];
   nutrition: MealNutrition;
   why_good: string;
+  why_good_pidgin?: string;
+  available_from_pidgin?: string;
+  why_good_fr?: string;
+  available_from_fr?: string;
   available_from: string;
   verified: boolean;                 // NEW
 }

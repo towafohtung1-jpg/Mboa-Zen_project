@@ -123,7 +123,7 @@ const MealDetailModal = ({
   onClose: () => void;
   onLogMeal: (meal: MealOption) => void;
 }) => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   if (!meal) return null;
 
   const foodImage = meal.image ? FOOD_IMAGES[meal.image] : null;
@@ -211,11 +211,19 @@ const MealDetailModal = ({
 
             <View style={styles.sectionDivider} />
             <Text style={styles.bodyTitle}>{t('nurture.whyGood')}</Text>
-            <Text style={styles.whyGoodText}>{meal.why_good}</Text>
+            <Text style={styles.whyGoodText}>
+              {language === 'pidgin' ? (meal.why_good_pidgin || meal.why_good) :
+               language === 'fr' ? (meal.why_good_fr || meal.why_good) :
+               meal.why_good}
+            </Text>
 
             <View style={styles.availableBox}>
               <Text style={styles.availableLabel}>📍 {t('nurture.whereToGet')}</Text>
-              <Text style={styles.availableText}>{meal.available_from}</Text>
+              <Text style={styles.availableText}>
+                {language === 'pidgin' ? (meal.available_from_pidgin || meal.available_from) :
+                 language === 'fr' ? (meal.available_from_fr || meal.available_from) :
+                 meal.available_from}
+              </Text>
             </View>
 
             <View style={{ marginTop: 14, alignItems: 'flex-end' }}>
@@ -247,7 +255,7 @@ const MealCard = ({
   onLogMeal: (meal: MealOption) => void;
   onOpenModal: (meal: MealOption) => void;
 }) => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const foodImage = meal.image ? FOOD_IMAGES[meal.image] : null;
 
@@ -329,10 +337,18 @@ const MealCard = ({
           <NutritionBar label={t('nurture.fiberBar')} value={meal.nutrition.fiber} max={20} color="#00BCD4" />
           <View style={styles.sectionDivider} />
           <Text style={styles.bodyTitle}>{t('nurture.whyGood')}</Text>
-          <Text style={styles.whyGoodText}>{meal.why_good}</Text>
+          <Text style={styles.whyGoodText}>
+            {language === 'pidgin' ? (meal.why_good_pidgin || meal.why_good) :
+             language === 'fr' ? (meal.why_good_fr || meal.why_good) :
+             meal.why_good}
+          </Text>
           <View style={styles.availableBox}>
             <Text style={styles.availableLabel}>📍 {t('nurture.whereToGet')}</Text>
-            <Text style={styles.availableText}>{meal.available_from}</Text>
+            <Text style={styles.availableText}>
+              {language === 'pidgin' ? (meal.available_from_pidgin || meal.available_from) :
+               language === 'fr' ? (meal.available_from_fr || meal.available_from) :
+               meal.available_from}
+            </Text>
           </View>
           <View style={{ marginTop: 14, alignItems: 'flex-end' }}>
             <MboaButton
