@@ -48,7 +48,7 @@ const BlogPostModal = ({
   visible: boolean;
   onClose: () => void;
 }) => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   if (!post) return null;
 
   return (
@@ -87,7 +87,11 @@ const BlogPostModal = ({
               </Text>
             </View>
 
-            <Text style={styles.modalTitle}>{post.title}</Text>
+            <Text style={styles.modalContent}>
+              {language === 'pidgin' ? post.content_pidgin :
+              language === 'fr' ? post.content_fr :
+              post.content}
+            </Text>
             <Text style={styles.modalReadTime}>{post.readTime}</Text>
 
             <View style={styles.modalDivider} />
@@ -111,7 +115,7 @@ const BlogCard = ({
   post: BlogPost;
   onPress: (post: BlogPost) => void;
 }) => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   return (
     <TouchableOpacity
       style={styles.blogCard}
@@ -138,8 +142,16 @@ const BlogCard = ({
         </Text>
       </View>
 
-      <Text style={styles.blogTitle}>{post.title}</Text>
-      <Text style={styles.blogSummary}>{post.summary}</Text>
+      <Text style={styles.blogTitle}>
+        {language === 'pidgin' ? post.title_pidgin :
+        language === 'fr' ? post.title_fr :
+        post.title}
+      </Text>
+      <Text style={styles.blogSummary}>
+        {language === 'pidgin' ? post.summary_pidgin :
+        language === 'fr' ? post.summary_fr :
+        post.summary}
+      </Text>
 
       <View style={styles.blogFooter}>
         <Text style={styles.blogReadTime}>{post.readTime}</Text>
