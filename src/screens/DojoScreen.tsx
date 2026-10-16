@@ -63,7 +63,7 @@ const DojoScreen = () => {
     getStepStreak,
     getStepPersonalBest,
   } = useUserStore();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -302,7 +302,11 @@ const DojoScreen = () => {
         {/* EXERCISE INFO */}
         <View style={styles.exerciseInfoContainer}>
           <Text style={styles.exerciseName}>{currentExercise?.name}</Text>
-          <Text style={styles.exerciseDescription}>{currentExercise?.description}</Text>
+          <Text style={styles.exerciseDescription}>
+            {language === 'pidgin' ? (currentExercise?.description_pidgin || currentExercise?.description) :
+            language === 'fr' ? (currentExercise?.description_fr || currentExercise?.description) :
+            currentExercise?.description}
+          </Text>
 
           <View style={styles.detailsRow}>
             <View style={styles.detailChip}>
@@ -311,7 +315,9 @@ const DojoScreen = () => {
             </View>
             <View style={styles.detailChip}>
               <Text style={styles.detailLabel}>{t('dojo.difficulty')}</Text>
-              <Text style={styles.detailValue}>{currentExercise?.difficulty}</Text>
+              <Text style={styles.detailValue}>
+                {currentExercise?.difficulty ? t(`difficulty.${currentExercise.difficulty}`) : ''}
+              </Text>
             </View>
             {currentExercise?.sets && (
               <View style={styles.detailChip}>

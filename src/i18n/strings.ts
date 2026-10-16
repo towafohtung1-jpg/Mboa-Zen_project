@@ -15,7 +15,7 @@ export const strings = {
       subtitle: 'Nutrition plans built around the foods you already know and trust.',
       startButton: 'Start Journey',
     },
-        difficulty: {
+    difficulty: {
       beginner: 'Beginner',
       intermediate: 'Intermediate',
       advanced: 'Advanced',
@@ -399,6 +399,11 @@ export const strings = {
       subtitle: 'Food plan wey dey use chop you sabi well well.',
       startButton: 'Start Journey',
     },
+    difficulty: {
+      beginner: 'Small Player',
+      intermediate: 'Correct Runner',
+      advanced: 'Iron Man',
+    },
     goal: {
       eyebrow: 'YOUR JOURNEY',
       title: 'Waity you want do for your health?',
@@ -777,6 +782,11 @@ export const strings = {
       title: 'Nourriture Locale. Vraie Force.',
       subtitle: 'Des plans nutritionnels basés sur les aliments que vous connaissez et en qui vous avez confiance.',
       startButton: 'Commencer',
+    },
+    difficulty: {
+      beginner: 'Débutant',
+      intermediate: 'Intermédiaire',
+      advanced: 'Avancé',
     },
     goal: {
       eyebrow: 'VOTRE PARCOURS',
