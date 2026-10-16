@@ -15,6 +15,11 @@ export const strings = {
       subtitle: 'Nutrition plans built around the foods you already know and trust.',
       startButton: 'Start Journey',
     },
+        difficulty: {
+      beginner: 'Beginner',
+      intermediate: 'Intermediate',
+      advanced: 'Advanced',
+    },
     goal: {
       eyebrow: 'YOUR JOURNEY',
       title: 'What is your main health goal?',
