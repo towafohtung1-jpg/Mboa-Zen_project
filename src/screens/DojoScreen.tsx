@@ -17,6 +17,7 @@ import { FadeInView } from '../components/common/FadeInView';
 import { MboaButton } from '../components/common/MboaButton';
 import { getExercisesForArchetype } from '../data/workoutOptions';
 import { useSwipeTabs } from '../hooks/useSwipeTabs';
+import { useTranslation } from '../i18n/useTranslation';
 
 // ─── DAY NAMES ──────────────────────────────────────────────────────────
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -62,6 +63,7 @@ const DojoScreen = () => {
     getStepStreak,
     getStepPersonalBest,
   } = useUserStore();
+  const { t } = useTranslation();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -121,7 +123,7 @@ const DojoScreen = () => {
   const handleExerciseComplete = () => {
     if (isLastExercise) {
       setIsWorkoutComplete(true);
-      Alert.alert('Workout Complete', 'You finished all exercises. Good job.', [
+      Alert.alert(t('dojo.alertTitle'), t('dojo.alertBody'), [
         { text: 'OK' }
       ]);
     } else {
@@ -164,9 +166,9 @@ const DojoScreen = () => {
     return (
       <FadeInView style={styles.container} {...panHandlers}>
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>Select Your Archetype</Text>
+          <Text style={styles.emptyTitle}>{t('dojo.selectArchetype')}</Text>
           <Text style={styles.emptySubtitle}>
-            Complete the quiz on the Hub screen to unlock your personalized workouts.
+            {t('dojo.selectArchetypeSub')}
           </Text>
         </View>
       </FadeInView>
@@ -177,9 +179,9 @@ const DojoScreen = () => {
     return (
       <FadeInView style={styles.container} {...panHandlers}>
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>No Exercises Found</Text>
+          <Text style={styles.emptyTitle}>{t('dojo.noExercises')}</Text>
           <Text style={styles.emptySubtitle}>
-            We couldn't find exercises for your archetype. Please try again.
+            {t('dojo.noExercisesSub')}
           </Text>
         </View>
       </FadeInView>
@@ -191,28 +193,28 @@ const DojoScreen = () => {
     return (
       <FadeInView style={styles.container} {...panHandlers}>
         <View style={styles.completeContainer}>
-          <Text style={styles.completeLabel}>WORKOUT COMPLETE</Text>
-          <Text style={styles.completeTitle}>Good Job</Text>
+          <Text style={styles.completeLabel}>{t('dojo.workoutComplete')}</Text>
+          <Text style={styles.completeTitle}>{t('dojo.goodJob')}</Text>
           <Text style={styles.completeSubtitle}>
-            You finished all {totalExercises} exercises today.
+            {t('dojo.goodJobSub').replace('{n}', String(totalExercises))}
           </Text>
 
           <View style={styles.completeStatsBox}>
             <View style={styles.completeStatItem}>
               <Text style={styles.completeStatValue}>{totalExercises}</Text>
-              <Text style={styles.completeStatLabel}>exercises</Text>
+              <Text style={styles.completeStatLabel}>{t('dojo.exercisesLabel')}</Text>
             </View>
             <View style={styles.completeStatDivider} />
             <View style={styles.completeStatItem}>
               <Text style={styles.completeStatValue}>
                 {Math.round(exercises.reduce((sum, e) => sum + (e.duration || 30), 0) / 60)}
               </Text>
-              <Text style={styles.completeStatLabel}>minutes</Text>
+              <Text style={styles.completeStatLabel}>{t('dojo.minutesLabel')}</Text>
             </View>
           </View>
 
           <MboaButton
-            title="Start Again"
+            title={t('dojo.startAgain')}
             onPress={() => {
               setIsWorkoutComplete(false);
               setCurrentIndex(0);
@@ -233,7 +235,7 @@ const DojoScreen = () => {
     <FadeInView style={styles.container} {...panHandlers}>
       {/* HEADER */}
       <View style={styles.headerArea}>
-        <Text style={styles.eyebrow}>THE DOJO</Text>
+        <Text style={styles.eyebrow}>{t('dojo.eyebrow')}</Text>
         <Text style={styles.header}>{currentDay}</Text>
         <Text style={styles.subHeader}>
           {archetype.charAt(0).toUpperCase() + archetype.slice(1)} — {totalExercises} exercises
@@ -264,12 +266,12 @@ const DojoScreen = () => {
             <WebVideo videoUrl={videoUrl} isPlaying={isPlaying} />
           ) : (
             <View style={styles.videoPlaceholder}>
-              <Text style={styles.videoPlaceholderLabel}>FOLLOW ALONG</Text>
+              <Text style={styles.videoPlaceholderLabel}>{t('dojo.videoLabel')}</Text>
               <Text style={styles.videoPlaceholderTitle}>
-                {currentExercise?.name || 'Exercise'}
+                {currentExercise?.name || t('dojo.exerciseFallback')}
               </Text>
               <Text style={styles.videoPlaceholderText}>
-                Follow along at your own pace
+                {t('dojo.videoPlaceholder')}
               </Text>
             </View>
           )}
@@ -283,12 +285,12 @@ const DojoScreen = () => {
           {showNextPrompt && (
             <View style={styles.completedOverlay}>
               <View style={styles.completedBox}>
-                <Text style={styles.completedLabel}>EXERCISE COMPLETE</Text>
+                <Text style={styles.completedLabel}>{t('dojo.exerciseComplete')}</Text>
                 <Text style={styles.completedText}>
-                  {isLastExercise ? 'Workout Complete' : 'Ready for the next one?'}
+                  {isLastExercise ? t('dojo.workoutComplete') : t('dojo.readyNext')}
                 </Text>
                 <MboaButton
-                  title={isLastExercise ? 'Finish Workout' : 'Next Exercise'}
+                  title={isLastExercise ? t('dojo.finishWorkout') : t('dojo.nextExercise')}
                   onPress={handleExerciseComplete}
                   variant="primary"
                 />
@@ -304,22 +306,22 @@ const DojoScreen = () => {
 
           <View style={styles.detailsRow}>
             <View style={styles.detailChip}>
-              <Text style={styles.detailLabel}>Duration</Text>
+              <Text style={styles.detailLabel}>{t('dojo.duration')}</Text>
               <Text style={styles.detailValue}>{currentExercise?.duration}s</Text>
             </View>
             <View style={styles.detailChip}>
-              <Text style={styles.detailLabel}>Difficulty</Text>
+              <Text style={styles.detailLabel}>{t('dojo.difficulty')}</Text>
               <Text style={styles.detailValue}>{currentExercise?.difficulty}</Text>
             </View>
             {currentExercise?.sets && (
               <View style={styles.detailChip}>
-                <Text style={styles.detailLabel}>Sets</Text>
+                <Text style={styles.detailLabel}>{t('dojo.sets')}</Text>
                 <Text style={styles.detailValue}>{currentExercise.sets}</Text>
               </View>
             )}
             {currentExercise?.reps && (
               <View style={styles.detailChip}>
-                <Text style={styles.detailLabel}>Reps</Text>
+                <Text style={styles.detailLabel}>{t('dojo.reps')}</Text>
                 <Text style={styles.detailValue}>{currentExercise.reps}</Text>
               </View>
             )}
@@ -329,7 +331,7 @@ const DojoScreen = () => {
         {/* UP NEXT */}
         {!isLastExercise && !showNextPrompt && exercises[currentIndex + 1] && (
           <View style={styles.upNextContainer}>
-            <Text style={styles.upNextLabel}>UP NEXT</Text>
+            <Text style={styles.upNextLabel}>{t('dojo.upNext')}</Text>
             <Text style={styles.upNextName}>
               {exercises[currentIndex + 1]?.name}
             </Text>
@@ -341,7 +343,7 @@ const DojoScreen = () => {
           <View style={styles.controlsContainer}>
             <View style={styles.controlButtonWrapper}>
               <MboaButton
-                title="Previous"
+                title={t('dojo.previous')}
                 onPress={goToPrevious}
                 variant="outline"
                 disabled={currentIndex === 0}
@@ -350,7 +352,7 @@ const DojoScreen = () => {
 
             <View style={styles.controlButtonWrapper}>
               <MboaButton
-                title={isPlaying ? 'Pause' : 'Play'}
+                title={isPlaying ? t('dojo.pause') : t('dojo.play')}
                 onPress={togglePlay}
                 variant="primary"
               />
@@ -358,7 +360,7 @@ const DojoScreen = () => {
 
             <View style={styles.controlButtonWrapper}>
               <MboaButton
-                title={isLastExercise ? 'Finish' : 'Next'}
+                title={isLastExercise ? t('dojo.finish') : t('dojo.next')}
                 onPress={goToNext}
                 variant="outline"
               />
@@ -368,25 +370,25 @@ const DojoScreen = () => {
 
         {/* ─── STEPS CARD ─────────────────────────────────────────── */}
         <View style={styles.stepsCard}>
-          <Text style={styles.stepsEyebrow}>TODAY'S STEPS</Text>
+          <Text style={styles.stepsEyebrow}>{t('dojo.stepsTitle')}</Text>
 
           {isWeb ? (
             <View>
               <Text style={styles.stepsPlaceholderTitle}>
-                Step tracking works on mobile.
+                {t('dojo.stepsOnWeb')}
               </Text>
               <Text style={styles.stepsPlaceholderText}>
-                Install Mboa-Zen on your phone to track your daily steps.
+                {t('dojo.stepsInstall')}
               </Text>
               <Text style={styles.stepsPlaceholderNote}>
-                Coming soon: Step streaks and town leaderboards.
+                {t('dojo.stepsComingSoon')}
               </Text>
             </View>
           ) : (
             <View>
               <View style={styles.stepsValueRow}>
                 <Text style={styles.stepsValue}>{todaySteps.toLocaleString()}</Text>
-                <Text style={styles.stepsValueLabel}>steps</Text>
+                <Text style={styles.stepsValueLabel}>{t('dojo.steps')}</Text>
               </View>
 
               <View style={styles.stepsProgressBg}>
@@ -398,15 +400,15 @@ const DojoScreen = () => {
                 />
               </View>
               <Text style={styles.stepsProgressText}>
-                Goal: {stepGoal.toLocaleString()} steps
+                {t('dojo.stepsGoal').replace('{n}', stepGoal.toLocaleString())}
               </Text>
 
               <View style={styles.stepsStreakRow}>
                 <Text style={styles.stepsStreak}>
-                  {getStepStreak()} day{getStepStreak() !== 1 ? 's' : ''} streak
+                  {t('dojo.stepsStreak').replace('{n}', String(getStepStreak()))}
                 </Text>
                 <Text style={styles.stepsBest}>
-                  Best: {getStepPersonalBest().toLocaleString()}
+                  {t('dojo.stepsBest').replace('{n}', getStepPersonalBest().toLocaleString())}
                 </Text>
               </View>
             </View>
@@ -861,4 +863,3 @@ const styles = StyleSheet.create({
 });
 
 export default DojoScreen;
-
