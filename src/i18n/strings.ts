@@ -352,7 +352,7 @@ export const strings = {
       warriorDesc: 'Protein-rich meals to support physical work and muscle recovery.',
       guardianDesc: 'Balanced, lower glycemic foods to support weight management.',
     },
-        dojo: {
+    dojo: {
       eyebrow: 'THE DOJO',
       videoLabel: 'FOLLOW ALONG',
       videoPlaceholder: 'Follow along at your own pace',
@@ -391,6 +391,19 @@ export const strings = {
       stepsGoal: 'Goal: {n} steps',
       stepsStreak: '{n} day(s) streak',
       stepsBest: 'Best: {n}',
+    },
+    blog: {
+      eyebrow: 'LEARN',
+      header: 'Mboa-Zen Blog',
+      subheader: 'Practical health, food, and workout advice for real Cameroonian life.',
+      readMore: 'Read →',
+      catAll: 'All',
+      catEatSmart: 'Eat Smart',
+      catMoveSmart: 'Move Smart',
+      catMboaStories: 'Mboa Stories',
+      emptyTitle: 'No articles yet',
+      emptySubtitle: 'Check back soon for new content.',
+      disclaimer: 'These articles are for general wellness education only. Consult a qualified health professional for personal medical advice.',
     },
   },
   pidgin: {
@@ -736,7 +749,7 @@ export const strings = {
       warriorDesc: 'Food wey full protein for support hard work and make muscle come back strong.',
       guardianDesc: 'Food wey balance, no too much sugar, for help control weight.',
     },
-        dojo: {
+    dojo: {
       eyebrow: 'THE DOJO',
       videoLabel: 'FOLLOW ALONG',
       videoPlaceholder: 'Follow am small-small for your own speed',
@@ -775,6 +788,19 @@ export const strings = {
       stepsGoal: 'Goal: {n} steps',
       stepsStreak: '{n} day(s) streak',
       stepsBest: 'Best: {n}',
+    },
+    blog: {
+      eyebrow: 'LEARN',
+      header: 'Mboa-Zen Blog',
+      subheader: 'Correct health, chop, and exercise advice for real Cameroon life.',
+      readMore: 'Read →',
+      catAll: 'All',
+      catEatSmart: 'Chop Well',
+      catMoveSmart: 'Move Well',
+      catMboaStories: 'Mboa Stories',
+      emptyTitle: 'No story dey yet.',
+      emptySubtitle: 'Check back small time for new updates.',
+      disclaimer: 'This story na just general body teaching. Go see correct health expert for personal health matter.',
     },
   },
   fr: {
@@ -1159,6 +1185,19 @@ export const strings = {
       stepsGoal: 'Objectif : {n} pas',
       stepsStreak: '{n} jour(s) de série',
       stepsBest: 'Record : {n}',
+    },
+    blog: {
+      eyebrow: 'APPRENDRE',
+      header: 'Blog Mboa-Zen',
+      subheader: 'Conseils pratiques sur la santé, la nourriture et les exercices pour la vie camerounaise réelle.',
+      readMore: 'Lire →',
+      catAll: 'Tout',
+      catEatSmart: 'Manger Malin',
+      catMoveSmart: 'Bouger Malin',
+      catMboaStories: 'Histoires Mboa',
+      emptyTitle: 'Aucun article pour l\'instant',
+      emptySubtitle: 'Revenez bientôt pour du nouveau contenu.',
+      disclaimer: 'Ces articles ne sont qu\'une éducation générale sur le bien-être. Consultez un professionnel de santé qualifié pour des conseils médicaux personnels.',
     },
   },
 };

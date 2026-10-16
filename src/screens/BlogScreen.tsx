@@ -16,6 +16,7 @@ import { FadeInView } from '../components/common/FadeInView';
 import { BLOG_POSTS, BlogPost, BlogCategory } from '../data/blogPosts';
 import { MboaButton } from '../components/common/MboaButton';
 import { useSwipeTabs } from '../hooks/useSwipeTabs';
+import { useTranslation } from '../i18n/useTranslation';
 
 const CATEGORIES: { key: BlogCategory | 'all'; label: string }[] = [
   { key: 'all', label: 'All' },
@@ -47,6 +48,7 @@ const BlogPostModal = ({
   visible: boolean;
   onClose: () => void;
 }) => {
+  const { t } = useTranslation();
   if (!post) return null;
 
   return (
@@ -78,7 +80,10 @@ const BlogPostModal = ({
               ]}
             >
               <Text style={styles.modalCategoryBadgeText}>
-                {CATEGORY_LABELS[post.category]}
+                {post.category === 'eat_smart' ? t('blog.catEatSmart') :
+                post.category === 'move_smart' ? t('blog.catMoveSmart') :
+                post.category === 'mboa_stories' ? t('blog.catMboaStories') :
+                CATEGORY_LABELS[post.category]}
               </Text>
             </View>
 
@@ -106,6 +111,7 @@ const BlogCard = ({
   post: BlogPost;
   onPress: (post: BlogPost) => void;
 }) => {
+  const { t } = useTranslation();
   return (
     <TouchableOpacity
       style={styles.blogCard}
@@ -125,7 +131,10 @@ const BlogCard = ({
         ]}
       >
         <Text style={styles.categoryBadgeText}>
-          {CATEGORY_LABELS[post.category]}
+          {post.category === 'eat_smart' ? t('blog.catEatSmart') :
+          post.category === 'move_smart' ? t('blog.catMoveSmart') :
+          post.category === 'mboa_stories' ? t('blog.catMboaStories') :
+          CATEGORY_LABELS[post.category]}
         </Text>
       </View>
 
@@ -137,7 +146,7 @@ const BlogCard = ({
       </View>
 
       <View style={styles.blogReadMoreBadge}>
-        <Text style={styles.blogReadMoreText}>Read →</Text>
+        <Text style={styles.blogReadMoreText}>{t('blog.readMore')}</Text>
       </View>
 
     </TouchableOpacity>
@@ -147,6 +156,7 @@ const BlogCard = ({
 // ─── MAIN BLOG SCREEN ───────────────────────────────────────────────────
 
 const BlogScreen = () => {
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<BlogCategory | 'all'>('all');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
@@ -192,11 +202,9 @@ const BlogScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headerArea}>
-          <Text style={styles.eyebrow}>LEARN</Text>
-          <Text style={styles.header}>Mboa-Zen Blog</Text>
-          <Text style={styles.subHeader}>
-            Practical health, food, and workout advice for real Cameroonian life.
-          </Text>
+          <Text style={styles.eyebrow}>{t('blog.eyebrow')}</Text>
+          <Text style={styles.header}>{t('blog.header')}</Text>
+          <Text style={styles.subHeader}>{t('blog.subheader')}</Text>
 
           {/* Category Tabs */}
           <ScrollView
@@ -207,7 +215,13 @@ const BlogScreen = () => {
             {CATEGORIES.map((cat) => (
               <MboaButton
                 key={cat.key}
-                title={cat.label}
+                title={
+                  cat.key === 'all' ? t('blog.catAll') :
+                  cat.key === 'eat_smart' ? t('blog.catEatSmart') :
+                  cat.key === 'move_smart' ? t('blog.catMoveSmart') :
+                  cat.key === 'mboa_stories' ? t('blog.catMboaStories') :
+                  cat.label
+                }
                 onPress={() => setSelectedCategory(cat.key)}
                 variant={selectedCategory === cat.key ? 'primary' : 'outline'}
                 style={{ marginRight: 8 }}
@@ -219,10 +233,8 @@ const BlogScreen = () => {
         <View style={styles.section}>
           {filteredPosts.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyTitle}>No articles yet</Text>
-              <Text style={styles.emptySubtitle}>
-                Check back soon for new content.
-              </Text>
+              <Text style={styles.emptyTitle}>{t('blog.emptyTitle')}</Text>
+              <Text style={styles.emptySubtitle}>{t('blog.emptySubtitle')}</Text>
             </View>
           ) : (
             filteredPosts.map((post) => (
@@ -231,10 +243,7 @@ const BlogScreen = () => {
           )}
 
           <View style={styles.disclaimerBox}>
-            <Text style={styles.disclaimerText}>
-              These articles are for general wellness education only. Consult a
-              qualified health professional for personal medical advice.
-            </Text>
+            <Text style={styles.disclaimerText}>{t('blog.disclaimer')}</Text>
           </View>
 
           <View style={{ height: 20 }} />
