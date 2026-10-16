@@ -1,6 +1,5 @@
-﻿// â”€â”€â”€ src/screens/QuizScreen.tsx â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-import React, { useState } from 'react';
+﻿// ─── src/screens/QuizScreen.tsx ─────────────────────────────────────────
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -14,14 +13,14 @@ import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
 import { useTranslation } from '../i18n/useTranslation';
+import { track } from '../utils/analytics';
 import { quizQuestions, calculateQuizResult, ArchetypeType } from '../data/quizLogic';
 
 type Props = {
   onFinish: () => void;
 };
 
-// â”€â”€â”€ TREE IMAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
+// ─── TREE IMAGES ────────────────────────────────────────────────────────
 import plantainTree from '../../assets/Media/Trees/plantain_tree.jpg';
 import irokoTree from '../../assets/Media/Trees/iroko_tree.jpg';
 import mangoTree from '../../assets/Media/Trees/mango_tree.jpg';
@@ -32,8 +31,7 @@ const TREE_IMAGES = {
   guardian: mangoTree,
 };
 
-// â”€â”€â”€ ICON IMAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
+// ─── ICON IMAGES ────────────────────────────────────────────────────────
 import runnerIcon from '../../assets/Media/Icons/runner_icon.png';
 import warriorIcon from '../../assets/Media/Icons/warrior_icon.png';
 import guardianIcon from '../../assets/Media/Icons/guardian_icon.png';
@@ -47,10 +45,22 @@ import powerIcon from '../../assets/Media/Icons/power_icon.png';
 import muscleIcon from '../../assets/Media/Icons/muscle_icon.png';
 import balanceIcon from '../../assets/Media/Icons/balance_icon.png';
 
+const ICON_MAP: Record<string, any> = {
+  runner_icon: runnerIcon,
+  warrior_icon: warriorIcon,
+  guardian_icon: guardianIcon,
+  walk_icon: walkIcon,
+  carry_icon: carryIcon,
+  sit_icon: sitIcon,
+  hungry_icon: hungryIcon,
+  strong_icon: strongIcon,
+  tired_icon: tiredIcon,
+  power_icon: powerIcon,
+  muscle_icon: muscleIcon,
+  balance_icon: balanceIcon,
+};
 
-
-// â”€â”€â”€ OPTION CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
+// ─── OPTION CARD ────────────────────────────────────────────────────────
 const OptionCard = ({
   label,
   icon,
@@ -62,7 +72,7 @@ const OptionCard = ({
   onPress: () => void;
   isSelected: boolean;
 }) => {
-  const scale = useState(new Animated.Value(1))[0];
+  const scale = useRef(new Animated.Value(1)).current;
 
   const pressIn = () => {
     Animated.spring(scale, {
@@ -82,28 +92,8 @@ const OptionCard = ({
     }).start();
   };
 
-  // Direct mapping of icon names to images
-  const getIconSource = (iconName: string) => {
-  switch (iconName) {
-    case 'runner_icon': return runnerIcon;
-    case 'warrior_icon': return warriorIcon;
-    case 'guardian_icon': return guardianIcon;
-    case 'walk_icon': return walkIcon;
-    case 'carry_icon': return carryIcon;
-    case 'sit_icon': return sitIcon;
-    case 'hungry_icon': return hungryIcon;
-    case 'strong_icon': return strongIcon;
-    case 'tired_icon': return tiredIcon;
-    case 'power_icon': return powerIcon;
-    case 'muscle_icon': return muscleIcon;
-    case 'balance_icon': return balanceIcon;
-    default: return null;
-  }
-};
-
-  const imageSource = icon ? getIconSource(icon) : null;
-  const isImageIcon = imageSource !== null;
-  console.log('ðŸ” Q3 icon:', icon, 'imageSource:', imageSource ? 'FOUND' : 'NULL');
+  const imageSource = icon ? ICON_MAP[icon] : undefined;
+  const isImageIcon = !!imageSource;
 
   return (
     <Animated.View style={{ transform: [{ scale }] }}>
@@ -119,9 +109,7 @@ const OptionCard = ({
         </View>
         {isImageIcon ? (
           <Image source={imageSource} style={styles.optionIconImage} />
-        ) : (
-          icon && <Text style={styles.optionIcon}>{icon}</Text>
-        )}
+        ) : null}
         <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
           {label}
         </Text>
@@ -130,8 +118,7 @@ const OptionCard = ({
   );
 };
 
-// â”€â”€â”€ TREE OPTION CARD (with images) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
+// ─── TREE OPTION CARD ───────────────────────────────────────────────────
 const TreeOptionCard = ({
   label,
   archetype,
@@ -143,7 +130,7 @@ const TreeOptionCard = ({
   onPress: () => void;
   isSelected: boolean;
 }) => {
-  const scale = useState(new Animated.Value(1))[0];
+  const scale = useRef(new Animated.Value(1)).current;
   const imageSource = TREE_IMAGES[archetype as keyof typeof TREE_IMAGES];
 
   const pressIn = () => {
@@ -185,8 +172,7 @@ const TreeOptionCard = ({
   );
 };
 
-// â”€â”€â”€ QUIZ SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
+// ─── QUIZ SCREEN ────────────────────────────────────────────────────────
 const QuizScreen = ({ onFinish }: Props) => {
   const { t } = useTranslation();
   const [answers, setAnswers] = useState<ArchetypeType[]>([]);
@@ -195,12 +181,25 @@ const QuizScreen = ({ onFinish }: Props) => {
   const [forceGuardian, setForceGuardian] = useState(false);
   const setArchetype = useUserStore((state) => state.setArchetype);
 
+  // Guard against rapid taps stacking timeouts
+  const isAdvancing = useRef(false);
+
   const totalQuestions = quizQuestions.length;
   const currentQ = quizQuestions[currentQuestion];
   const progress = ((currentQuestion + 1) / totalQuestions) * 100;
   const isLast = currentQuestion === totalQuestions - 1;
 
+  // Track quiz start once
+  const hasTrackedStart = useRef(false);
+  if (!hasTrackedStart.current) {
+    hasTrackedStart.current = true;
+    track('quiz_started');
+  }
+
   const handleOptionPress = (index: number) => {
+    if (isAdvancing.current) return;
+    isAdvancing.current = true;
+
     setSelectedOption(index);
     const selected = currentQ.options[index];
 
@@ -216,8 +215,9 @@ const QuizScreen = ({ onFinish }: Props) => {
       if (isLast) {
         finishQuiz(newAnswers);
       } else {
-        setCurrentQuestion(currentQuestion + 1);
+        setCurrentQuestion((prev) => prev + 1);
         setSelectedOption(null);
+        isAdvancing.current = false;
       }
     }, 500);
   };
@@ -233,6 +233,7 @@ const QuizScreen = ({ onFinish }: Props) => {
     }
 
     setArchetype(resultArchetype);
+    track('archetype_selected', { archetype: resultArchetype, source: 'quiz' });
     onFinish();
   };
 
@@ -252,7 +253,9 @@ const QuizScreen = ({ onFinish }: Props) => {
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false}>
-          <Text style={styles.questionNumber}>{t('quiz.questionLabel')} {currentQuestion + 1}</Text>
+          <Text style={styles.questionNumber}>
+            {t('quiz.questionLabel')} {currentQuestion + 1}
+          </Text>
           <Text style={styles.question}>{t(currentQ.questionKey)}</Text>
 
           <View style={styles.optionsContainer}>
@@ -282,8 +285,8 @@ const QuizScreen = ({ onFinish }: Props) => {
 
           {currentQuestion === 0 && (
             <View style={styles.imageHintContainer}>
-          <Text style={styles.imageHintText}>{t('quiz.imageHint')}</Text>
-      </View>
+              <Text style={styles.imageHintText}>{t('quiz.imageHint')}</Text>
+            </View>
           )}
 
           {currentQuestion === 3 && (
@@ -299,8 +302,7 @@ const QuizScreen = ({ onFinish }: Props) => {
   );
 };
 
-// â”€â”€â”€ STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
+// ─── STYLES ─────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: {
     flex: 1,

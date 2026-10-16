@@ -1,7 +1,15 @@
 ﻿// ─── src/screens/NurtureScreen.tsx ──────────────────────────────────────
-
 import React, { useState, useRef } from 'react';
-import {View,Text,StyleSheet,ScrollView,TouchableOpacity,Image,Alert,Modal,} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Alert,
+  Modal,
+} from 'react-native';
 import { Colors } from '../constants/colors';
 import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
@@ -14,9 +22,9 @@ import { getTodaySwap } from '../data/chopSwaps';
 import chopSwapIcon from '../../assets/Graphics/UI_vectors_icon_set/chop_swap.png';
 import { useSwipeTabs } from '../hooks/useSwipeTabs';
 import { useTranslation } from '../i18n/useTranslation';
+import { track } from '../utils/analytics';
 
 // ─── FOOD IMAGES ────────────────────────────────────────────────────────
-
 import akara_break_pepper from '../../assets/Media/Meals/high-res/akara_break_pepper.jpg';
 import kumba_bread_akara_pap from '../../assets/Media/Meals/high-res/kumba_bread_akara_pap.jpg';
 import boiled_eggs_kumba_bread from '../../assets/Media/Meals/high-res/boiled_eggs_kumba_bread.jpg';
@@ -89,21 +97,32 @@ const FOOD_IMAGES: Record<string, any> = {
   'burning_fish.jpg': burning_fish,
 };
 
-const MEAL_TIMES = [
-  { key: 'breakfast' as const, label: 'Breakfast' },
-  { key: 'lunch' as const, label: 'Lunch' },
-  { key: 'supper' as const, label: 'Supper' },
+const MEAL_TIME_KEYS = [
+  { key: 'breakfast' as const, labelKey: 'nurture.breakfast' },
+  { key: 'lunch' as const, labelKey: 'nurture.lunch' },
+  { key: 'supper' as const, labelKey: 'nurture.supper' },
 ];
 
 // ─── NUTRITION BAR ──────────────────────────────────────────────────────
-
-const NutritionBar = ({ label, value, max, color }: { label: string; value: number; max: number; color: string }) => {
+const NutritionBar = ({
+  label,
+  value,
+  max,
+  color,
+}: {
+  label: string;
+  value: number;
+  max: number;
+  color: string;
+}) => {
   const percentage = Math.min((value / max) * 100, 100);
   return (
     <View style={styles.nutritionBarWrapper}>
       <Text style={styles.nutritionBarLabel}>{label}</Text>
       <View style={styles.nutritionBarBg}>
-        <View style={[styles.nutritionBarFill, { width: `${percentage}%`, backgroundColor: color }]} />
+        <View
+          style={[styles.nutritionBarFill, { width: `${percentage}%`, backgroundColor: color }]}
+        />
       </View>
       <Text style={styles.nutritionBarValue}>{value}</Text>
     </View>
@@ -111,7 +130,6 @@ const NutritionBar = ({ label, value, max, color }: { label: string; value: numb
 };
 
 // ─── MEAL DETAIL MODAL ──────────────────────────────────────────────────
-
 const MealDetailModal = ({
   meal,
   visible,
@@ -151,16 +169,14 @@ const MealDetailModal = ({
             showsVerticalScrollIndicator={false}
           >
             {foodImage && (
-              <Image
-                source={foodImage}
-                style={styles.modalImage}
-                resizeMode="contain"
-              />
+              <Image source={foodImage} style={styles.modalImage} resizeMode="contain" />
             )}
 
             <View style={styles.modalHeader}>
               <View style={styles.optionBadge}>
-                <Text style={styles.optionBadgeText}>{t('nurture.option').replace('{n}', String(meal.option_number))}</Text>
+                <Text style={styles.optionBadgeText}>
+                  {t('nurture.option').replace('{n}', String(meal.option_number))}
+                </Text>
               </View>
               <Text style={styles.modalMealName}>{meal.meal_name}</Text>
               <Text style={styles.modalRegion}>{meal.region}</Text>
@@ -212,17 +228,21 @@ const MealDetailModal = ({
             <View style={styles.sectionDivider} />
             <Text style={styles.bodyTitle}>{t('nurture.whyGood')}</Text>
             <Text style={styles.whyGoodText}>
-              {language === 'pidgin' ? (meal.why_good_pidgin || meal.why_good) :
-               language === 'fr' ? (meal.why_good_fr || meal.why_good) :
-               meal.why_good}
+              {language === 'pidgin'
+                ? meal.why_good_pidgin || meal.why_good
+                : language === 'fr'
+                ? meal.why_good_fr || meal.why_good
+                : meal.why_good}
             </Text>
 
             <View style={styles.availableBox}>
               <Text style={styles.availableLabel}>📍 {t('nurture.whereToGet')}</Text>
               <Text style={styles.availableText}>
-                {language === 'pidgin' ? (meal.available_from_pidgin || meal.available_from) :
-                 language === 'fr' ? (meal.available_from_fr || meal.available_from) :
-                 meal.available_from}
+                {language === 'pidgin'
+                  ? meal.available_from_pidgin || meal.available_from
+                  : language === 'fr'
+                  ? meal.available_from_fr || meal.available_from
+                  : meal.available_from}
               </Text>
             </View>
 
@@ -245,7 +265,6 @@ const MealDetailModal = ({
 };
 
 // ─── MEAL CARD ──────────────────────────────────────────────────────────
-
 const MealCard = ({
   meal,
   onLogMeal,
@@ -263,11 +282,7 @@ const MealCard = ({
     <View style={styles.mealCard}>
       <TouchableOpacity onPress={() => onOpenModal(meal)} activeOpacity={0.9}>
         {foodImage && (
-          <Image
-            source={foodImage}
-            style={styles.mealCardImage}
-            resizeMode="contain"
-          />
+          <Image source={foodImage} style={styles.mealCardImage} resizeMode="contain" />
         )}
       </TouchableOpacity>
 
@@ -278,7 +293,9 @@ const MealCard = ({
       >
         <View style={styles.mealCardTitleRow}>
           <View style={styles.optionBadge}>
-            <Text style={styles.optionBadgeText}>{t('nurture.option').replace('{n}', String(meal.option_number))}</Text>
+            <Text style={styles.optionBadgeText}>
+              {t('nurture.option').replace('{n}', String(meal.option_number))}
+            </Text>
           </View>
           <Text style={styles.mealCardToggle}>{expanded ? '▲' : '▼'}</Text>
         </View>
@@ -338,16 +355,20 @@ const MealCard = ({
           <View style={styles.sectionDivider} />
           <Text style={styles.bodyTitle}>{t('nurture.whyGood')}</Text>
           <Text style={styles.whyGoodText}>
-            {language === 'pidgin' ? (meal.why_good_pidgin || meal.why_good) :
-             language === 'fr' ? (meal.why_good_fr || meal.why_good) :
-             meal.why_good}
+            {language === 'pidgin'
+              ? meal.why_good_pidgin || meal.why_good
+              : language === 'fr'
+              ? meal.why_good_fr || meal.why_good
+              : meal.why_good}
           </Text>
           <View style={styles.availableBox}>
             <Text style={styles.availableLabel}>📍 {t('nurture.whereToGet')}</Text>
             <Text style={styles.availableText}>
-              {language === 'pidgin' ? (meal.available_from_pidgin || meal.available_from) :
-               language === 'fr' ? (meal.available_from_fr || meal.available_from) :
-               meal.available_from}
+              {language === 'pidgin'
+                ? meal.available_from_pidgin || meal.available_from
+                : language === 'fr'
+                ? meal.available_from_fr || meal.available_from
+                : meal.available_from}
             </Text>
           </View>
           <View style={{ marginTop: 14, alignItems: 'flex-end' }}>
@@ -364,12 +385,12 @@ const MealCard = ({
 };
 
 // ─── NURTURE SCREEN ─────────────────────────────────────────────────────
-
 const NurtureScreen = () => {
   const { archetype } = useUserStore();
-  const [selectedMealTime, setSelectedMealTime] = useState<'breakfast' | 'lunch' | 'supper'>('breakfast');
+  const [selectedMealTime, setSelectedMealTime] = useState<'breakfast' | 'lunch' | 'supper'>(
+    'breakfast'
+  );
   const [todayCalories, setTodayCalories] = useState(0);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   // Scroll-to-top
   const scrollRef = useRef<any>(null);
@@ -417,10 +438,18 @@ const NurtureScreen = () => {
       );
       const newTotal = await offlineAgent.getTodayCalories();
       setTodayCalories(newTotal);
+      track('meal_logged', {
+        meal_id: meal.id,
+        calories: meal.nutrition.calories,
+        meal_time: selectedMealTime,
+      });
       Alert.alert(
         t('nurture.mealLoggedTitle'),
-        t('nurture.mealLoggedBody').replace('{name}', meal.meal_name).replace('{kcal}', String(meal.nutrition.calories)).replace('{total}', String(newTotal)),
-        [{ text: 'OK' }]
+        t('nurture.mealLoggedBody')
+          .replace('{name}', meal.meal_name)
+          .replace('{kcal}', String(meal.nutrition.calories))
+          .replace('{total}', String(newTotal)),
+        [{ text: t('common.ok') || 'OK' }]
       );
     } catch (error) {
       console.error('Failed to log meal:', error);
@@ -431,6 +460,7 @@ const NurtureScreen = () => {
   const openModal = (meal: MealOption) => {
     setSelectedMeal(meal);
     setModalVisible(true);
+    track('meal_view_detail', { meal_id: meal.id });
   };
 
   const closeModal = () => {
@@ -439,7 +469,7 @@ const NurtureScreen = () => {
   };
 
   return (
-    <FadeInView style={styles.container} key={refreshKey} {...panHandlers}>
+    <FadeInView style={styles.container} {...panHandlers}>
       <ScrollView
         ref={scrollRef}
         onScroll={handleScroll}
@@ -471,37 +501,50 @@ const NurtureScreen = () => {
                 <Text style={styles.chopSwapTitle}>{t('nurture.chopSwapTitle')}</Text>
               </View>
               <Text style={styles.chopSwapFrom}>
-                {t('nurture.chopSwapInstead').replace('{from}',
-                  language === 'pidgin' ? todaySwap.from_pidgin :
-                  language === 'fr' ? todaySwap.from_fr :
-                  todaySwap.from
+                {t('nurture.chopSwapInstead').replace(
+                  '{from}',
+                  language === 'pidgin'
+                    ? todaySwap.from_pidgin
+                    : language === 'fr'
+                    ? todaySwap.from_fr
+                    : todaySwap.from
                 )}
               </Text>
               <Text style={styles.chopSwapTo}>
-                {t('nurture.chopSwapTry').replace('{to}',
-                  language === 'pidgin' ? todaySwap.to_pidgin :
-                  language === 'fr' ? todaySwap.to_fr :
-                  todaySwap.to
+                {t('nurture.chopSwapTry').replace(
+                  '{to}',
+                  language === 'pidgin'
+                    ? todaySwap.to_pidgin
+                    : language === 'fr'
+                    ? todaySwap.to_fr
+                    : todaySwap.to
                 )}
               </Text>
               <Text style={styles.chopSwapReason}>
-                {language === 'pidgin' ? todaySwap.reason_pidgin :
-                 language === 'fr' ? todaySwap.reason_fr :
-                 todaySwap.reason}
+                {language === 'pidgin'
+                  ? todaySwap.reason_pidgin
+                  : language === 'fr'
+                  ? todaySwap.reason_fr
+                  : todaySwap.reason}
               </Text>
             </View>
           )}
 
           <View style={styles.tabRow}>
-            {MEAL_TIMES.map((tab) => (
+            {MEAL_TIME_KEYS.map((tab) => (
               <TouchableOpacity
                 key={tab.key}
                 style={[styles.tab, selectedMealTime === tab.key && styles.tabActive]}
                 onPress={() => setSelectedMealTime(tab.key)}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.tabLabel, selectedMealTime === tab.key && styles.tabLabelActive]}>
-                  {tab.label}
+                <Text
+                  style={[
+                    styles.tabLabel,
+                    selectedMealTime === tab.key && styles.tabLabelActive,
+                  ]}
+                >
+                  {t(tab.labelKey)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -532,7 +575,6 @@ const NurtureScreen = () => {
         </View>
       </ScrollView>
 
-      {/* Meal Detail Modal */}
       <MealDetailModal
         meal={selectedMeal}
         visible={modalVisible}
@@ -540,7 +582,6 @@ const NurtureScreen = () => {
         onLogMeal={handleLogMeal}
       />
 
-      {/* ─── SCROLL TO TOP BUTTON ────────────────────────────────────── */}
       {showScrollTop && (
         <TouchableOpacity
           style={styles.scrollTopButton}
@@ -555,15 +596,50 @@ const NurtureScreen = () => {
 };
 
 // ─── STYLES ─────────────────────────────────────────────────────────────
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.softBg, alignItems: 'center' },
-  headerArea: { width: '100%', maxWidth: 480, paddingHorizontal: 20, paddingTop: 20, paddingBottom: 4, backgroundColor: Colors.softBg },
-  eyebrow: { fontSize: 11, ...FONTS.bold, color: Colors.zenGold, letterSpacing: 3, marginBottom: 6 },
+  headerArea: {
+    width: '100%',
+    maxWidth: 480,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 4,
+    backgroundColor: Colors.softBg,
+  },
+  eyebrow: {
+    fontSize: 11,
+    ...FONTS.bold,
+    color: Colors.zenGold,
+    letterSpacing: 3,
+    marginBottom: 6,
+  },
   header: { fontSize: 24, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 2 },
-  profileSub: { fontSize: 13, ...FONTS.semibold, color: Colors.mboaGreen, letterSpacing: 1, marginBottom: 4 },
-  subHeader: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, lineHeight: 20, marginBottom: 16 },
-  calorieBanner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F1FAF3', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 10, marginBottom: 16, borderWidth: 1, borderColor: Colors.mboaGreen },
+  profileSub: {
+    fontSize: 13,
+    ...FONTS.semibold,
+    color: Colors.mboaGreen,
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  subHeader: {
+    fontSize: 13,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  calorieBanner: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#F1FAF3',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: Colors.mboaGreen,
+  },
   calorieBannerLabel: { fontSize: 13, ...FONTS.bold, color: Colors.earthBlack },
   calorieBannerValue: { fontSize: 18, ...FONTS.bold, color: Colors.mboaGreen },
   tabRow: { flexDirection: 'row', gap: 10, marginBottom: 4 },
@@ -586,48 +662,167 @@ const styles = StyleSheet.create({
   },
   tabLabel: { fontSize: 13, ...FONTS.bold, color: Colors.mboaGreen },
   tabLabelActive: { color: Colors.cleanWhite },
-  chooseText: { fontSize: 12, ...FONTS.regular, color: Colors.textMuted, fontStyle: 'italic', marginTop: 12, marginBottom: 8 },
+  chooseText: {
+    fontSize: 12,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    fontStyle: 'italic',
+    marginTop: 12,
+    marginBottom: 8,
+  },
   scrollContent: { width: '100%', alignItems: 'center', paddingTop: 8 },
   section: { width: '100%', maxWidth: 480, paddingHorizontal: 20, paddingBottom: 20 },
-  mealCard: { backgroundColor: Colors.cleanWhite, borderRadius: 18, marginBottom: 14, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 10, elevation: 2 },
+  mealCard: {
+    backgroundColor: Colors.cleanWhite,
+    borderRadius: 18,
+    marginBottom: 14,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
+  },
   mealCardImage: { width: '100%', height: 220, backgroundColor: '#F5F5F5' },
   mealCardHeader: { padding: 18 },
-  mealCardTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  optionBadge: { backgroundColor: '#F1FAF3', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, borderWidth: 1, borderColor: Colors.mboaGreen },
+  mealCardTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  optionBadge: {
+    backgroundColor: '#F1FAF3',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.mboaGreen,
+  },
   optionBadgeText: { fontSize: 11, ...FONTS.bold, color: Colors.mboaGreen },
   mealCardToggle: { fontSize: 12, ...FONTS.bold, color: Colors.textMuted },
-  mealCardName: { fontSize: 17, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 14, lineHeight: 23 },
-  quickNutrition: { flexDirection: 'row', backgroundColor: Colors.softBg, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 8, alignItems: 'center', justifyContent: 'space-around' },
+  mealCardName: {
+    fontSize: 17,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    marginBottom: 14,
+    lineHeight: 23,
+  },
+  quickNutrition: {
+    flexDirection: 'row',
+    backgroundColor: Colors.softBg,
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
   quickNutritionItem: { alignItems: 'center', flex: 1 },
   quickNutritionValue: { fontSize: 15, ...FONTS.bold, color: Colors.earthBlack },
-  quickNutritionLabel: { fontSize: 10, ...FONTS.regular, color: Colors.textMuted, marginTop: 2 },
+  quickNutritionLabel: {
+    fontSize: 10,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    marginTop: 2,
+  },
   quickNutritionDivider: { width: 1, height: 28, backgroundColor: '#E0E0E0' },
   mealCardBody: { paddingHorizontal: 18, paddingBottom: 18 },
-  viewDetailsButtonText: { fontSize: 13, ...FONTS.bold, color: Colors.mboaGreen },
   sectionDivider: { height: 1, backgroundColor: '#F0F0F0', marginVertical: 14 },
-  bodyTitle: { fontSize: 13, ...FONTS.bold, color: Colors.earthBlack, letterSpacing: 0.5, marginBottom: 12 },
+  bodyTitle: {
+    fontSize: 13,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    letterSpacing: 0.5,
+    marginBottom: 12,
+  },
   foodRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 },
-  foodDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.mboaGreen, marginTop: 6, marginRight: 12 },
+  foodDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.mboaGreen,
+    marginTop: 6,
+    marginRight: 12,
+  },
   foodInfo: { flex: 1 },
   foodName: { fontSize: 14, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 2 },
   foodQty: { fontSize: 12, ...FONTS.regular, color: Colors.textMuted },
-  foodNotes: { fontSize: 11, ...FONTS.regular, color: Colors.mboaGreen, fontStyle: 'italic', marginTop: 2 },
+  foodNotes: {
+    fontSize: 11,
+    ...FONTS.regular,
+    color: Colors.mboaGreen,
+    fontStyle: 'italic',
+    marginTop: 2,
+  },
   nutritionBarWrapper: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  nutritionBarLabel: { fontSize: 12, ...FONTS.medium, color: Colors.earthBlack, width: 60 },
-  nutritionBarBg: { flex: 1, height: 6, backgroundColor: '#F0F0F0', borderRadius: 3, overflow: 'hidden', marginHorizontal: 8 },
+  nutritionBarLabel: {
+    fontSize: 12,
+    ...FONTS.medium,
+    color: Colors.earthBlack,
+    width: 60,
+  },
+  nutritionBarBg: {
+    flex: 1,
+    height: 6,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 3,
+    overflow: 'hidden',
+    marginHorizontal: 8,
+  },
   nutritionBarFill: { height: 6, borderRadius: 3 },
-  nutritionBarValue: { fontSize: 11, ...FONTS.bold, color: Colors.textMuted, width: 40, textAlign: 'right' },
-  whyGoodText: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, lineHeight: 21, marginBottom: 14 },
-  availableBox: { backgroundColor: '#F1FAF3', borderRadius: 10, padding: 12, borderLeftWidth: 3, borderLeftColor: Colors.mboaGreen },
+  nutritionBarValue: {
+    fontSize: 11,
+    ...FONTS.bold,
+    color: Colors.textMuted,
+    width: 40,
+    textAlign: 'right',
+  },
+  whyGoodText: {
+    fontSize: 13,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    lineHeight: 21,
+    marginBottom: 14,
+  },
+  availableBox: {
+    backgroundColor: '#F1FAF3',
+    borderRadius: 10,
+    padding: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.mboaGreen,
+  },
   availableLabel: { fontSize: 11, ...FONTS.bold, color: Colors.mboaGreen, marginBottom: 4 },
   availableText: { fontSize: 12, ...FONTS.regular, color: Colors.textMuted },
-  logMealButton: { backgroundColor: Colors.mboaGreen, borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 14 },
-  logMealButtonText: { fontSize: 15, ...FONTS.bold, color: Colors.cleanWhite, letterSpacing: 0.5 },
   emptyState: { paddingVertical: 60, alignItems: 'center' },
-  emptyTitle: { fontSize: 18, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 8, textAlign: 'center' },
-  emptySubtitle: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, textAlign: 'center', lineHeight: 22, paddingHorizontal: 20 },
-  disclaimerBox: { backgroundColor: '#FFF8E1', borderRadius: 12, padding: 14, marginTop: 8, borderLeftWidth: 3, borderLeftColor: Colors.zenGold },
-  disclaimerText: { fontSize: 12, ...FONTS.regular, color: Colors.earthBlack, lineHeight: 18 },
+  emptyTitle: {
+    fontSize: 18,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    lineHeight: 22,
+    paddingHorizontal: 20,
+  },
+  disclaimerBox: {
+    backgroundColor: '#FFF8E1',
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.zenGold,
+  },
+  disclaimerText: {
+    fontSize: 12,
+    ...FONTS.regular,
+    color: Colors.earthBlack,
+    lineHeight: 18,
+  },
 
   modalOverlay: {
     flex: 1,
@@ -654,18 +849,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  modalCloseText: {
-    fontSize: 18,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-  },
-  modalScroll: {
-    width: '100%',
-  },
-  modalScrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
+  modalCloseText: { fontSize: 18, ...FONTS.bold, color: Colors.earthBlack },
+  modalScroll: { width: '100%' },
+  modalScrollContent: { paddingHorizontal: 20, paddingBottom: 20 },
   modalImage: {
     width: '100%',
     height: 280,
@@ -673,9 +859,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     marginBottom: 16,
   },
-  modalHeader: {
-    marginBottom: 16,
-  },
+  modalHeader: { marginBottom: 16 },
   modalMealName: {
     fontSize: 22,
     ...FONTS.bold,
@@ -706,11 +890,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     gap: 8,
   },
-  chopSwapIcon: {
-    width: 40,
-    height: 40,
-    resizeMode: 'contain',
-  },
+  chopSwapIcon: { width: 40, height: 40, resizeMode: 'contain' },
   chopSwapTitle: {
     fontSize: 13,
     ...FONTS.bold,
@@ -755,11 +935,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 999,
   },
-  scrollTopArrow: {
-    fontSize: 24,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-  },
+  scrollTopArrow: { fontSize: 24, ...FONTS.bold, color: Colors.cleanWhite },
 });
 
 export default NurtureScreen;

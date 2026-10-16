@@ -1,5 +1,4 @@
-// ─── src/screens/MarketScreen.tsx ──────────────────────────────────────
-
+// ─── src/screens/MarketScreen.tsx ───────────────────────────────────────
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -8,8 +7,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Platform,
-  Linking,
   Image,
 } from 'react-native';
 import { Colors } from '../constants/colors';
@@ -19,9 +16,12 @@ import { FadeInView } from '../components/common/FadeInView';
 import { MboaButton } from '../components/common/MboaButton';
 import { useSwipeTabs } from '../hooks/useSwipeTabs';
 import { useTranslation } from '../i18n/useTranslation';
+import { track } from '../utils/analytics';
+
+// ─── CONSTANTS ──────────────────────────────────────────────────────────
+const NJANGI_SAVE_AMOUNT = 100;
 
 // ─── ICONS ──────────────────────────────────────────────────────────────
-
 const ICONS = {
   analytics: require('../../assets/Graphics/UI_vectors_icon_set/analytics.png'),
   check: require('../../assets/Graphics/UI_vectors_icon_set/check.png'),
@@ -38,7 +38,7 @@ const ICONS = {
   coach_sarah: require('../../assets/Graphics/UI_vectors_icon_set/coach_sarah.png'),
 };
 
-// ─── COACHES DATA ──────────────────────────────────────────────────────
+// ─── COACHES DATA ───────────────────────────────────────────────────────
 const COACHES = [
   {
     id: '1',
@@ -75,10 +75,8 @@ const COACHES = [
 const MarketScreen = () => {
   const { t } = useTranslation();
   const {
-    archetype,
     isPremium,
     setIsPremium,
-    njangiHistory,
     njangiSavings,
     saveNjangiMoney,
     getNjangiStreak,
@@ -87,15 +85,21 @@ const MarketScreen = () => {
 
   const todayNjangi = getTodayNjangi();
   const njangiStreak = getNjangiStreak();
+
   const njangiItems = [
-  { key: 'water' as const, labelKey: 'market.njangiWater' },
-  { key: 'food' as const, labelKey: 'market.njangiFood' },
-  { key: 'move' as const, labelKey: 'market.njangiMove' },
-];
+    { key: 'water' as const, labelKey: 'market.njangiWater' },
+    { key: 'food' as const, labelKey: 'market.njangiFood' },
+    { key: 'move' as const, labelKey: 'market.njangiMove' },
+  ];
+
   const [selectedPayment, setSelectedPayment] = useState<'momo' | 'orange' | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const panHandlers = useSwipeTabs();
+
+  useEffect(() => {
+    track('market_view');
+  }, []);
 
   // Scroll-to-top
   const scrollRef = useRef<any>(null);
@@ -117,16 +121,18 @@ const MarketScreen = () => {
       return;
     }
 
+    track('premium_upgrade_clicked', { method: selectedPayment });
     setIsProcessing(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       setIsPremium(true);
+      track('premium_upgrade_succeeded', { method: selectedPayment });
+
       Alert.alert(
         t('market.alertPremiumTitle'),
         t('market.alertPremiumBody'),
-        [{ text: 'Great!' }]
+        [{ text: t('market.greatBtn') || 'Great!' }]
       );
     } catch (error) {
       Alert.alert(t('market.alertFailedTitle'), t('market.alertFailedBody'));
@@ -138,42 +144,54 @@ const MarketScreen = () => {
   // ─── HANDLE COACH BOOKING ────────────────────────────────────────────
   const handleBookCoach = (coach: any) => {
     if (!isPremium) {
-    Alert.alert(
-      t('market.alertCoachTitle'),
-      t('market.alertCoachBody'),
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: t('market.upgradeNow'), onPress: () => {} }
-      ]
-    );
+      Alert.alert(
+        t('market.alertCoachTitle'),
+        t('market.alertCoachBody'),
+        [
+          { text: t('common.cancel') || 'Cancel', style: 'cancel' },
+          {
+            text: t('market.upgradeNow'),
+            onPress: () => {
+              scrollRef.current?.scrollTo({ y: 0, animated: true });
+            },
+          },
+        ]
+      );
       return;
     }
 
- Alert.alert(
-  t('market.alertBookTitle').replace('{coach}', coach.name),
-  `${t(coach.specialtyKey)}\n${coach.location}\n${coach.price}\n\n${coach.rating} rating\n\nBook a session?`,
-  [
-    { text: 'Cancel', style: 'cancel' },
-    {
-      text: t('market.bookBtn'),
-      onPress: () => {
-        Alert.alert(
-          t('market.alertSavedTitle'),
-          t('market.alertSavedBody'),
-          [{ text: 'OK' }]
-        );
-      }
-    }
-  ]
-);
+    track('coach_booking_clicked', { coachId: coach.id, coachName: coach.name });
+
+    Alert.alert(
+      t('market.alertBookTitle').replace('{coach}', coach.name),
+      `${t(coach.specialtyKey)}\n${coach.location}\n${coach.price}\n\n${coach.rating} rating\n\n${t('market.bookSessionPrompt') || 'Book a session?'}`,
+      [
+        { text: t('common.cancel') || 'Cancel', style: 'cancel' },
+        {
+          text: t('market.bookBtn'),
+          onPress: () => {
+            track('coach_booked', { coachId: coach.id, coachName: coach.name });
+            Alert.alert(
+              t('market.alertSavedTitle'),
+              t('market.alertSavedBody'),
+              [{ text: 'OK' }]
+            );
+          },
+        },
+      ]
+    );
   };
 
   // ─── HANDLE NJANGI SAVE ──────────────────────────────────────────────
   const handleSaveNjangi = () => {
-    saveNjangiMoney(100);
+    saveNjangiMoney(NJANGI_SAVE_AMOUNT);
+    track('njangi_save', { amount: NJANGI_SAVE_AMOUNT });
     Alert.alert(
-      'Saved!',
-      '100 FCFA added to your Njangi Box.\n\nKeep going. Little drop = Ocean.',
+      t('market.njangiSavedTitle') || 'Saved!',
+      (t('market.njangiSavedBody') || '{amount} FCFA added to your Njangi Box.\n\nKeep going. Little drop = Ocean.').replace(
+        '{amount}',
+        String(NJANGI_SAVE_AMOUNT)
+      ),
       [{ text: 'OK' }]
     );
   };
@@ -188,7 +206,7 @@ const MarketScreen = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* ─── HEADER ────────────────────────────────────────────────────── */}
+        {/* HEADER */}
         <View style={styles.headerArea}>
           <Text style={styles.eyebrow}>{t('market.eyebrow')}</Text>
           <Text style={styles.header}>{t('market.header')}</Text>
@@ -197,7 +215,7 @@ const MarketScreen = () => {
           </Text>
         </View>
 
-        {/* ─── PREMIUM STATUS CARD ──────────────────────────────────────── */}
+        {/* PREMIUM STATUS CARD */}
         <View style={[styles.premiumCard, isPremium && styles.premiumCardActive]}>
           <View style={styles.premiumHeader}>
             <View style={styles.premiumBadgeRow}>
@@ -218,68 +236,33 @@ const MarketScreen = () => {
           </Text>
         </View>
 
-        {/* ─── FEATURES LIST ────────────────────────────────────────────── */}
+        {/* FEATURES LIST */}
         <View style={styles.featuresContainer}>
           <Text style={styles.sectionTitle}>{t('market.whatYouGet')}</Text>
 
-          <View style={styles.featureItem}>
-            <Image source={ICONS.dojo} style={styles.featureIconImage} />
-            <View style={styles.featureContent}>
-              <Text style={styles.featureName}>{t('market.feat1Name')}</Text>
-              <Text style={styles.featureDescription}>
-                {isPremium ? t('market.feat1DescActive') : t('market.feat1DescInactive')}
-              </Text>
+          {[
+            { icon: ICONS.dojo, name: 'market.feat1Name', active: 'market.feat1DescActive', inactive: 'market.feat1DescInactive' },
+            { icon: ICONS.kitchen, name: 'market.feat2Name', active: 'market.feat2DescActive', inactive: 'market.feat2DescInactive' },
+            { icon: ICONS.coaches, name: 'market.feat3Name', active: 'market.feat3DescActive', inactive: 'market.feat3DescInactive' },
+            { icon: ICONS.analytics, name: 'market.feat4Name', active: 'market.feat4DescActive', inactive: 'market.feat4DescInactive' },
+          ].map((feat, idx) => (
+            <View key={idx} style={styles.featureItem}>
+              <Image source={feat.icon} style={styles.featureIconImage} />
+              <View style={styles.featureContent}>
+                <Text style={styles.featureName}>{t(feat.name)}</Text>
+                <Text style={styles.featureDescription}>
+                  {isPremium ? t(feat.active) : t(feat.inactive)}
+                </Text>
+              </View>
+              <Image
+                source={isPremium ? ICONS.check : ICONS.lock}
+                style={styles.featureStatusImage}
+              />
             </View>
-            <Image
-              source={isPremium ? ICONS.check : ICONS.lock}
-              style={styles.featureStatusImage}
-            />
-          </View>
-
-          <View style={styles.featureItem}>
-            <Image source={ICONS.kitchen} style={styles.featureIconImage} />
-            <View style={styles.featureContent}>
-              <Text style={styles.featureName}>{t('market.feat2Name')}</Text>
-              <Text style={styles.featureDescription}>
-                {isPremium ? t('market.feat2DescActive') : t('market.feat2DescInactive')}
-              </Text>
-            </View>
-            <Image
-              source={isPremium ? ICONS.check : ICONS.lock}
-              style={styles.featureStatusImage}
-            />
-          </View>
-
-          <View style={styles.featureItem}>
-            <Image source={ICONS.coaches} style={styles.featureIconImage} />
-            <View style={styles.featureContent}>
-              <Text style={styles.featureName}>{t('market.feat3Name')}</Text>
-              <Text style={styles.featureDescription}>
-                {isPremium ? t('market.feat3DescActive') : t('market.feat3DescInactive')}
-              </Text>
-            </View>
-            <Image
-              source={isPremium ? ICONS.check : ICONS.lock}
-              style={styles.featureStatusImage}
-            />
-          </View>
-
-          <View style={styles.featureItem}>
-            <Image source={ICONS.analytics} style={styles.featureIconImage} />
-            <View style={styles.featureContent}>
-              <Text style={styles.featureName}>{t('market.feat4Name')}</Text>
-              <Text style={styles.featureDescription}>
-                {isPremium ? t('market.feat4DescActive') : t('market.feat4DescInactive')}
-              </Text>
-            </View>
-            <Image
-              source={isPremium ? ICONS.check : ICONS.lock}
-              style={styles.featureStatusImage}
-            />
-          </View>
+          ))}
         </View>
 
-        {/* ─── NJANGI BOX ───────────────────────────────────────────────── */}
+        {/* NJANGI BOX */}
         <View style={styles.njangiContainer}>
           <View style={styles.njangiHeader}>
             <Image source={ICONS.njangi} style={styles.njangiIcon} />
@@ -292,18 +275,8 @@ const MarketScreen = () => {
               const isDone = todayNjangi.includes(item.key);
               return (
                 <View key={item.key} style={styles.njangiItemRow}>
-                  <View
-                    style={[
-                      styles.njangiItemDot,
-                      isDone && styles.njangiItemDotDone,
-                    ]}
-                  />
-                  <Text
-                    style={[
-                      styles.njangiItem,
-                      isDone && styles.njangiItemDone,
-                    ]}
-                  >
+                  <View style={[styles.njangiItemDot, isDone && styles.njangiItemDotDone]} />
+                  <Text style={[styles.njangiItem, isDone && styles.njangiItemDone]}>
                     {t(item.labelKey)}
                   </Text>
                 </View>
@@ -343,7 +316,7 @@ const MarketScreen = () => {
           />
         </View>
 
-        {/* ─── PAYMENT SECTION ──────────────────────────────────────────── */}
+        {/* PAYMENT SECTION */}
         {!isPremium && (
           <View style={styles.paymentContainer}>
             <Text style={styles.sectionTitle}>{t('market.payWith')}</Text>
@@ -403,7 +376,7 @@ const MarketScreen = () => {
           </View>
         )}
 
-        {/* ─── COACHES SECTION ──────────────────────────────────────────── */}
+        {/* COACHES SECTION */}
         <View style={styles.coachesContainer}>
           <View style={styles.sectionTitleRow}>
             <Image source={ICONS.coaches} style={styles.sectionTitleIcon} />
@@ -418,10 +391,7 @@ const MarketScreen = () => {
           {COACHES.map((coach) => (
             <TouchableOpacity
               key={coach.id}
-              style={[
-                styles.coachCard,
-                !isPremium && styles.coachCardLocked,
-              ]}
+              style={[styles.coachCard, !isPremium && styles.coachCardLocked]}
               onPress={() => handleBookCoach(coach)}
               activeOpacity={0.8}
             >
@@ -465,7 +435,7 @@ const MarketScreen = () => {
         <View style={{ height: 30 }} />
       </ScrollView>
 
-      {/* ─── SCROLL TO TOP BUTTON ────────────────────────────────────── */}
+      {/* SCROLL TO TOP */}
       {showScrollTop && (
         <TouchableOpacity
           style={styles.scrollTopButton}
@@ -515,8 +485,6 @@ const styles = StyleSheet.create({
     ...FONTS.regular,
     color: Colors.textMuted,
   },
-
-  // ─── PREMIUM CARD ──────────────────────────────────────────────────────
   premiumCard: {
     width: '100%',
     maxWidth: 480,
@@ -533,25 +501,15 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     borderLeftColor: Colors.mboaGreen,
   },
-  premiumCardActive: {
-    borderLeftColor: '#FFD700',
-  },
+  premiumCardActive: { borderLeftColor: '#FFD700' },
   premiumHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
   },
-  premiumBadgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  premiumBadgeIcon: {
-    width: 14,
-    height: 14,
-    resizeMode: 'contain',
-  },
+  premiumBadgeRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  premiumBadgeIcon: { width: 14, height: 14, resizeMode: 'contain' },
   premiumBadge: {
     fontSize: 12,
     ...FONTS.bold,
@@ -564,11 +522,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
   },
-  activeBadgeText: {
-    fontSize: 10,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-  },
+  activeBadgeText: { fontSize: 10, ...FONTS.bold, color: Colors.cleanWhite },
   premiumPrice: {
     fontSize: 22,
     ...FONTS.bold,
@@ -581,8 +535,6 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     lineHeight: 20,
   },
-
-  // ─── FEATURES ──────────────────────────────────────────────────────────
   featuresContainer: {
     width: '100%',
     maxWidth: 480,
@@ -592,22 +544,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 16,
   },
-  sectionTitle: {
-    fontSize: 16,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-  },
+  sectionTitle: { fontSize: 16, ...FONTS.bold, color: Colors.earthBlack },
   sectionTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     marginBottom: 12,
   },
-  sectionTitleIcon: {
-    width: 20,
-    height: 20,
-    resizeMode: 'contain',
-  },
+  sectionTitleIcon: { width: 20, height: 20, resizeMode: 'contain' },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -615,32 +559,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },
-  featureIconImage: {
-    width: 24,
-    height: 24,
-    marginRight: 12,
-    resizeMode: 'contain',
-  },
-  featureContent: {
-    flex: 1,
-  },
-  featureName: {
-    fontSize: 14,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-  },
-  featureDescription: {
-    fontSize: 12,
-    ...FONTS.regular,
-    color: Colors.textMuted,
-  },
-  featureStatusImage: {
-    width: 20,
-    height: 20,
-    resizeMode: 'contain',
-  },
-
-  // ─── NJANGI BOX ───────────────────────────────────────────────────────
+  featureIconImage: { width: 24, height: 24, marginRight: 12, resizeMode: 'contain' },
+  featureContent: { flex: 1 },
+  featureName: { fontSize: 14, ...FONTS.bold, color: Colors.earthBlack },
+  featureDescription: { fontSize: 12, ...FONTS.regular, color: Colors.textMuted },
+  featureStatusImage: { width: 20, height: 20, resizeMode: 'contain' },
   njangiContainer: {
     width: '100%',
     maxWidth: 480,
@@ -652,22 +575,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.mboaGreen,
   },
-  njangiHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 6,
-  },
-  njangiIcon: {
-    width: 56,
-    height: 56,
-    resizeMode: 'contain',
-  },
-  njangiTitle: {
-    fontSize: 18,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-  },
+  njangiHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 6 },
+  njangiIcon: { width: 56, height: 56, resizeMode: 'contain' },
+  njangiTitle: { fontSize: 18, ...FONTS.bold, color: Colors.earthBlack },
   njangiSubtitle: {
     fontSize: 13,
     ...FONTS.regular,
@@ -675,9 +585,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontStyle: 'italic',
   },
-  njangiItemsList: {
-    marginBottom: 14,
-  },
+  njangiItemsList: { marginBottom: 14 },
   njangiItemRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -696,15 +604,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.mboaGreen,
     borderColor: Colors.mboaGreen,
   },
-  njangiItem: {
-    fontSize: 14,
-    ...FONTS.medium,
-    color: Colors.textMuted,
-  },
-  njangiItemDone: {
-    color: Colors.mboaGreen,
-    ...FONTS.bold,
-  },
+  njangiItem: { fontSize: 14, ...FONTS.medium, color: Colors.textMuted },
+  njangiItemDone: { color: Colors.mboaGreen, ...FONTS.bold },
   njangiProgressRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -718,16 +619,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     overflow: 'hidden',
   },
-  njangiProgressFill: {
-    height: 8,
-    backgroundColor: Colors.mboaGreen,
-    borderRadius: 4,
-  },
-  njangiProgressText: {
-    fontSize: 12,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-  },
+  njangiProgressFill: { height: 8, backgroundColor: Colors.mboaGreen, borderRadius: 4 },
+  njangiProgressText: { fontSize: 12, ...FONTS.bold, color: Colors.earthBlack },
   njangiStreak: {
     fontSize: 13,
     ...FONTS.bold,
@@ -744,18 +637,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#D9D9D9',
   },
-  njangiSavingsLabel: {
-    fontSize: 13,
-    ...FONTS.medium,
-    color: Colors.textMuted,
-  },
-  njangiSavingsValue: {
-    fontSize: 18,
-    ...FONTS.bold,
-    color: Colors.mboaGreen,
-  },
-
-  // ─── PAYMENT ──────────────────────────────────────────────────────────
+  njangiSavingsLabel: { fontSize: 13, ...FONTS.medium, color: Colors.textMuted },
+  njangiSavingsValue: { fontSize: 18, ...FONTS.bold, color: Colors.mboaGreen },
   paymentContainer: {
     width: '100%',
     maxWidth: 480,
@@ -776,30 +659,11 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     marginBottom: 10,
   },
-  paymentOptionSelected: {
-    borderColor: Colors.mboaGreen,
-    backgroundColor: '#F1FAF3',
-  },
-  paymentLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  paymentIconImage: {
-    width: 24,
-    height: 24,
-    marginRight: 12,
-    resizeMode: 'contain',
-  },
-  paymentName: {
-    fontSize: 15,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-  },
-  paymentSubtext: {
-    fontSize: 12,
-    ...FONTS.regular,
-    color: Colors.textMuted,
-  },
+  paymentOptionSelected: { borderColor: Colors.mboaGreen, backgroundColor: '#F1FAF3' },
+  paymentLeft: { flexDirection: 'row', alignItems: 'center' },
+  paymentIconImage: { width: 24, height: 24, marginRight: 12, resizeMode: 'contain' },
+  paymentName: { fontSize: 15, ...FONTS.bold, color: Colors.earthBlack },
+  paymentSubtext: { fontSize: 12, ...FONTS.regular, color: Colors.textMuted },
   paymentCheck: {
     width: 24,
     height: 24,
@@ -808,10 +672,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  paymentCheckText: {
-    fontSize: 14,
-    color: Colors.cleanWhite,
-  },
+  paymentCheckText: { fontSize: 14, color: Colors.cleanWhite },
   paymentNote: {
     fontSize: 12,
     ...FONTS.regular,
@@ -819,8 +680,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
-
-  // ─── COACHES ──────────────────────────────────────────────────────────
   coachesContainer: {
     width: '100%',
     maxWidth: 480,
@@ -842,13 +701,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     position: 'relative',
   },
-  coachCardLocked: {
-    opacity: 0.6,
-  },
-  coachHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+  coachCardLocked: { opacity: 0.6 },
+  coachHeader: { flexDirection: 'row', alignItems: 'center' },
   coachAvatarImage: {
     width: 48,
     height: 48,
@@ -856,50 +710,15 @@ const styles = StyleSheet.create({
     marginRight: 12,
     resizeMode: 'cover',
   },
-  coachInfo: {
-    flex: 1,
-  },
-  coachName: {
-    fontSize: 15,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-  },
-  coachSpecialty: {
-    fontSize: 12,
-    ...FONTS.regular,
-    color: Colors.textMuted,
-  },
-  coachMeta: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 2,
-  },
-  coachMetaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  coachMetaIcon: {
-    width: 12,
-    height: 12,
-    resizeMode: 'contain',
-  },
-  coachLocation: {
-    fontSize: 11,
-    ...FONTS.regular,
-    color: Colors.textMuted,
-  },
-  coachRating: {
-    fontSize: 11,
-    ...FONTS.regular,
-    color: Colors.zenGold,
-  },
-  coachPrice: {
-    fontSize: 12,
-    ...FONTS.medium,
-    color: Colors.mboaGreen,
-    marginTop: 4,
-  },
+  coachInfo: { flex: 1 },
+  coachName: { fontSize: 15, ...FONTS.bold, color: Colors.earthBlack },
+  coachSpecialty: { fontSize: 12, ...FONTS.regular, color: Colors.textMuted },
+  coachMeta: { flexDirection: 'row', gap: 12, marginTop: 2 },
+  coachMetaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  coachMetaIcon: { width: 12, height: 12, resizeMode: 'contain' },
+  coachLocation: { fontSize: 11, ...FONTS.regular, color: Colors.textMuted },
+  coachRating: { fontSize: 11, ...FONTS.regular, color: Colors.zenGold },
+  coachPrice: { fontSize: 12, ...FONTS.medium, color: Colors.mboaGreen, marginTop: 4 },
   coachLockOverlay: {
     position: 'absolute',
     top: 0,
@@ -911,13 +730,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.7)',
     borderRadius: 12,
   },
-  coachLockIcon: {
-    width: 40,
-    height: 40,
-    resizeMode: 'contain',
-  },
-
-  // ─── SCROLL TO TOP ─────────────────────────────────────────────────────
+  coachLockIcon: { width: 40, height: 40, resizeMode: 'contain' },
   scrollTopButton: {
     position: 'absolute',
     bottom: 30,
@@ -937,12 +750,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 999,
   },
-  scrollTopArrow: {
-    fontSize: 24,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-  },
+  scrollTopArrow: { fontSize: 24, ...FONTS.bold, color: Colors.cleanWhite },
 });
 
 export default MarketScreen;
-

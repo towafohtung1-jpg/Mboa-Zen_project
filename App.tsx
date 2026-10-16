@@ -18,6 +18,7 @@ import { Colors } from './src/constants/colors';
 import { loadUserState } from './src/utils/storage';
 import { useFonts } from './src/utils/useFonts';
 import { AnimatedLogo } from './src/components/common/AnimatedLogo';
+import { track } from './src/utils/analytics';
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -58,7 +59,9 @@ export default function App() {
       if (!fontsLoaded) return;
 
       const saved = await loadUserState();
-      console.log('APP INIT - Saved state:', saved);
+            console.log('APP INIT - Saved state:', saved);
+
+      track('app_open');
 
       if (saved && saved.onboardingComplete) {
         console.log('APP INIT - Found saved state, going to app');

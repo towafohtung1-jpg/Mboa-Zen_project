@@ -1,5 +1,4 @@
-﻿// ─── src/screens/HubScreen.tsx ─────────────────────────────────────────
-
+﻿// ─── src/screens/HubScreen.tsx ──────────────────────────────────────────
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -21,9 +20,9 @@ import WaterDrop from '../components/common/WaterDrop';
 import { MboaButton } from '../components/common/MboaButton';
 import { useSwipeTabs } from '../hooks/useSwipeTabs';
 import { useTranslation } from '../i18n/useTranslation';
+import { track } from '../utils/analytics';
 
-// ─── ARCHETYPE DATA ──────────────────────────────────────────────────────
-
+// ─── ARCHETYPE DATA ─────────────────────────────────────────────────────
 const ARCHETYPE_DATA: Record<
   string,
   { image: any; titleKey: string; subtitleKey: string }
@@ -45,8 +44,7 @@ const ARCHETYPE_DATA: Record<
   },
 };
 
-// ─── GUIDE CARDS ─────────────────────────────────────────────────────────
-
+// ─── GUIDE CARDS ────────────────────────────────────────────────────────
 const GUIDE_CARDS: Record<
   string,
   { icon: any; titleKey: string; tipKey: string; color: string }[]
@@ -95,8 +93,7 @@ const GUIDE_CARDS: Record<
   ],
 };
 
-// ─── HELPERS ──────────────────────────────────────────────────────────────
-
+// ─── HELPERS ────────────────────────────────────────────────────────────
 const getDailyGuides = (archetype: string): any[] => {
   const allCards = GUIDE_CARDS[archetype] || [];
   if (allCards.length <= 4) return allCards;
@@ -152,8 +149,7 @@ const getHarmonyColor = (score: number): string => {
   return Colors.textMuted;
 };
 
-// ─── WATER NEAR-MISS / HEALTH MESSAGE ────────────────────────────────────
-
+// ─── WATER MESSAGE ──────────────────────────────────────────────────────
 const getWaterMessage = ({
   waterIntake,
   waterGoal,
@@ -171,7 +167,10 @@ const getWaterMessage = ({
     const remaining = waterGoal - waterIntake;
     if (remaining >= 3) {
       return {
-        text: t('hub.waterKidneys').replace('{n}', String(waterIntake)).replace('{goal}', String(waterGoal)).replace('{m}', String(remaining)),
+        text: t('hub.waterKidneys')
+          .replace('{n}', String(waterIntake))
+          .replace('{goal}', String(waterGoal))
+          .replace('{m}', String(remaining)),
         color: Colors.mboaGreen,
       };
     } else if (remaining > 0) {
@@ -224,8 +223,7 @@ const getWaterMessage = ({
   return null;
 };
 
-// ─── MILESTONE DEFINITIONS ────────────────────────────────────────────────
-
+// ─── MILESTONES ─────────────────────────────────────────────────────────
 const getMilestones = (t: (k: string) => string): Record<number, { title: string; message: string }> => ({
   7: { title: t('hub.ms7'), message: t('hub.ms7') },
   14: { title: t('hub.ms14'), message: t('hub.ms14') },
@@ -257,28 +255,17 @@ const getNewMilestone = (
   return null;
 };
 
-// ─── BROKEN-STREAK ORGAN MESSAGE ──────────────────────────────────────────
-
+// ─── BROKEN STREAK MESSAGE ──────────────────────────────────────────────
 const getBrokenStreakMessage = (daysSinceLastGoal: number, t: (k: string) => string): { text: string; color: string } | null => {
   if (daysSinceLastGoal <= 0) return null;
-
-  if (daysSinceLastGoal >= 999) {
-    return { text: t('hub.brokenNew'), color: Colors.mboaGreen };
-  }
-  if (daysSinceLastGoal === 1) {
-    return { text: t('hub.broken1'), color: '#FF9800' };
-  }
-  if (daysSinceLastGoal <= 3) {
-    return { text: t('hub.broken3').replace('{n}', String(daysSinceLastGoal)), color: '#FF9800' };
-  }
-  if (daysSinceLastGoal <= 6) {
-    return { text: t('hub.broken6').replace('{n}', String(daysSinceLastGoal)), color: Colors.errorRed };
-  }
+  if (daysSinceLastGoal >= 999) return { text: t('hub.brokenNew'), color: Colors.mboaGreen };
+  if (daysSinceLastGoal === 1) return { text: t('hub.broken1'), color: '#FF9800' };
+  if (daysSinceLastGoal <= 3) return { text: t('hub.broken3').replace('{n}', String(daysSinceLastGoal)), color: '#FF9800' };
+  if (daysSinceLastGoal <= 6) return { text: t('hub.broken6').replace('{n}', String(daysSinceLastGoal)), color: Colors.errorRed };
   return { text: t('hub.brokenWeek'), color: Colors.errorRed };
 };
 
-// ─── PREVIOUS MONTH SUMMARY ───────────────────────────────────────────────
-
+// ─── PREVIOUS MONTH SUMMARY ─────────────────────────────────────────────
 const PrevMonthSummary = ({
   checkInHistory,
   monthName,
@@ -326,12 +313,8 @@ const PrevMonthSummary = ({
 
   return (
     <View style={styles.prevMonthCard}>
-      <Text style={styles.prevMonthTitle}>
-        {monthName} {prevYear} — {t('hub.yourMonthComplete')}
-      </Text>
-      <Text style={styles.prevMonthSubtitle}>
-        {t('hub.howHealthJourney')}
-      </Text>
+      <Text style={styles.prevMonthTitle}>{monthName} {prevYear} — {t('hub.yourMonthComplete')}</Text>
+      <Text style={styles.prevMonthSubtitle}>{t('hub.howHealthJourney')}</Text>
 
       <View style={styles.reportRow}>
         {[
@@ -359,22 +342,13 @@ const PrevMonthSummary = ({
         {t('hub.needsAttention')}: {weakest.label} ({weakest.days}/{daysInPrevMonth} {t('hub.daysSuffix')})
       </Text>
 
-      <MboaButton
-        title={t('hub.startNewMonth')}
-        onPress={onDismiss}
-        variant="primary"
-      />
+      <MboaButton title={t('hub.startNewMonth')} onPress={onDismiss} variant="primary" />
     </View>
   );
 };
 
-// ─── MONTHLY REPORT ───────────────────────────────────────────────────────
-
-const MonthlyReport = ({
-  checkInHistory,
-}: {
-  checkInHistory: Record<string, any>;
-}) => {
+// ─── MONTHLY REPORT ─────────────────────────────────────────────────────
+const MonthlyReport = ({ checkInHistory }: { checkInHistory: Record<string, any> }) => {
   const { t } = useTranslation();
   const today = new Date();
   const year = today.getFullYear();
@@ -440,8 +414,7 @@ const MonthlyReport = ({
   );
 };
 
-// ─── MONTHLY CALENDAR ─────────────────────────────────────────────────────
-
+// ─── MONTHLY CALENDAR ───────────────────────────────────────────────────
 const MonthlyCalendar = ({
   checkInHistory,
   streak,
@@ -510,9 +483,7 @@ const MonthlyCalendar = ({
                 },
               ]}
             >
-              <Text style={[styles.dayNumber, { color: SCORE_TEXT_COLORS[score] }]}>
-                {day}
-              </Text>
+              <Text style={[styles.dayNumber, { color: SCORE_TEXT_COLORS[score] }]}>{day}</Text>
             </View>
           );
         })}
@@ -537,8 +508,7 @@ const MonthlyCalendar = ({
   );
 };
 
-// ─── GUIDE CARD LIST ──────────────────────────────────────────────────────
-
+// ─── GUIDE CARD LIST ────────────────────────────────────────────────────
 const GuideCardList = ({ guideCards, t }: { guideCards: any[]; t: (k: string) => string }) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   return (
@@ -553,15 +523,9 @@ const GuideCardList = ({ guideCards, t }: { guideCards: any[]; t: (k: string) =>
             activeOpacity={0.8}
           >
             <View style={styles.guideTitleRow}>
-              <Image
-                source={guide.icon}
-                style={[styles.guideIconImage, { tintColor: guide.color }]}
-                resizeMode="contain"
-              />
+              <Image source={guide.icon} style={[styles.guideIconImage, { tintColor: guide.color }]} resizeMode="contain" />
               <Text style={styles.guideTitle}>{t(guide.titleKey)}</Text>
-              <Text style={[styles.guideToggle, { color: guide.color }]}>
-                {isOpen ? '▲' : '▼'}
-              </Text>
+              <Text style={[styles.guideToggle, { color: guide.color }]}>{isOpen ? '▲' : '▼'}</Text>
             </View>
             {isOpen && <Text style={styles.guideTip}>{t(guide.tipKey)}</Text>}
           </TouchableOpacity>
@@ -571,12 +535,10 @@ const GuideCardList = ({ guideCards, t }: { guideCards: any[]; t: (k: string) =>
   );
 };
 
-// ─── ANSWER TYPE ──────────────────────────────────────────────────────────
-
+// ─── ANSWER TYPE ────────────────────────────────────────────────────────
 type Answer = 'yes' | 'not_yet' | null;
 
-// ─── MAIN HUB SCREEN ──────────────────────────────────────────────────────
-
+// ─── MAIN HUB SCREEN ────────────────────────────────────────────────────
 const HubScreen = () => {
   const { t, language } = useTranslation();
   const navigation = useNavigation<any>();
@@ -602,10 +564,11 @@ const HubScreen = () => {
     celebratedMilestones,
     markMilestoneCelebrated,
     addNjangiItem,
+    rehydrateCheckInsForToday,
   } = useUserStore();
 
   const [guidesExpanded, setGuidesExpanded] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshKey] = useState(0);
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [showGoodJobModal, setShowGoodJobModal] = useState(false);
   const [milestoneData, setMilestoneData] = useState<{
@@ -652,7 +615,7 @@ const HubScreen = () => {
     training: todayAlreadyAnswered ? (checkIns.training ? 'yes' : 'not_yet') : null,
   });
 
-  const answeredCount = Object.values(answers).filter(a => a !== null).length;
+  const answeredCount = Object.values(answers).filter((a) => a !== null).length;
   const allAnswered = answeredCount === 3;
   const progressPercent = Math.round((answeredCount / 3) * 100);
 
@@ -664,9 +627,10 @@ const HubScreen = () => {
     if (key === 'nutrition') addNjangiItem('food');
     if (key === 'training') addNjangiItem('move');
 
-    const allDone = Object.values(newAnswers).filter(a => a !== null).length === 3;
-    if (allDone) {
+    const allDone = Object.values(newAnswers).filter((a) => a !== null).length === 3;
+    if (allDone && !todayAlreadyAnswered) {
       setLastCheckinDate(todayStr);
+      track('check_in_complete', { value: 'yes' });
       setTimeout(() => setShowProgressModal(true), 400);
     }
   };
@@ -675,9 +639,11 @@ const HubScreen = () => {
     const newAnswers = { ...answers, [key]: 'not_yet' as Answer };
     setAnswers(newAnswers);
     if (checkIns[key]) toggleCheckIn(key);
-    const allDone = Object.values(newAnswers).filter(a => a !== null).length === 3;
-    if (allDone) {
+
+    const allDone = Object.values(newAnswers).filter((a) => a !== null).length === 3;
+    if (allDone && !todayAlreadyAnswered) {
       setLastCheckinDate(todayStr);
+      track('check_in_complete', { value: 'not_yet' });
       setTimeout(() => setShowProgressModal(true), 400);
     }
   };
@@ -705,6 +671,11 @@ const HubScreen = () => {
     return count;
   }, [checkInHistory]);
 
+  // Rehydrate today's check-ins from persisted history on mount
+  useEffect(() => {
+    rehydrateCheckInsForToday();
+  }, []);
+
   useEffect(() => {
     logCheckInHistory();
   }, [checkIns]);
@@ -713,6 +684,7 @@ const HubScreen = () => {
     syncWaterForToday();
   }, []);
 
+  // Milestone check — re-runs when streak changes
   useEffect(() => {
     if (milestoneCheckedRef.current) return;
     milestoneCheckedRef.current = true;
@@ -721,21 +693,16 @@ const HubScreen = () => {
       const waterStreak = getWaterStreak();
       const checkInStreak = streak;
 
-      const milestone = getNewMilestone(
-        waterStreak,
-        checkInStreak,
-        celebratedMilestones,
-        t
-      );
-
+      const milestone = getNewMilestone(waterStreak, checkInStreak, celebratedMilestones, t);
       if (milestone) {
         setMilestoneData(milestone);
         markMilestoneCelebrated(milestone.key);
+        track('milestone_celebrated', { days: milestone.days, key: milestone.key });
       }
     }, 500);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [streak]);
 
   const handleShare = async () => {
     try {
@@ -776,21 +743,15 @@ const HubScreen = () => {
               <MboaButton
                 key={option.id}
                 title={option.label}
-                onPress={() => setArchetype(option.id)}
+                onPress={() => {
+                  setArchetype(option.id);
+                  track('archetype_selected', { archetype: option.id, source: 'hub' });
+                }}
                 variant="primary"
               />
             ))}
           </View>
         </View>
-        {showScrollTop && (
-          <TouchableOpacity
-            style={styles.scrollTopButton}
-            onPress={scrollToTop}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.scrollTopArrow}>↑</Text>
-          </TouchableOpacity>
-        )}
       </FadeInView>
     );
   }
@@ -809,13 +770,8 @@ const HubScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.section}>
-
           <View style={styles.heroContainer}>
-            <Image
-              source={archetypeData.image}
-              style={styles.heroImage}
-              resizeMode="cover"
-            />
+            <Image source={archetypeData.image} style={styles.heroImage} resizeMode="cover" />
             <View style={styles.heroOverlay}>
               <Text style={styles.heroTitle}>{t(archetypeData.titleKey)}</Text>
               <Text style={styles.heroSubtitle}>{t(archetypeData.subtitleKey)}</Text>
@@ -850,6 +806,7 @@ const HubScreen = () => {
                       const willHitGoal = nextAmount >= waterGoal;
 
                       setWaterIntake(nextAmount);
+                      track('water_intake_set', { amount: nextAmount });
 
                       if (wasBelowGoal && willHitGoal) {
                         setTimeout(() => setShowGoodJobModal(true), 300);
@@ -998,9 +955,7 @@ const HubScreen = () => {
                     styles.progressBarFill,
                     {
                       width: `${progressPercent}%`,
-                      backgroundColor: allAnswered
-                        ? getHarmonyColor(harmonyScore)
-                        : Colors.mboaGreen,
+                      backgroundColor: allAnswered ? getHarmonyColor(harmonyScore) : Colors.mboaGreen,
                     },
                   ]}
                 />
@@ -1016,38 +971,24 @@ const HubScreen = () => {
                 const answer = answers[item.key];
                 return (
                   <View key={item.key} style={styles.qaBlock}>
-                    <Text style={styles.qaQuestion}>
-                      {item.question}
-                    </Text>
+                    <Text style={styles.qaQuestion}>{item.question}</Text>
                     <View style={styles.qaButtons}>
                       <TouchableOpacity
-                        style={[
-                          styles.qaBtn,
-                          answer === 'yes' ? styles.qaBtnYesActive : styles.qaBtnYes,
-                        ]}
+                        style={[styles.qaBtn, answer === 'yes' ? styles.qaBtnYesActive : styles.qaBtnYes]}
                         onPress={() => handleYes(item.key)}
                         activeOpacity={0.8}
                       >
-                        <Text style={[
-                          styles.qaBtnText,
-                          answer === 'yes' && styles.qaBtnTextWhite,
-                        ]}>
+                        <Text style={[styles.qaBtnText, answer === 'yes' && styles.qaBtnTextWhite]}>
                           {t('hub.yes')}
                         </Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity
-                        style={[
-                          styles.qaBtn,
-                          answer === 'not_yet' ? styles.qaBtnNoActive : styles.qaBtnNo,
-                        ]}
+                        style={[styles.qaBtn, answer === 'not_yet' ? styles.qaBtnNoActive : styles.qaBtnNo]}
                         onPress={() => handleNotYet(item.key)}
                         activeOpacity={0.8}
                       >
-                        <Text style={[
-                          styles.qaBtnText,
-                          answer === 'not_yet' && styles.qaBtnNoTextActive,
-                        ]}>
+                        <Text style={[styles.qaBtnText, answer === 'not_yet' && styles.qaBtnNoTextActive]}>
                           {t('hub.notYet')}
                         </Text>
                       </TouchableOpacity>
@@ -1072,9 +1013,7 @@ const HubScreen = () => {
             activeOpacity={0.8}
           >
             <Text style={styles.sectionLabel}>{t('hub.wellnessGuides')}</Text>
-            <Text style={styles.guidesToggle}>
-              {guidesExpanded ? t('hub.hide') : t('hub.show')}
-            </Text>
+            <Text style={styles.guidesToggle}>{guidesExpanded ? t('hub.hide') : t('hub.show')}</Text>
           </TouchableOpacity>
 
           {guidesExpanded && <GuideCardList guideCards={guideCards} t={t} />}
@@ -1082,17 +1021,14 @@ const HubScreen = () => {
           <View style={styles.shareCard}>
             <Text style={styles.shareTitle}>{t('hub.shareTitle')}</Text>
             <Text style={styles.shareSubtitle}>{t('hub.shareSubtitle')}</Text>
-            <MboaButton
-              title={t('hub.shareApp')}
-              onPress={handleShare}
-              variant="primary"
-            />
+            <MboaButton title={t('hub.shareApp')} onPress={handleShare} variant="primary" />
           </View>
 
           <View style={{ height: 20 }} />
         </View>
       </ScrollView>
 
+      {/* PROGRESS MODAL */}
       <Modal
         visible={showProgressModal}
         animationType="slide"
@@ -1131,20 +1067,24 @@ const HubScreen = () => {
                   />
                 </View>
                 <Text style={styles.harmonyMessage}>
-                  {harmonyScore === 100 ? t('hub.harmonyPerfect') : harmonyScore >= 66 ? t('hub.harmonyGreat') : harmonyScore >= 33 ? t('hub.harmonyStarting') : t('hub.harmonyTomorrow')}
+                  {harmonyScore === 100
+                    ? t('hub.harmonyPerfect')
+                    : harmonyScore >= 66
+                    ? t('hub.harmonyGreat')
+                    : harmonyScore >= 33
+                    ? t('hub.harmonyStarting')
+                    : t('hub.harmonyTomorrow')}
                 </Text>
               </View>
 
               <Text style={styles.sectionLabel}>{t('hub.thisMonthProgress')}</Text>
-              <MonthlyCalendar
-                checkInHistory={checkInHistory}
-                streak={streak}
-              />
+              <MonthlyCalendar checkInHistory={checkInHistory} streak={streak} />
             </ScrollView>
           </View>
         </View>
       </Modal>
 
+      {/* GOOD JOB MODAL */}
       <Modal
         visible={showGoodJobModal}
         animationType="fade"
@@ -1155,7 +1095,9 @@ const HubScreen = () => {
           <View style={styles.goodJobContainer}>
             <Text style={styles.goodJobEmoji}>🌊</Text>
             <Text style={styles.goodJobTitle}>{t('hub.goodJobTitle')}</Text>
-            <Text style={styles.goodJobSubtitle}>{t('hub.goodJobSubtitle').replace('{n}', String(waterGoal))}</Text>
+            <Text style={styles.goodJobSubtitle}>
+              {t('hub.goodJobSubtitle').replace('{n}', String(waterGoal))}
+            </Text>
 
             <View style={styles.goodJobStreakBadge}>
               <Text style={styles.goodJobStreakText}>
@@ -1164,20 +1106,29 @@ const HubScreen = () => {
             </View>
 
             <Text style={styles.goodJobMessage}>
-              {getWaterStreak() <= 1 ? t('hub.goodJobMsg1') : getWaterStreak() <= 3 ? t('hub.goodJobMsg2') : getWaterStreak() <= 6 ? t('hub.goodJobMsg3') : getWaterStreak() === 7 ? t('hub.goodJobMsg4') : getWaterStreak() <= 13 ? t('hub.goodJobMsg5') : getWaterStreak() <= 29 ? t('hub.goodJobMsg6') : t('hub.goodJobMsg7')}
+              {getWaterStreak() <= 1
+                ? t('hub.goodJobMsg1')
+                : getWaterStreak() <= 3
+                ? t('hub.goodJobMsg2')
+                : getWaterStreak() <= 6
+                ? t('hub.goodJobMsg3')
+                : getWaterStreak() === 7
+                ? t('hub.goodJobMsg4')
+                : getWaterStreak() <= 13
+                ? t('hub.goodJobMsg5')
+                : getWaterStreak() <= 29
+                ? t('hub.goodJobMsg6')
+                : t('hub.goodJobMsg7')}
             </Text>
 
             <View style={styles.goodJobButtonRow}>
-              <MboaButton
-                title={t('hub.done')}
-                onPress={() => setShowGoodJobModal(false)}
-                variant="primary"
-              />
+              <MboaButton title={t('hub.done')} onPress={() => setShowGoodJobModal(false)} variant="primary" />
             </View>
           </View>
         </View>
       </Modal>
 
+      {/* MILESTONE MODAL */}
       <Modal
         visible={!!milestoneData}
         animationType="fade"
@@ -1195,22 +1146,14 @@ const HubScreen = () => {
             <Text style={styles.milestoneMessage}>{milestoneData?.message}</Text>
 
             <View style={styles.milestoneButtonRow}>
-              <MboaButton
-                title={t('hub.keepGoing')}
-                onPress={() => setMilestoneData(null)}
-                variant="primary"
-              />
+              <MboaButton title={t('hub.keepGoing')} onPress={() => setMilestoneData(null)} variant="primary" />
             </View>
           </View>
         </View>
       </Modal>
 
       {showScrollTop && (
-        <TouchableOpacity
-          style={styles.scrollTopButton}
-          onPress={scrollToTop}
-          activeOpacity={0.8}
-        >
+        <TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop} activeOpacity={0.8}>
           <Text style={styles.scrollTopArrow}>↑</Text>
         </TouchableOpacity>
       )}
@@ -1218,8 +1161,7 @@ const HubScreen = () => {
   );
 };
 
-// ─── STYLES ────────────────────────────────────────────────────────────────
-
+// ─── STYLES ─────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.cleanWhite, alignItems: 'center' },
   scrollContent: { width: '100%', alignItems: 'center' },
@@ -1228,10 +1170,7 @@ const styles = StyleSheet.create({
   eyebrow: { fontSize: 11, ...FONTS.bold, color: Colors.zenGold, letterSpacing: 3, marginBottom: 6 },
   header: { fontSize: 28, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 24 },
   subHeader: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, lineHeight: 22, marginBottom: 28 },
-  archetypeButtonRow: {
-    alignItems: 'flex-end',
-    gap: 12,
-  },
+  archetypeButtonRow: { alignItems: 'flex-end', gap: 12 },
 
   heroContainer: {
     width: '100%',
@@ -1241,10 +1180,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     position: 'relative',
   },
-  heroImage: {
-    width: '100%',
-    height: '100%',
-  },
+  heroImage: { width: '100%', height: '100%' },
   heroOverlay: {
     position: 'absolute',
     bottom: 0,
@@ -1253,11 +1189,7 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
-  heroTitle: {
-    fontSize: 24,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-  },
+  heroTitle: { fontSize: 24, ...FONTS.bold, color: Colors.cleanWhite },
   heroSubtitle: {
     fontSize: 14,
     ...FONTS.regular,
@@ -1265,16 +1197,55 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  proverbCard: { width: '100%', padding: 24, backgroundColor: Colors.softBg, borderRadius: 18, position: 'relative', marginBottom: 28 },
-  accentLine: { position: 'absolute', top: 16, left: 0, width: 4, height: 40, backgroundColor: Colors.zenGold, borderTopRightRadius: 4, borderBottomRightRadius: 4 },
-  proverb: { fontSize: 18, ...FONTS.medium, marginBottom: 12, color: Colors.earthBlack, lineHeight: 28, fontStyle: 'italic', marginLeft: 12 },
+  proverbCard: {
+    width: '100%',
+    padding: 24,
+    backgroundColor: Colors.softBg,
+    borderRadius: 18,
+    position: 'relative',
+    marginBottom: 28,
+  },
+  accentLine: {
+    position: 'absolute',
+    top: 16,
+    left: 0,
+    width: 4,
+    height: 40,
+    backgroundColor: Colors.zenGold,
+    borderTopRightRadius: 4,
+    borderBottomRightRadius: 4,
+  },
+  proverb: {
+    fontSize: 18,
+    ...FONTS.medium,
+    marginBottom: 12,
+    color: Colors.earthBlack,
+    lineHeight: 28,
+    fontStyle: 'italic',
+    marginLeft: 12,
+  },
   author: { fontSize: 13, ...FONTS.semibold, color: Colors.mboaGreen, textAlign: 'right', letterSpacing: 1 },
   divider: { height: 1, backgroundColor: '#D9D9D9', marginVertical: 16 },
   lesson: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, lineHeight: 22 },
 
-  sectionLabel: { fontSize: 11, ...FONTS.bold, color: Colors.earthBlack, letterSpacing: 2, marginBottom: 12, marginTop: 4 },
+  sectionLabel: {
+    fontSize: 11,
+    ...FONTS.bold,
+    color: Colors.earthBlack,
+    letterSpacing: 2,
+    marginBottom: 12,
+    marginTop: 4,
+  },
 
-  prevMonthCard: { width: '100%', backgroundColor: '#F1FAF3', borderRadius: 18, padding: 20, marginBottom: 20, borderWidth: 2, borderColor: Colors.mboaGreen },
+  prevMonthCard: {
+    width: '100%',
+    backgroundColor: '#F1FAF3',
+    borderRadius: 18,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: Colors.mboaGreen,
+  },
   prevMonthTitle: { fontSize: 16, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 6 },
   prevMonthSubtitle: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, marginBottom: 16 },
 
@@ -1283,7 +1254,14 @@ const styles = StyleSheet.create({
   alreadyDoneSubtitle: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted },
 
   checkInCard: { width: '100%', backgroundColor: Colors.softBg, borderRadius: 18, padding: 20, marginBottom: 20 },
-  checkInIntro: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, lineHeight: 20, marginBottom: 16, fontStyle: 'italic' },
+  checkInIntro: {
+    fontSize: 13,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    lineHeight: 20,
+    marginBottom: 16,
+    fontStyle: 'italic',
+  },
   progressBarBg: { height: 8, backgroundColor: '#E0E0E0', borderRadius: 4, overflow: 'hidden', marginBottom: 6 },
   progressBarFill: { height: 8, borderRadius: 4 },
   progressHint: { fontSize: 11, ...FONTS.medium, color: Colors.textMuted, marginBottom: 16 },
@@ -1301,24 +1279,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
     backgroundColor: 'transparent',
   },
-  qaBtnYes: {
-    borderColor: Colors.mboaGreen,
-    borderBottomColor: Colors.zenGold,
-  },
-  qaBtnYesActive: {
-    backgroundColor: Colors.mboaGreen,
-    borderColor: Colors.mboaGreen,
-    borderBottomColor: Colors.zenGold,
-  },
-  qaBtnNo: {
-    borderColor: Colors.mboaGreen,
-    borderBottomColor: Colors.zenGold,
-  },
-  qaBtnNoActive: {
-    backgroundColor: Colors.zenGold,
-    borderColor: Colors.zenGold,
-    borderBottomColor: Colors.mboaGreen,
-  },
+  qaBtnYes: { borderColor: Colors.mboaGreen, borderBottomColor: Colors.zenGold },
+  qaBtnYesActive: { backgroundColor: Colors.mboaGreen, borderColor: Colors.mboaGreen, borderBottomColor: Colors.zenGold },
+  qaBtnNo: { borderColor: Colors.mboaGreen, borderBottomColor: Colors.zenGold },
+  qaBtnNoActive: { backgroundColor: Colors.zenGold, borderColor: Colors.zenGold, borderBottomColor: Colors.mboaGreen },
   qaBtnText: { fontSize: 14, ...FONTS.bold, color: Colors.mboaGreen },
   qaBtnTextWhite: { color: Colors.cleanWhite },
   qaBtnNoTextActive: { color: Colors.earthBlack },
@@ -1328,18 +1292,36 @@ const styles = StyleSheet.create({
   harmonyRevealScore: { fontSize: 24, ...FONTS.bold, marginBottom: 14 },
   progressBarBgLarge: { height: 10, backgroundColor: '#E0E0E0', borderRadius: 5, overflow: 'hidden', marginBottom: 14 },
   progressBarFillLarge: { height: 10, borderRadius: 5 },
-  harmonyMessage: { fontSize: 14, ...FONTS.regular, color: Colors.textMuted, lineHeight: 22, fontStyle: 'italic' },
+  harmonyMessage: {
+    fontSize: 14,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    lineHeight: 22,
+    fontStyle: 'italic',
+  },
 
   calendarCard: { width: '100%', backgroundColor: Colors.softBg, borderRadius: 18, padding: 20, marginBottom: 20 },
   streakText: { fontSize: 12, ...FONTS.bold, color: '#FF6D00' },
-  calendarTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
+  calendarTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
   calendarMonth: { fontSize: 15, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 4 },
   reportButton: { backgroundColor: Colors.mboaGreen, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 },
   reportButtonText: { fontSize: 11, ...FONTS.bold, color: Colors.cleanWhite },
   calendarDayLabels: { flexDirection: 'row', marginBottom: 6 },
   dayLabel: { flex: 1, textAlign: 'center', fontSize: 11, ...FONTS.bold, color: Colors.textMuted },
   calendarGrid: { flexDirection: 'row', flexWrap: 'wrap' },
-  dayCell: { width: `${100 / 7}%`, aspectRatio: 1, borderRadius: 6, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
+  dayCell: {
+    width: `${100 / 7}%`,
+    aspectRatio: 1,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
   dayNumber: { fontSize: 11, ...FONTS.medium },
   calendarLegend: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 12 },
   legendItem: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 6, marginBottom: 4 },
@@ -1356,18 +1338,47 @@ const styles = StyleSheet.create({
   reportOverall: { fontSize: 14, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 8 },
   reportHabit: { fontSize: 13, ...FONTS.medium, marginBottom: 4 },
 
-  guidesHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, marginTop: 4 },
+  guidesHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    marginTop: 4,
+  },
   guidesToggle: { fontSize: 12, ...FONTS.bold, color: Colors.mboaGreen },
-  guideCard: { width: '100%', backgroundColor: Colors.softBg, borderRadius: 14, marginBottom: 12, padding: 16, borderLeftWidth: 4 },
+  guideCard: {
+    width: '100%',
+    backgroundColor: Colors.softBg,
+    borderRadius: 14,
+    marginBottom: 12,
+    padding: 16,
+    borderLeftWidth: 4,
+  },
   guideTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
   guideIconImage: { width: 22, height: 22, marginRight: 10 },
   guideTitle: { fontSize: 15, ...FONTS.bold, color: Colors.earthBlack, flex: 1 },
   guideToggle: { fontSize: 11, ...FONTS.bold, marginLeft: 8 },
   guideTip: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, lineHeight: 20, marginTop: 8 },
 
-  shareCard: { width: '100%', backgroundColor: '#F1FAF3', borderRadius: 18, padding: 20, marginTop: 8, borderWidth: 1, borderColor: Colors.mboaGreen, alignItems: 'center' },
+  shareCard: {
+    width: '100%',
+    backgroundColor: '#F1FAF3',
+    borderRadius: 18,
+    padding: 20,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: Colors.mboaGreen,
+    alignItems: 'center',
+  },
   shareTitle: { fontSize: 16, ...FONTS.bold, color: Colors.earthBlack, textAlign: 'center', marginBottom: 8 },
-  shareSubtitle: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, textAlign: 'center', lineHeight: 20, marginBottom: 16 },
+  shareSubtitle: {
+    fontSize: 13,
+    ...FONTS.regular,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 16,
+  },
 
   waterSection: {
     width: '100%',
@@ -1376,47 +1387,19 @@ const styles = StyleSheet.create({
     padding: 20,
     marginBottom: 20,
   },
-  waterTitle: {
-    fontSize: 15,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-    marginBottom: 14,
-  },
+  waterTitle: { fontSize: 15, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 14 },
   dropsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 14,
   },
-  waterStatus: {
-    fontSize: 14,
-    ...FONTS.medium,
-    color: Colors.textMuted,
-    textAlign: 'center',
-  },
-  waterComplete: {
-    fontSize: 14,
-    ...FONTS.bold,
-    color: Colors.mboaGreen,
-    textAlign: 'center',
-    marginTop: 8,
-  },
+  waterStatus: { fontSize: 14, ...FONTS.medium, color: Colors.textMuted, textAlign: 'center' },
+  waterComplete: { fontSize: 14, ...FONTS.bold, color: Colors.mboaGreen, textAlign: 'center', marginTop: 8 },
 
-  streakDivider: {
-    height: 1,
-    backgroundColor: '#E0E0E0',
-    marginTop: 16,
-    marginBottom: 12,
-  },
-  streakRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  streakDayCol: {
-    alignItems: 'center',
-  },
+  streakDivider: { height: 1, backgroundColor: '#E0E0E0', marginTop: 16, marginBottom: 12 },
+  streakRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  streakDayCol: { alignItems: 'center' },
   streakDrop: {
     width: 14,
     height: 14,
@@ -1426,24 +1409,10 @@ const styles = StyleSheet.create({
     borderColor: '#D0D0D0',
     marginBottom: 6,
   },
-  streakDropFilled: {
-    backgroundColor: '#2F80ED',
-    borderColor: '#2F80ED',
-  },
-  streakDropToday: {
-    borderColor: Colors.mboaGreen,
-  },
-  streakDayLabel: {
-    fontSize: 10,
-    ...FONTS.medium,
-    color: Colors.textMuted,
-  },
-  waterStreakText: {
-    fontSize: 13,
-    ...FONTS.bold,
-    color: Colors.mboaGreen,
-    textAlign: 'center',
-  },
+  streakDropFilled: { backgroundColor: '#2F80ED', borderColor: '#2F80ED' },
+  streakDropToday: { borderColor: Colors.mboaGreen },
+  streakDayLabel: { fontSize: 10, ...FONTS.medium, color: Colors.textMuted },
+  waterStreakText: { fontSize: 13, ...FONTS.bold, color: Colors.mboaGreen, textAlign: 'center' },
 
   waterMessageBox: {
     marginTop: 14,
@@ -1454,12 +1423,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     borderLeftColor: Colors.zenGold,
   },
-  waterMessageText: {
-    fontSize: 13,
-    ...FONTS.medium,
-    lineHeight: 20,
-    textAlign: 'center',
-  },
+  waterMessageText: { fontSize: 13, ...FONTS.medium, lineHeight: 20, textAlign: 'center' },
 
   daysActiveBox: {
     marginTop: 14,
@@ -1471,16 +1435,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
   },
-  daysActiveNumber: {
-    fontSize: 20,
-    ...FONTS.bold,
-    color: Colors.zenGold,
-  },
-  daysActiveLabel: {
-    fontSize: 13,
-    ...FONTS.medium,
-    color: Colors.textMuted,
-  },
+  daysActiveNumber: { fontSize: 20, ...FONTS.bold, color: Colors.zenGold },
+  daysActiveLabel: { fontSize: 13, ...FONTS.medium, color: Colors.textMuted },
 
   scanCard: {
     width: '100%',
@@ -1493,33 +1449,12 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     borderLeftColor: Colors.zenGold,
   },
-  scanCardContent: {
-    flex: 1,
-  },
-  scanCardTitle: {
-    fontSize: 16,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-    marginBottom: 4,
-  },
-  scanCardSubtitle: {
-    fontSize: 13,
-    ...FONTS.regular,
-    color: Colors.textMuted,
-    lineHeight: 19,
-  },
-  scanCardArrow: {
-    fontSize: 22,
-    ...FONTS.bold,
-    color: Colors.mboaGreen,
-    marginLeft: 12,
-  },
+  scanCardContent: { flex: 1 },
+  scanCardTitle: { fontSize: 16, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 4 },
+  scanCardSubtitle: { fontSize: 13, ...FONTS.regular, color: Colors.textMuted, lineHeight: 19 },
+  scanCardArrow: { fontSize: 22, ...FONTS.bold, color: Colors.mboaGreen, marginLeft: 12 },
 
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'flex-end',
-  },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
   modalContainer: {
     backgroundColor: Colors.cleanWhite,
     borderTopLeftRadius: 24,
@@ -1540,18 +1475,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  modalCloseText: {
-    fontSize: 18,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-  },
-  modalScroll: {
-    width: '100%',
-  },
-  modalScrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 30,
-  },
+  modalCloseText: { fontSize: 18, ...FONTS.bold, color: Colors.earthBlack },
+  modalScroll: { width: '100%' },
+  modalScrollContent: { paddingHorizontal: 20, paddingBottom: 30 },
 
   goodJobOverlay: {
     flex: 1,
@@ -1570,16 +1496,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 6,
     borderTopColor: Colors.zenGold,
   },
-  goodJobEmoji: {
-    fontSize: 56,
-    marginBottom: 12,
-  },
-  goodJobTitle: {
-    fontSize: 28,
-    ...FONTS.bold,
-    color: Colors.mboaGreen,
-    marginBottom: 8,
-  },
+  goodJobEmoji: { fontSize: 56, marginBottom: 12 },
+  goodJobTitle: { fontSize: 28, ...FONTS.bold, color: Colors.mboaGreen, marginBottom: 8 },
   goodJobSubtitle: {
     fontSize: 15,
     ...FONTS.regular,
@@ -1596,11 +1514,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.mboaGreen,
   },
-  goodJobStreakText: {
-    fontSize: 15,
-    ...FONTS.bold,
-    color: Colors.mboaGreen,
-  },
+  goodJobStreakText: { fontSize: 15, ...FONTS.bold, color: Colors.mboaGreen },
   goodJobMessage: {
     fontSize: 15,
     ...FONTS.regular,
@@ -1610,9 +1524,7 @@ const styles = StyleSheet.create({
     marginBottom: 28,
     fontStyle: 'italic',
   },
-  goodJobButtonRow: {
-    alignItems: 'center',
-  },
+  goodJobButtonRow: { alignItems: 'center' },
 
   milestoneOverlay: {
     flex: 1,
@@ -1633,16 +1545,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 6,
     borderBottomColor: Colors.mboaGreen,
   },
-  milestoneStar: {
-    fontSize: 72,
-    marginBottom: 8,
-  },
-  milestoneDays: {
-    fontSize: 64,
-    ...FONTS.bold,
-    color: Colors.mboaGreen,
-    lineHeight: 70,
-  },
+  milestoneStar: { fontSize: 72, marginBottom: 8 },
+  milestoneDays: { fontSize: 64, ...FONTS.bold, color: Colors.mboaGreen, lineHeight: 70 },
   milestoneDaysLabel: {
     fontSize: 16,
     ...FONTS.medium,
@@ -1650,13 +1554,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     marginBottom: 20,
   },
-  milestoneTitle: {
-    fontSize: 24,
-    ...FONTS.bold,
-    color: Colors.zenGold,
-    marginBottom: 12,
-    textAlign: 'center',
-  },
+  milestoneTitle: { fontSize: 24, ...FONTS.bold, color: Colors.zenGold, marginBottom: 12, textAlign: 'center' },
   milestoneMessage: {
     fontSize: 15,
     ...FONTS.regular,
@@ -1666,9 +1564,8 @@ const styles = StyleSheet.create({
     marginBottom: 28,
     fontStyle: 'italic',
   },
-  milestoneButtonRow: {
-    alignItems: 'center',
-  },
+  milestoneButtonRow: { alignItems: 'center' },
+
   scrollTopButton: {
     position: 'absolute',
     bottom: 30,
@@ -1688,11 +1585,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 999,
   },
-  scrollTopArrow: {
-    fontSize: 24,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-  },
+  scrollTopArrow: { fontSize: 24, ...FONTS.bold, color: Colors.cleanWhite },
 });
 
 export default HubScreen;

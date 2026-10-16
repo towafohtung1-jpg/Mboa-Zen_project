@@ -7,6 +7,27 @@ import { strings, Language } from './strings';
 
 const isWeb = typeof window !== 'undefined';
 
+// Web storage adapter — must return raw strings (Zustand handles JSON)
+const webStorage = {
+  getItem: async (key: string): Promise<string | null> => {
+    try {
+      return isWeb ? localStorage.getItem(key) : null;
+    } catch {
+      return null;
+    }
+  },
+  setItem: async (key: string, value: string): Promise<void> => {
+    try {
+      if (isWeb) localStorage.setItem(key, value);
+    } catch {}
+  },
+  removeItem: async (key: string): Promise<void> => {
+    try {
+      if (isWeb) localStorage.removeItem(key);
+    } catch {}
+  },
+};
+
 interface LanguageState {
   language: Language;
   setLanguage: (lang: Language) => void;
@@ -20,7 +41,7 @@ export const useLanguageStore = create<LanguageState>()(
     }),
     {
       name: 'mboa-zen-language',
-      storage: createJSONStorage(() => (isWeb ? localStorage : AsyncStorage)),
+      storage: createJSONStorage(() => (isWeb ? webStorage : AsyncStorage)),
     }
   )
 );

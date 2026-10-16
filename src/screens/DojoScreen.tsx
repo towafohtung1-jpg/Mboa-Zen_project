@@ -1,5 +1,4 @@
 // ─── src/screens/DojoScreen.tsx ────────────────────────────────────────
-
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -18,20 +17,21 @@ import { MboaButton } from '../components/common/MboaButton';
 import { getExercisesForArchetype } from '../data/workoutOptions';
 import { useSwipeTabs } from '../hooks/useSwipeTabs';
 import { useTranslation } from '../i18n/useTranslation';
+import { track } from '../utils/analytics';
 
 // ─── DAY NAMES ──────────────────────────────────────────────────────────
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 // ─── WEB VIDEO PLAYER ───────────────────────────────────────────────────
 const WebVideo = ({ videoUrl, isPlaying }: { videoUrl: string; isPlaying: boolean }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<any>(null);
 
   useEffect(() => {
     if (videoRef.current) {
       if (isPlaying) {
-        videoRef.current.play().catch(() => {});
+        videoRef.current.play?.().catch(() => {});
       } else {
-        videoRef.current.pause();
+        videoRef.current.pause?.();
       }
     }
   }, [isPlaying]);
@@ -58,7 +58,6 @@ const DojoScreen = () => {
   const {
     archetype,
     todaySteps,
-    stepsHistory,
     stepGoal,
     getStepStreak,
     getStepPersonalBest,
@@ -70,6 +69,9 @@ const DojoScreen = () => {
   const [timeLeft, setTimeLeft] = useState(30);
   const [isWorkoutComplete, setIsWorkoutComplete] = useState(false);
   const [showNextPrompt, setShowNextPrompt] = useState(false);
+
+  // Track "started" only once per screen session
+  const hasTrackedStart = useRef(false);
 
   const panHandlers = useSwipeTabs();
 
@@ -123,23 +125,29 @@ const DojoScreen = () => {
   const handleExerciseComplete = () => {
     if (isLastExercise) {
       setIsWorkoutComplete(true);
+      const totalSeconds = exercises.reduce((sum, e) => sum + (e.duration || 30), 0);
+      track('workout_completed', {
+        exercises: totalExercises,
+        duration_seconds: totalSeconds,
+        archetype,
+      });
       Alert.alert(t('dojo.alertTitle'), t('dojo.alertBody'), [
-        { text: 'OK' }
+        { text: t('common.ok') || 'OK' },
       ]);
     } else {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex((prev) => prev + 1);
     }
   };
 
   const goToPrevious = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
+      setCurrentIndex((prev) => prev - 1);
     }
   };
 
   const goToNext = () => {
     if (!isLastExercise) {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex((prev) => prev + 1);
     } else {
       handleExerciseComplete();
     }
@@ -149,6 +157,10 @@ const DojoScreen = () => {
     if (timeLeft === 0) {
       setTimeLeft(currentExercise?.duration || 30);
       setShowNextPrompt(false);
+    }
+    if (!isPlaying && !hasTrackedStart.current) {
+      hasTrackedStart.current = true;
+      track('workout_started', { archetype });
     }
     setIsPlaying(!isPlaying);
   };
@@ -167,9 +179,7 @@ const DojoScreen = () => {
       <FadeInView style={styles.container} {...panHandlers}>
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>{t('dojo.selectArchetype')}</Text>
-          <Text style={styles.emptySubtitle}>
-            {t('dojo.selectArchetypeSub')}
-          </Text>
+          <Text style={styles.emptySubtitle}>{t('dojo.selectArchetypeSub')}</Text>
         </View>
       </FadeInView>
     );
@@ -180,9 +190,7 @@ const DojoScreen = () => {
       <FadeInView style={styles.container} {...panHandlers}>
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>{t('dojo.noExercises')}</Text>
-          <Text style={styles.emptySubtitle}>
-            {t('dojo.noExercisesSub')}
-          </Text>
+          <Text style={styles.emptySubtitle}>{t('dojo.noExercisesSub')}</Text>
         </View>
       </FadeInView>
     );
@@ -220,6 +228,7 @@ const DojoScreen = () => {
               setCurrentIndex(0);
               setTimeLeft(exercises[0]?.duration || 30);
               setShowNextPrompt(false);
+              hasTrackedStart.current = false;
             }}
             variant="primary"
           />
@@ -233,7 +242,6 @@ const DojoScreen = () => {
 
   return (
     <FadeInView style={styles.container} {...panHandlers}>
-      {/* HEADER */}
       <View style={styles.headerArea}>
         <Text style={styles.eyebrow}>{t('dojo.eyebrow')}</Text>
         <Text style={styles.header}>{currentDay}</Text>
@@ -241,7 +249,6 @@ const DojoScreen = () => {
           {archetype.charAt(0).toUpperCase() + archetype.slice(1)} — {totalExercises} exercises
         </Text>
 
-        {/* PROGRESS BAR */}
         <View style={styles.progressContainer}>
           <View style={styles.progressBarBg}>
             <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
@@ -270,18 +277,14 @@ const DojoScreen = () => {
               <Text style={styles.videoPlaceholderTitle}>
                 {currentExercise?.name || t('dojo.exerciseFallback')}
               </Text>
-              <Text style={styles.videoPlaceholderText}>
-                {t('dojo.videoPlaceholder')}
-              </Text>
+              <Text style={styles.videoPlaceholderText}>{t('dojo.videoPlaceholder')}</Text>
             </View>
           )}
 
-          {/* TIMER OVERLAY */}
           <View style={styles.timerOverlay}>
             <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
           </View>
 
-          {/* EXERCISE COMPLETE OVERLAY */}
           {showNextPrompt && (
             <View style={styles.completedOverlay}>
               <View style={styles.completedBox}>
@@ -303,9 +306,11 @@ const DojoScreen = () => {
         <View style={styles.exerciseInfoContainer}>
           <Text style={styles.exerciseName}>{currentExercise?.name}</Text>
           <Text style={styles.exerciseDescription}>
-            {language === 'pidgin' ? (currentExercise?.description_pidgin || currentExercise?.description) :
-            language === 'fr' ? (currentExercise?.description_fr || currentExercise?.description) :
-            currentExercise?.description}
+            {language === 'pidgin'
+              ? currentExercise?.description_pidgin || currentExercise?.description
+              : language === 'fr'
+              ? currentExercise?.description_fr || currentExercise?.description
+              : currentExercise?.description}
           </Text>
 
           <View style={styles.detailsRow}>
@@ -338,9 +343,7 @@ const DojoScreen = () => {
         {!isLastExercise && !showNextPrompt && exercises[currentIndex + 1] && (
           <View style={styles.upNextContainer}>
             <Text style={styles.upNextLabel}>{t('dojo.upNext')}</Text>
-            <Text style={styles.upNextName}>
-              {exercises[currentIndex + 1]?.name}
-            </Text>
+            <Text style={styles.upNextName}>{exercises[currentIndex + 1]?.name}</Text>
           </View>
         )}
 
@@ -374,21 +377,15 @@ const DojoScreen = () => {
           </View>
         )}
 
-        {/* ─── STEPS CARD ─────────────────────────────────────────── */}
+        {/* STEPS CARD */}
         <View style={styles.stepsCard}>
           <Text style={styles.stepsEyebrow}>{t('dojo.stepsTitle')}</Text>
 
           {isWeb ? (
             <View>
-              <Text style={styles.stepsPlaceholderTitle}>
-                {t('dojo.stepsOnWeb')}
-              </Text>
-              <Text style={styles.stepsPlaceholderText}>
-                {t('dojo.stepsInstall')}
-              </Text>
-              <Text style={styles.stepsPlaceholderNote}>
-                {t('dojo.stepsComingSoon')}
-              </Text>
+              <Text style={styles.stepsPlaceholderTitle}>{t('dojo.stepsOnWeb')}</Text>
+              <Text style={styles.stepsPlaceholderText}>{t('dojo.stepsInstall')}</Text>
+              <Text style={styles.stepsPlaceholderNote}>{t('dojo.stepsComingSoon')}</Text>
             </View>
           ) : (
             <View>
@@ -422,7 +419,6 @@ const DojoScreen = () => {
         </View>
       </ScrollView>
 
-      {/* ─── SCROLL TO TOP BUTTON ────────────────────────────────────── */}
       {showScrollTop && (
         <TouchableOpacity
           style={styles.scrollTopButton}
@@ -457,23 +453,14 @@ const styles = StyleSheet.create({
     letterSpacing: 3,
     marginBottom: 4,
   },
-  header: {
-    fontSize: 24,
-    ...FONTS.bold,
-    color: Colors.earthBlack,
-    marginBottom: 2,
-  },
+  header: { fontSize: 24, ...FONTS.bold, color: Colors.earthBlack, marginBottom: 2 },
   subHeader: {
     fontSize: 13,
     ...FONTS.regular,
     color: Colors.textMuted,
     marginBottom: 12,
   },
-  progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
+  progressContainer: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   progressBarBg: {
     flex: 1,
     height: 6,
@@ -481,16 +468,8 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     overflow: 'hidden',
   },
-  progressBarFill: {
-    height: 6,
-    backgroundColor: Colors.mboaGreen,
-    borderRadius: 3,
-  },
-  progressText: {
-    fontSize: 12,
-    ...FONTS.bold,
-    color: Colors.textMuted,
-  },
+  progressBarFill: { height: 6, backgroundColor: Colors.mboaGreen, borderRadius: 3 },
+  progressText: { fontSize: 12, ...FONTS.bold, color: Colors.textMuted },
   scrollContent: {
     width: '100%',
     alignItems: 'center',
@@ -498,7 +477,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 
-  // ─── VIDEO ──────────────────────────────────────────────────────────
   videoContainer: {
     width: '100%',
     maxWidth: 480,
@@ -546,13 +524,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
   },
-  timerText: {
-    fontSize: 20,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-  },
+  timerText: { fontSize: 20, ...FONTS.bold, color: Colors.cleanWhite },
 
-  // ─── COMPLETED OVERLAY ──────────────────────────────────────────────
   completedOverlay: {
     position: 'absolute',
     top: 0,
@@ -564,11 +537,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.75)',
     paddingHorizontal: 24,
   },
-  completedBox: {
-    width: '100%',
-    maxWidth: 320,
-    alignItems: 'center',
-  },
+  completedBox: { width: '100%', maxWidth: 320, alignItems: 'center' },
   completedLabel: {
     fontSize: 11,
     ...FONTS.bold,
@@ -584,7 +553,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
-  // ─── EXERCISE INFO ──────────────────────────────────────────────────
   exerciseInfoContainer: {
     width: '100%',
     maxWidth: 480,
@@ -606,11 +574,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     lineHeight: 20,
   },
-  detailsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
+  detailsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   detailChip: {
     backgroundColor: Colors.cleanWhite,
     paddingHorizontal: 12,
@@ -624,13 +588,8 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     letterSpacing: 1,
   },
-  detailValue: {
-    fontSize: 14,
-    ...FONTS.bold,
-    color: Colors.mboaGreen,
-  },
+  detailValue: { fontSize: 14, ...FONTS.bold, color: Colors.mboaGreen },
 
-  // ─── UP NEXT ────────────────────────────────────────────────────────
   upNextContainer: {
     width: '100%',
     maxWidth: 480,
@@ -649,13 +608,8 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     marginBottom: 4,
   },
-  upNextName: {
-    fontSize: 16,
-    ...FONTS.bold,
-    color: Colors.mboaGreen,
-  },
+  upNextName: { fontSize: 16, ...FONTS.bold, color: Colors.mboaGreen },
 
-  // ─── CONTROLS ───────────────────────────────────────────────────────
   controlsContainer: {
     width: '100%',
     maxWidth: 480,
@@ -665,12 +619,8 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 16,
   },
-  controlButtonWrapper: {
-    flex: 1,
-    alignItems: 'center',
-  },
+  controlButtonWrapper: { flex: 1, alignItems: 'center' },
 
-  // ─── EMPTY / COMPLETE ───────────────────────────────────────────────
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -726,15 +676,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     alignItems: 'center',
   },
-  completeStatItem: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  completeStatValue: {
-    fontSize: 28,
-    ...FONTS.bold,
-    color: Colors.mboaGreen,
-  },
+  completeStatItem: { alignItems: 'center', paddingHorizontal: 20 },
+  completeStatValue: { fontSize: 28, ...FONTS.bold, color: Colors.mboaGreen },
   completeStatLabel: {
     fontSize: 11,
     ...FONTS.medium,
@@ -742,13 +685,8 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginTop: 2,
   },
-  completeStatDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: '#D9D9D9',
-  },
+  completeStatDivider: { width: 1, height: 40, backgroundColor: '#D9D9D9' },
 
-  // ─── STEPS CARD ─────────────────────────────────────────────────────
   stepsCard: {
     width: '100%',
     maxWidth: 480,
@@ -793,17 +731,8 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 14,
   },
-  stepsValue: {
-    fontSize: 36,
-    ...FONTS.bold,
-    color: Colors.mboaGreen,
-    lineHeight: 40,
-  },
-  stepsValueLabel: {
-    fontSize: 14,
-    ...FONTS.medium,
-    color: Colors.textMuted,
-  },
+  stepsValue: { fontSize: 36, ...FONTS.bold, color: Colors.mboaGreen, lineHeight: 40 },
+  stepsValueLabel: { fontSize: 14, ...FONTS.medium, color: Colors.textMuted },
   stepsProgressBg: {
     height: 8,
     backgroundColor: '#D9E9DD',
@@ -811,11 +740,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 8,
   },
-  stepsProgressFill: {
-    height: 8,
-    backgroundColor: Colors.mboaGreen,
-    borderRadius: 4,
-  },
+  stepsProgressFill: { height: 8, backgroundColor: Colors.mboaGreen, borderRadius: 4 },
   stepsProgressText: {
     fontSize: 12,
     ...FONTS.medium,
@@ -830,18 +755,9 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#D9D9D9',
   },
-  stepsStreak: {
-    fontSize: 13,
-    ...FONTS.bold,
-    color: Colors.mboaGreen,
-  },
-  stepsBest: {
-    fontSize: 12,
-    ...FONTS.medium,
-    color: Colors.textMuted,
-  },
+  stepsStreak: { fontSize: 13, ...FONTS.bold, color: Colors.mboaGreen },
+  stepsBest: { fontSize: 12, ...FONTS.medium, color: Colors.textMuted },
 
-  // ─── SCROLL TO TOP ─────────────────────────────────────────────────────
   scrollTopButton: {
     position: 'absolute',
     bottom: 30,
@@ -861,11 +777,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 999,
   },
-  scrollTopArrow: {
-    fontSize: 24,
-    ...FONTS.bold,
-    color: Colors.cleanWhite,
-  },
+  scrollTopArrow: { fontSize: 24, ...FONTS.bold, color: Colors.cleanWhite },
 });
 
 export default DojoScreen;

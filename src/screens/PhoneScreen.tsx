@@ -1,12 +1,15 @@
-﻿import React, { useState } from 'react';
+﻿// ─── src/screens/PhoneScreen.tsx ────────────────────────────────────────
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
 import { Colors } from '../constants/colors';
-import { FONTS, SIZES } from '../constants/typography';
+import { FONTS } from '../constants/typography';
 import { useUserStore } from '../store/useUserStore';
 import { saveUserState } from '../utils/storage';
 import { FadeInView } from '../components/common/FadeInView';
 import { MboaButton } from '../components/common/MboaButton';
 import { useTranslation } from '../i18n/useTranslation';
+import { track } from '../utils/analytics';
+
 type Props = {
   onFinish: () => void;
   onSkip: () => void;
@@ -21,10 +24,7 @@ const PhoneScreen = ({ onFinish, onSkip }: Props) => {
 
   const handleContinue = async () => {
     if (!isValid) {
-      Alert.alert(
-        t('phone.alertTitle'),
-        t('phone.alertBody')
-      );
+      Alert.alert(t('phone.alertTitle'), t('phone.alertBody'));
       return;
     }
 
@@ -40,6 +40,7 @@ const PhoneScreen = ({ onFinish, onSkip }: Props) => {
       phone: fullNumber,
     });
 
+    track('phone_login');
     onFinish();
   };
 
@@ -53,6 +54,7 @@ const PhoneScreen = ({ onFinish, onSkip }: Props) => {
       phone: null,
     });
 
+    track('guest_login');
     onSkip();
   };
 
@@ -85,7 +87,7 @@ const PhoneScreen = ({ onFinish, onSkip }: Props) => {
         )}
       </View>
 
-            <View style={styles.footer}>
+      <View style={styles.footer}>
         <View style={styles.buttonRow}>
           <MboaButton
             title={t('phone.continueBtn')}
@@ -93,7 +95,6 @@ const PhoneScreen = ({ onFinish, onSkip }: Props) => {
             variant="primary"
             disabled={!isValid}
           />
-
           <MboaButton
             title={t('phone.guestBtn')}
             onPress={handleSkip}
@@ -191,17 +192,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 30,
   },
-    buttonRow: {
+  buttonRow: {
     flexDirection: 'row',
     gap: 12,
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
-
 });
 
 export default PhoneScreen;
-
-
-
-
