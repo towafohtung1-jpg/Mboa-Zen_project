@@ -18,6 +18,7 @@ import { useUserStore } from '../store/useUserStore';
 import { FadeInView } from '../components/common/FadeInView';
 import { MboaButton } from '../components/common/MboaButton';
 import { useSwipeTabs } from '../hooks/useSwipeTabs';
+import { useTranslation } from '../i18n/useTranslation';
 
 // ─── ICONS ──────────────────────────────────────────────────────────────
 
@@ -42,7 +43,7 @@ const COACHES = [
   {
     id: '1',
     name: 'Coach Marie',
-    specialty: 'Nutrition & Meal Planning',
+    specialtyKey: 'market.coachNutrition',
     location: 'Yaoundé',
     rating: 4.9,
     price: 'FCFA 5,000/session',
@@ -52,7 +53,7 @@ const COACHES = [
   {
     id: '2',
     name: 'Coach Jean',
-    specialty: 'Strength Training & Fitness',
+    specialtyKey: 'market.coachStrength',
     location: 'Douala',
     rating: 4.8,
     price: 'FCFA 4,500/session',
@@ -62,7 +63,7 @@ const COACHES = [
   {
     id: '3',
     name: 'Coach Sarah',
-    specialty: 'Wellness & Lifestyle',
+    specialtyKey: 'market.coachWellness',
     location: 'Buea',
     rating: 4.7,
     price: 'FCFA 4,000/session',
@@ -72,6 +73,7 @@ const COACHES = [
 ];
 
 const MarketScreen = () => {
+  const { t } = useTranslation();
   const {
     archetype,
     isPremium,
@@ -86,10 +88,10 @@ const MarketScreen = () => {
   const todayNjangi = getTodayNjangi();
   const njangiStreak = getNjangiStreak();
   const njangiItems = [
-    { key: 'water' as const, label: 'Drink 8 glasses' },
-    { key: 'food' as const, label: 'Eat healthy' },
-    { key: 'move' as const, label: 'Move 10 minutes' },
-  ];
+  { key: 'water' as const, labelKey: 'market.njangiWater' },
+  { key: 'food' as const, labelKey: 'market.njangiFood' },
+  { key: 'move' as const, labelKey: 'market.njangiMove' },
+];
   const [selectedPayment, setSelectedPayment] = useState<'momo' | 'orange' | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -111,7 +113,7 @@ const MarketScreen = () => {
   // ─── HANDLE PREMIUM UPGRADE ──────────────────────────────────────────
   const handleUpgrade = async () => {
     if (!selectedPayment) {
-      Alert.alert('Select Payment Method', 'Please select MTN MoMo or Orange Money.');
+      Alert.alert(t('market.alertPayTitle'), t('market.alertPayBody'));
       return;
     }
 
@@ -122,16 +124,12 @@ const MarketScreen = () => {
 
       setIsPremium(true);
       Alert.alert(
-        'Premium Activated!',
-        'You now have access to all premium features.\n\n' +
-        'Exclusive workouts\n' +
-        'Personalized meal plans\n' +
-        'Coach booking\n' +
-        'Advanced analytics',
+        t('market.alertPremiumTitle'),
+        t('market.alertPremiumBody'),
         [{ text: 'Great!' }]
       );
     } catch (error) {
-      Alert.alert('Payment Failed', 'Please try again or use a different payment method.');
+      Alert.alert(t('market.alertFailedTitle'), t('market.alertFailedBody'));
     } finally {
       setIsProcessing(false);
     }
@@ -140,33 +138,34 @@ const MarketScreen = () => {
   // ─── HANDLE COACH BOOKING ────────────────────────────────────────────
   const handleBookCoach = (coach: any) => {
     if (!isPremium) {
-      Alert.alert(
-        'Premium Required',
-        'Book a coach session with your premium subscription.\n\n' +
-        'Subscribe now for FCFA 2,500/month',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Upgrade Now', onPress: () => {} }
-        ]
-      );
+    Alert.alert(
+      t('market.alertCoachTitle'),
+      t('market.alertCoachBody'),
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: t('market.upgradeNow'), onPress: () => {} }
+      ]
+    );
       return;
     }
 
-    Alert.alert(
-      `Book ${coach.name}`,
-      `${coach.specialty}\n${coach.location}\n${coach.price}\n\n${coach.rating} rating\n\nWould you like to book a session?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Book Session',
-          onPress: () => {
-            Alert.alert('Booking Requested!',
-              `You have requested a session with ${coach.name}.\nThey will contact you shortly.`
-            );
-          }
-        }
-      ]
-    );
+ Alert.alert(
+  t('market.alertBookTitle').replace('{coach}', coach.name),
+  `${t(coach.specialtyKey)}\n${coach.location}\n${coach.price}\n\n${coach.rating} rating\n\nBook a session?`,
+  [
+    { text: 'Cancel', style: 'cancel' },
+    {
+      text: t('market.bookBtn'),
+      onPress: () => {
+        Alert.alert(
+          t('market.alertSavedTitle'),
+          t('market.alertSavedBody'),
+          [{ text: 'OK' }]
+        );
+      }
+    }
+  ]
+);
   };
 
   // ─── HANDLE NJANGI SAVE ──────────────────────────────────────────────
@@ -191,10 +190,10 @@ const MarketScreen = () => {
       >
         {/* ─── HEADER ────────────────────────────────────────────────────── */}
         <View style={styles.headerArea}>
-          <Text style={styles.eyebrow}>THE MARKET</Text>
-          <Text style={styles.header}>Premium Features</Text>
+          <Text style={styles.eyebrow}>{t('market.eyebrow')}</Text>
+          <Text style={styles.header}>{t('market.header')}</Text>
           <Text style={styles.subHeader}>
-            {isPremium ? 'You have full access!' : 'Upgrade to unlock everything'}
+            {isPremium ? t('market.subheaderActive') : t('market.subheaderInactive')}
           </Text>
         </View>
 
@@ -203,36 +202,32 @@ const MarketScreen = () => {
           <View style={styles.premiumHeader}>
             <View style={styles.premiumBadgeRow}>
               <Image source={ICONS.check} style={styles.premiumBadgeIcon} />
-              <Text style={styles.premiumBadge}>PREMIUM</Text>
+              <Text style={styles.premiumBadge}>{t('market.premiumBadge')}</Text>
             </View>
             {isPremium && (
               <View style={styles.activeBadge}>
-                <Text style={styles.activeBadgeText}>ACTIVE</Text>
+                <Text style={styles.activeBadgeText}>{t('market.activeBadge')}</Text>
               </View>
             )}
           </View>
           <Text style={styles.premiumPrice}>
-            {isPremium ? 'You have full access' : 'FCFA 2,500 / month'}
+            {isPremium ? t('market.priceActive') : t('market.priceInactive')}
           </Text>
           <Text style={styles.premiumDescription}>
-            {isPremium
-              ? 'Enjoy all premium features including exclusive workouts and meal plans.'
-              : 'Unlock premium content and features to get the most out of Mboa-Zen.'}
+            {isPremium ? t('market.descActive') : t('market.descInactive')}
           </Text>
         </View>
 
         {/* ─── FEATURES LIST ────────────────────────────────────────────── */}
         <View style={styles.featuresContainer}>
-          <Text style={styles.sectionTitle}>What You Get</Text>
+          <Text style={styles.sectionTitle}>{t('market.whatYouGet')}</Text>
 
           <View style={styles.featureItem}>
             <Image source={ICONS.dojo} style={styles.featureIconImage} />
             <View style={styles.featureContent}>
-              <Text style={styles.featureName}>Exclusive Workouts</Text>
+              <Text style={styles.featureName}>{t('market.feat1Name')}</Text>
               <Text style={styles.featureDescription}>
-                {isPremium
-                  ? 'All premium workouts unlocked'
-                  : 'Advanced workouts and progress tracking'}
+                {isPremium ? t('market.feat1DescActive') : t('market.feat1DescInactive')}
               </Text>
             </View>
             <Image
@@ -244,11 +239,9 @@ const MarketScreen = () => {
           <View style={styles.featureItem}>
             <Image source={ICONS.kitchen} style={styles.featureIconImage} />
             <View style={styles.featureContent}>
-              <Text style={styles.featureName}>Personalized Meal Plans</Text>
+              <Text style={styles.featureName}>{t('market.feat2Name')}</Text>
               <Text style={styles.featureDescription}>
-                {isPremium
-                  ? 'All meal plans unlocked'
-                  : 'Custom meal plans based on your goals'}
+                {isPremium ? t('market.feat2DescActive') : t('market.feat2DescInactive')}
               </Text>
             </View>
             <Image
@@ -260,11 +253,9 @@ const MarketScreen = () => {
           <View style={styles.featureItem}>
             <Image source={ICONS.coaches} style={styles.featureIconImage} />
             <View style={styles.featureContent}>
-              <Text style={styles.featureName}>Coach Booking</Text>
+              <Text style={styles.featureName}>{t('market.feat3Name')}</Text>
               <Text style={styles.featureDescription}>
-                {isPremium
-                  ? 'Book any coach anytime'
-                  : '1-on-1 sessions with certified coaches'}
+                {isPremium ? t('market.feat3DescActive') : t('market.feat3DescInactive')}
               </Text>
             </View>
             <Image
@@ -276,11 +267,9 @@ const MarketScreen = () => {
           <View style={styles.featureItem}>
             <Image source={ICONS.analytics} style={styles.featureIconImage} />
             <View style={styles.featureContent}>
-              <Text style={styles.featureName}>Advanced Analytics</Text>
+              <Text style={styles.featureName}>{t('market.feat4Name')}</Text>
               <Text style={styles.featureDescription}>
-                {isPremium
-                  ? 'Full analytics dashboard'
-                  : 'Track your progress with detailed insights'}
+                {isPremium ? t('market.feat4DescActive') : t('market.feat4DescInactive')}
               </Text>
             </View>
             <Image
@@ -294,11 +283,9 @@ const MarketScreen = () => {
         <View style={styles.njangiContainer}>
           <View style={styles.njangiHeader}>
             <Image source={ICONS.njangi} style={styles.njangiIcon} />
-            <Text style={styles.njangiTitle}>Njangi Box</Text>
+            <Text style={styles.njangiTitle}>{t('market.njangiTitle')}</Text>
           </View>
-          <Text style={styles.njangiSubtitle}>
-            Save small. Grow big. The Mboa-Zen way.
-          </Text>
+          <Text style={styles.njangiSubtitle}>{t('market.njangiSubtitle')}</Text>
 
           <View style={styles.njangiItemsList}>
             {njangiItems.map((item) => {
@@ -317,7 +304,7 @@ const MarketScreen = () => {
                       isDone && styles.njangiItemDone,
                     ]}
                   >
-                    {item.label}
+                    {t(item.labelKey)}
                   </Text>
                 </View>
               );
@@ -334,23 +321,23 @@ const MarketScreen = () => {
               />
             </View>
             <Text style={styles.njangiProgressText}>
-              {todayNjangi.length}/3 today
+              {t('market.njangiProgress').replace('{n}', String(todayNjangi.length))}
             </Text>
           </View>
 
           <Text style={styles.njangiStreak}>
-            {njangiStreak} day{njangiStreak !== 1 ? 's' : ''} njangi streak
+            {t('market.njangiStreak').replace('{n}', String(njangiStreak))}
           </Text>
 
           <View style={styles.njangiSavingsRow}>
-            <Text style={styles.njangiSavingsLabel}>Total saved:</Text>
+            <Text style={styles.njangiSavingsLabel}>{t('market.njangiSaved')}</Text>
             <Text style={styles.njangiSavingsValue}>
               {njangiSavings.toLocaleString()} FCFA
             </Text>
           </View>
 
           <MboaButton
-            title="Save 100 FCFA Today"
+            title={t('market.njangiSaveBtn')}
             onPress={handleSaveNjangi}
             variant="primary"
           />
@@ -359,7 +346,7 @@ const MarketScreen = () => {
         {/* ─── PAYMENT SECTION ──────────────────────────────────────────── */}
         {!isPremium && (
           <View style={styles.paymentContainer}>
-            <Text style={styles.sectionTitle}>Pay with</Text>
+            <Text style={styles.sectionTitle}>{t('market.payWith')}</Text>
 
             <TouchableOpacity
               style={[
@@ -372,8 +359,8 @@ const MarketScreen = () => {
               <View style={styles.paymentLeft}>
                 <Image source={ICONS.payment} style={styles.paymentIconImage} />
                 <View>
-                  <Text style={styles.paymentName}>MTN MoMo</Text>
-                  <Text style={styles.paymentSubtext}>Mobile Money</Text>
+                  <Text style={styles.paymentName}>{t('market.momoName')}</Text>
+                  <Text style={styles.paymentSubtext}>{t('market.momoSubtext')}</Text>
                 </View>
               </View>
               {selectedPayment === 'momo' && (
@@ -406,15 +393,13 @@ const MarketScreen = () => {
             </TouchableOpacity>
 
             <MboaButton
-              title={isProcessing ? 'Processing...' : 'Upgrade Now'}
+              title={isProcessing ? t('market.processing') : t('market.upgradeNow')}
               onPress={handleUpgrade}
               variant="primary"
               disabled={isProcessing}
             />
 
-            <Text style={styles.paymentNote}>
-              Secure payment via MTN MoMo or Orange Money
-            </Text>
+            <Text style={styles.paymentNote}>{t('market.paymentNote')}</Text>
           </View>
         )}
 
@@ -423,13 +408,11 @@ const MarketScreen = () => {
           <View style={styles.sectionTitleRow}>
             <Image source={ICONS.coaches} style={styles.sectionTitleIcon} />
             <Text style={styles.sectionTitle}>
-              {isPremium ? 'Book a Coach' : 'Available Coaches'}
+              {isPremium ? t('market.coachesTitlePremium') : t('market.coachesTitle')}
             </Text>
           </View>
           {!isPremium && (
-            <Text style={styles.coachesSubtext}>
-              Upgrade to premium to book a session
-            </Text>
+            <Text style={styles.coachesSubtext}>{t('market.coachesSubtext')}</Text>
           )}
 
           {COACHES.map((coach) => (
@@ -449,7 +432,7 @@ const MarketScreen = () => {
                 />
                 <View style={styles.coachInfo}>
                   <Text style={styles.coachName}>{coach.name}</Text>
-                  <Text style={styles.coachSpecialty}>{coach.specialty}</Text>
+                  <Text style={styles.coachSpecialty}>{t(coach.specialtyKey)}</Text>
                   <View style={styles.coachMeta}>
                     <View style={styles.coachMetaItem}>
                       <Image source={ICONS.location_pin} style={styles.coachMetaIcon} />
@@ -463,7 +446,7 @@ const MarketScreen = () => {
                 </View>
                 {isPremium && (
                   <MboaButton
-                    title="Book"
+                    title={t('market.bookBtn')}
                     onPress={() => handleBookCoach(coach)}
                     variant="primary"
                   />
