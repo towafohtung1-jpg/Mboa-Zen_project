@@ -19,8 +19,14 @@ import { loadUserState } from './src/utils/storage';
 import { useFonts } from './src/utils/useFonts';
 import { AnimatedLogo } from './src/components/common/AnimatedLogo';
 import { track } from './src/utils/analytics';
+import * as Sentry from "@sentry/react-native";
 
-export default function App() {
+Sentry.init({
+  dsn:"https://10feffa7826e789e0aa144e44ed3ab4c@o4512279658037248.ingest.us.sentry.io/4512282763329536",
+  tracesSampleRate: 1.0,
+});
+
+function App() {
   const [loading, setLoading] = useState(true);
   const [step, setStep] = useState<
     'onboarding' | 'goal' | 'quiz' | 'phone' | 'otp' | 'app'
@@ -142,5 +148,8 @@ export default function App() {
     );
   };
 
-  return <>{renderScreen()}</>;
+  return <>{renderScreen()}</>; 
 }
+
+
+export default Sentry.wrap(App);
