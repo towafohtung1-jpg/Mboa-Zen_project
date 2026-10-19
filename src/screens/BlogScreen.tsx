@@ -1,4 +1,4 @@
-// ─── src/screens/BlogScreen.tsx ─────────────────────────────────────────
+﻿// ─── src/screens/BlogScreen.tsx ─────────────────────────────────────────
 
 import React, { useState, useRef } from 'react';
 import {
@@ -97,7 +97,6 @@ const BlogPostModal = ({
 
             <View style={styles.modalDivider} />
 
-            <Text style={styles.modalContent}>{post.content}</Text>
 
             <View style={{ height: 40 }} />
           </ScrollView>
