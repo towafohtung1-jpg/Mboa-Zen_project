@@ -20,7 +20,6 @@ import { useFonts } from './src/utils/useFonts';
 import { AnimatedLogo } from './src/components/common/AnimatedLogo';
 import { track } from './src/utils/analytics';
 import * as Sentry from "@sentry/react-native";
-import { testSupabaseConnection } from './src/utils/testSupabase';
 
 Sentry.init({
   dsn:"https://10feffa7826e789e0aa144e44ed3ab4c@o4512279658037248.ingest.us.sentry.io/4512282763329536",
@@ -28,7 +27,6 @@ Sentry.init({
 });
 
 function App() {
-    testSupabaseConnection();
   const [loading, setLoading] = useState(true);
   const [step, setStep] = useState<
     'onboarding' | 'goal' | 'quiz' | 'phone' | 'otp' | 'app'
