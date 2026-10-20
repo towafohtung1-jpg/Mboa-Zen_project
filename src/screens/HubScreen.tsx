@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
   Share,
+  Linking,
   Modal,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -1023,6 +1024,16 @@ const HubScreen = () => {
             <Text style={styles.shareSubtitle}>{t('hub.shareSubtitle')}</Text>
             <MboaButton title={t('hub.shareApp')} onPress={handleShare} variant="primary" />
           </View>
+                    {/* ─── LEGAL LINKS ────────────────────────────────────────── */}
+          <View style={styles.legalContainer}>
+            <Text style={styles.legalLink} onPress={() => Linking.openURL('https://mboa-zen.vercel.app/privacy.html')}>
+              Privacy Policy
+            </Text>
+            <Text style={styles.legalBullet}>•</Text>
+            <Text style={styles.legalLink} onPress={() => Linking.openURL('https://mboa-zen.vercel.app/terms.html')}>
+              Terms of Service
+            </Text>
+          </View>
 
           <View style={{ height: 20 }} />
         </View>
@@ -1586,6 +1597,25 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   scrollTopArrow: { fontSize: 24, ...FONTS.bold, color: Colors.cleanWhite },
+    legalContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 24,
+    marginBottom: 10,
+    gap: 10,
+  },
+  legalLink: {
+    fontSize: 12,
+    ...FONTS.medium,
+    color: Colors.textMuted,
+    textDecorationLine: 'underline',
+  },
+  legalBullet: {
+    fontSize: 12,
+    color: Colors.textMuted,
+  },
+
 });
 
 export default HubScreen;
