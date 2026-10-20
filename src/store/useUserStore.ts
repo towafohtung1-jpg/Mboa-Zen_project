@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '../utils/supabase';
 
 const isWeb = typeof window !== 'undefined';
 
@@ -47,6 +48,32 @@ interface AnalyticsEvent {
   props: Record<string, any>;
   ts: number;
 }
+// ─── SUPABASE SYNC HELPER ───────────────────────────────────────────────
+// We use a dummy phone number for now since we haven't wired the real auth yet.
+const DEV_PHONE_NUMBER = '+237600000000';
+
+const syncToCloud = async (state: any) => {
+  try {
+    const { error } = await supabase
+      .from('users')
+      .update({
+        archetype: state.archetype,
+        is_premium: state.isPremium,
+        water_intake: state.waterIntake,
+        water_goal: state.waterGoal,
+        harmony_score: state.harmonyScore,
+      })
+      .eq('phone', DEV_PHONE_NUMBER);
+
+    if (error) {
+      console.warn('Supabase sync error:', error.message);
+    } else {
+      console.log('☁️ Synced to cloud');
+    }
+  } catch (err) {
+    console.warn('Supabase sync failed:', err);
+  }
+};
 
 interface UserState {
   archetype: string | null;
@@ -195,15 +222,20 @@ export const useUserStore = create<UserState>()(
       waterHistory: {},
       lastWaterLogDate: null,
 
-      setWaterIntake: (amount) => {
+            setWaterIntake: (amount) => {
         const { waterGoal, waterHistory } = get();
         const capped = Math.min(Math.max(amount, 0), waterGoal);
         const today = getTodayStr();
         set({
           waterIntake: capped,
           lastWaterLogDate: today,
-          waterHistory: { ...waterHistory, [today]: capped },
+          waterHistory: {
+            ...waterHistory,
+            [today]: capped,
+          },
         });
+        // 🔥 Sync to cloud in the background
+        syncToCloud(get());
       },
 
       syncWaterForToday: () => {
