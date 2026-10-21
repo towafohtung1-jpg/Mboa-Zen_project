@@ -54,7 +54,12 @@ const DEV_PHONE_NUMBER = '+237600000000';
 
 const syncToCloud = async (state: any) => {
   try {
-    const { error } = await supabase
+    // Wrap in a Promise.race with a 3-second timeout
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Sync timeout')), 3000)
+    );
+
+    const syncPromise = supabase
       .from('users')
       .update({
         archetype: state.archetype,
@@ -65,13 +70,20 @@ const syncToCloud = async (state: any) => {
       })
       .eq('phone', DEV_PHONE_NUMBER);
 
+    const { error } = await Promise.race([syncPromise, timeoutPromise]) as any;
+
     if (error) {
       console.warn('Supabase sync error:', error.message);
     } else {
       console.log('☁️ Synced to cloud');
     }
-  } catch (err) {
-    console.warn('Supabase sync failed:', err);
+  } catch (err: any) {
+    // 🔇 Silent catch: don't crash the app if the sync fails
+    if (err.message === 'Sync timeout') {
+      console.warn('⚠️ Cloud sync timed out (ignored)');
+    } else {
+      console.warn('Supabase sync failed (ignored):', err);
+    }
   }
 };
 
