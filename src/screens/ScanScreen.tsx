@@ -40,6 +40,7 @@ const ScanScreen = () => {
     const w = parseFloat(weight);
     const h = parseFloat(height);
     const wc = parseFloat(waist);
+    const ageNum = parseFloat(age);
 
     if (!w || !h) {
       Alert.alert(t('scan.alertMissingTitle'), t('scan.alertMissingBody'));
@@ -55,8 +56,15 @@ const ScanScreen = () => {
       Alert.alert(t('scan.alertHeightTitle'), t('scan.alertHeightBody'));
       return;
     }
-
-    const heightInMeters = h / 100;
+        if (ageNum >= 18 && h < 120) {
+      Alert.alert(
+        'Invalid Height',
+        'An adult cannot be under 120cm tall. Please check your height (e.g., 165).'
+      );
+      return;
+    }
+    // If the user types 1.52, use it as meters. If they type 152, divide by 100.
+    const heightInMeters = h > 3 ? h / 100 : h;
     const bmi = w / (heightInMeters * heightInMeters);
 
     let bmiCategory = '';
