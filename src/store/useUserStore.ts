@@ -7,9 +7,6 @@ import { supabase } from '../utils/supabase';
 const isWeb = typeof window !== 'undefined';
 
 // ─── WEB STORAGE ADAPTER ────────────────────────────────────────────────
-// IMPORTANT: Zustand's createJSONStorage expects getItem to return the raw
-// serialized string (or null). It also passes already-serialized strings
-// to setItem. Do NOT JSON.parse / JSON.stringify here.
 const webStorage = {
   getItem: async (key: string): Promise<string | null> => {
     try {
@@ -39,22 +36,11 @@ const getDateStrOffset = (offsetDays: number) => {
   return d.toISOString().split('T')[0];
 };
 
-// ─── TYPES ──────────────────────────────────────────────────────────────
-type CheckInKey = 'hydration' | 'nutrition' | 'training';
-type NjangiItem = 'water' | 'food' | 'move';
-
-interface AnalyticsEvent {
-  event: string;
-  props: Record<string, any>;
-  ts: number;
-}
 // ─── SUPABASE SYNC HELPER ───────────────────────────────────────────────
-// We use a dummy phone number for now since we haven't wired the real auth yet.
 const DEV_PHONE_NUMBER = '+237600000000';
 
 const syncToCloud = async (state: any) => {
   try {
-    // Wrap in a Promise.race with a 3-second timeout
     const timeoutPromise = new Promise((_, reject) => 
       setTimeout(() => reject(new Error('Sync timeout')), 3000)
     );
@@ -78,14 +64,21 @@ const syncToCloud = async (state: any) => {
       console.log('☁️ Synced to cloud');
     }
   } catch (err: any) {
-    // 🔇 Silent catch: don't crash the app if the sync fails
-    if (err.message === 'Sync timeout') {
-      console.warn('⚠️ Cloud sync timed out (ignored)');
-    } else {
+    if (err.message !== 'Sync timeout') {
       console.warn('Supabase sync failed (ignored):', err);
     }
   }
 };
+
+// ─── TYPES ──────────────────────────────────────────────────────────────
+type CheckInKey = 'hydration' | 'nutrition' | 'training';
+type NjangiItem = 'water' | 'food' | 'move';
+
+interface AnalyticsEvent {
+  event: string;
+  props: Record<string, any>;
+  ts: number;
+}
 
 interface UserState {
   archetype: string | null;
@@ -107,7 +100,6 @@ interface UserState {
   lastCheckinDate: string | null;
   setLastCheckinDate: (date: string) => void;
   resetCheckIns: () => void;
-  /** Restore today's checkIns from persisted history. Call on app mount. */
   rehydrateCheckInsForToday: () => void;
 
   // Water tracking
@@ -166,9 +158,15 @@ export const useUserStore = create<UserState>()(
       archetype: null,
       phone: null,
       isPremium: false,
-      setArchetype: (archetype) => set({ archetype }),
+      setArchetype: (archetype) => {
+        set({ archetype });
+        syncToCloud(get());
+      },
       setPhone: (phone) => set({ phone }),
-      setIsPremium: (isPremium) => set({ isPremium }),
+      setIsPremium: (isPremium) => {
+        set({ isPremium });
+        syncToCloud(get());
+      },
 
       // ─── Check-ins ───────────────────────────────────────────────────
       checkIns: { hydration: false, nutrition: false, training: false },
@@ -188,7 +186,6 @@ export const useUserStore = create<UserState>()(
         const score = Math.round((completed / 3) * 100);
 
         const existing = checkInHistory[today];
-        // Guard: don't overwrite a real log with an all-false log.
         if (
           existing &&
           typeof existing === 'object' &&
@@ -204,6 +201,8 @@ export const useUserStore = create<UserState>()(
           },
           harmonyScore: score,
         });
+
+        syncToCloud(get());
       },
 
       lastCheckinDate: null,
@@ -234,19 +233,15 @@ export const useUserStore = create<UserState>()(
       waterHistory: {},
       lastWaterLogDate: null,
 
-            setWaterIntake: (amount) => {
+      setWaterIntake: (amount) => {
         const { waterGoal, waterHistory } = get();
         const capped = Math.min(Math.max(amount, 0), waterGoal);
         const today = getTodayStr();
         set({
           waterIntake: capped,
           lastWaterLogDate: today,
-          waterHistory: {
-            ...waterHistory,
-            [today]: capped,
-          },
+          waterHistory: { ...waterHistory, [today]: capped },
         });
-        // 🔥 Sync to cloud in the background
         syncToCloud(get());
       },
 
@@ -494,7 +489,7 @@ export const useUserStore = create<UserState>()(
         archetype: state.archetype,
         phone: state.phone,
         isPremium: state.isPremium,
-        checkIns: state.checkIns, // ✅ now persisted
+        checkIns: state.checkIns, // ✅ persisted
         checkInHistory: state.checkInHistory,
         harmonyScore: state.harmonyScore,
         lastCheckinDate: state.lastCheckinDate,
